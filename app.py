@@ -998,36 +998,24 @@ if st.session_state.current_view == "ky_mon":
                                     st.markdown(f"**🔗 {can_thien}/{can_dia}:** {combination_data.get('Luận_Giải', 'Chưa có nội dung')}")
                                     st.caption(f"Cát/Hung: {combination_data.get('Cát_Hung', 'Bình')}")
                                 with col_can_2:
+                                    show_can_exp = False
                                     if 'gemini_helper' in st.session_state:
-                                        if st.button(f"🤖 Giải thích {can_thien}/{can_dia}", key=f"ai_can_{palace_num}_{can_thien}_{can_dia}"):
-                                            with st.spinner(f"AI đang giải thích về tổ hợp {can_thien}/{can_dia}..."):
-                                                explanation = st.session_state.gemini_helper.explain_element('stem', f"{can_thien}/{can_dia}")
-                                                st.info(explanation)
+                                        if st.button(f"🔮 Giải Thích", key=f"ai_can_{palace_num}_{can_thien}_{can_dia}", use_container_width=True):
+                                            show_can_exp = True
+                                
+                                # Move explanation out of columns for full width
+                                if show_can_exp:
+                                    with st.spinner(f"AI đang phân giải tổ hợp {can_thien}/{can_dia}..."):
+                                        explanation = st.session_state.gemini_helper.explain_element('stem', f"{can_thien}/{can_dia}")
+                                        st.markdown(f"""
+                                        <div class="interpret-box">
+                                            <div class="interpret-title">📖 Luận Giải Cặp Can: {can_thien}/{can_dia}</div>
+                                            <div style="font-size: 15px; line-height: 1.6; color: #1e293b;">{explanation}</div>
+                                        </div>
+                                        """, unsafe_allow_html=True)
                             
-                            # AI Analysis Button
-                            if 'gemini_helper' in st.session_state:
-                                st.markdown("---")
-                                if st.button(f"🤖 Hỏi AI về Cung {palace_num}", key=f"ai_palace_{palace_num}", type="primary"):
-                                    with st.spinner("🤖 AI đang phân tích..."):
-                                        palace_data = {
-                                            'num': palace_num,
-                                            'qua': QUAI_TUONG.get(palace_num, 'N/A'),
-                                            'hanh': hanh,
-                                            'star': sao,
-                                            'door': cua,
-                                            'deity': than,
-                                            'can_thien': can_thien,
-                                            'can_dia': can_dia
-                                        }
-                                        try:
-                                            analysis = st.session_state.gemini_helper.analyze_palace(
-                                                palace_data,
-                                                selected_topic
-                                            )
-                                            st.markdown("### 🤖 Phân Tích AI")
-                                            st.markdown(analysis)
-                                        except Exception as e:
-                                            st.error(f"❌ Lỗi: {str(e)}")
+                            st.markdown("---")
+                            # End of Palace Details
 
         
         # Display Dụng Thần info

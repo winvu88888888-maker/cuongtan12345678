@@ -1231,7 +1231,7 @@ if st.session_state.current_view == "ky_mon":
             if 'gemini_helper' in st.session_state:
                 with st.container():
                     st.markdown("### 🎯 KẾT LUẬN TỔNG HỢP TỪ AI (Dụng Thần)")
-                    if st.button("🚀 Bắt Đầu Luận Giải Chuyên Sâu", type="primary", key="ai_final_report_btn"):
+                    if st.button("🔴 ⭐ BẮT ĐẦU LUẬN GIẢI CHUYÊN SÂU (ƯU TIÊN ĐỌC TRƯỚC) ⭐ 🔴", type="primary", key="ai_final_report_btn", use_container_width=True):
                         with st.spinner("🤖 AI đang thực hiện luận giải trọng tâm..."):
                             try:
                                 # Get Dụng Thần info from the best available source

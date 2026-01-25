@@ -8,6 +8,18 @@ import os
 import requests
 import json
 
+CUNG_NGU_HANH = {
+    1: "Thủy",
+    2: "Thổ",
+    3: "Mộc",
+    4: "Mộc",
+    5: "Thổ",
+    6: "Kim",
+    7: "Kim",
+    8: "Thổ",
+    9: "Hỏa"
+}
+
 class GeminiQMDGHelper:
     """Helper class with context awareness for QMDG analysis"""
     
@@ -200,34 +212,51 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
     
     def comprehensive_analysis(self, chart_data, topic, dung_than_info=None, topic_hints=""):
         """
-        Multi-Factor Relational Analysis: Comparing Buyer, Price, Seller, etc.
+        Laser-Focused Analysis: Interaction between specific Dụng Thần palaces.
         """
         # Update context
         self.update_context(
             topic=topic,
             chart_data=chart_data,
             dung_than=dung_than_info or [],
-            last_action="Luận giải trọng tâm Dụng Thần (Đa tầng)"
+            last_action="Luận giải đa tầng Laser-Focused"
         )
         
-        # 1. SCAN FOR CORE ACTORS
         can_ngay = chart_data.get('can_ngay', 'N/A')
         can_gio = chart_data.get('can_gio', 'N/A')
         truc_phu = chart_data.get('truc_phu_ten', 'N/A')
         truc_su = chart_data.get('truc_su_ten', 'N/A')
+        khong_vong = chart_data.get('khong_vong', [])
         
-        self_palace = "?"
-        dung_than_details = []
-        process_palace = "?"
+        # 1. GROUP DATA BY PALACE
+        palaces_of_interest = {} # {palace_num: {info}}
         
+        def add_to_poi(p_num, label):
+            if p_num not in palaces_of_interest:
+                palaces_of_interest[p_num] = {
+                    'labels': [],
+                    'star': chart_data.get('thien_ban', {}).get(p_num, 'N/A'),
+                    'door': chart_data.get('nhan_ban', {}).get(p_num, 'N/A'),
+                    'deity': chart_data.get('than_ban', {}).get(p_num, 'N/A'),
+                    'can_thien': chart_data.get('can_thien_ban', {}).get(p_num, 'N/A'),
+                    'can_dia': chart_data.get('dia_can', {}).get(p_num, 'N/A'),
+                    'hanh': CUNG_NGU_HANH.get(p_num, 'N/A'),
+                    'void': p_num in khong_vong
+                }
+            if label not in palaces_of_interest[p_num]['labels']:
+                palaces_of_interest[p_num]['labels'].append(label)
+
+        # Scan all palaces for Useful Gods
         for i in range(1, 10):
-            # Locate Self (Seller/Subject)
+            # Check Self (Can Ngay)
             if chart_data.get('can_thien_ban', {}).get(i) == can_ngay:
-                self_palace = str(i)
-            # Locate Outcome (Outcome/Timing)
+                add_to_poi(i, f"Bản Thân ({can_ngay})")
+            
+            # Check Outcome (Can Gio)
             if chart_data.get('can_thien_ban', {}).get(i) == can_gio:
-                process_palace = str(i)
-            # Locate Topic Factors (Dụng Thần)
+                add_to_poi(i, f"Đối Tượng/Kết Quả ({can_gio})")
+            
+            # Check other Dụng Thần
             if dung_than_info:
                 for dt in dung_than_info:
                     door_val = chart_data.get('nhan_ban', {}).get(i)
@@ -236,39 +265,41 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
                         chart_data.get('than_ban', {}).get(i) == dt or 
                         chart_data.get('can_thien_ban', {}).get(i) == dt or
                         (dt.endswith(" Môn") and door_val and door_val in dt)):
-                        
-                        detail = {
-                            'dt': dt,
-                            'palace': i,
-                            'star': chart_data.get('thien_ban', {}).get(i),
-                            'door': door_val,
-                            'deity': chart_data.get('than_ban', {}).get(i),
-                            'void': i in chart_data.get('khong_vong', [])
-                        }
-                        dung_than_details.append(detail)
+                        add_to_poi(i, dt)
         
         # 2. CONTEXTUAL PROMPT
-        prompt = f"""{self.get_context_prompt()}Bạn là bậc thầy Kỳ Môn Độn Giáp. Hãy thực hiện LUẬN GIẢI ĐA TẦNG cho chủ đề: **{topic}**.
+        poi_desc = []
+        for p_num, info in palaces_of_interest.items():
+            labels_str = ", ".join(info['labels'])
+            void_str = " [KHÔNG VONG]" if info['void'] else ""
+            desc = (f"Cung {p_num} ({info['hanh']}): Chứa {labels_str}. "
+                    f"Trận thế: {info['star']} - {info['door']} - {info['deity']}. "
+                    f"Cặp Can: {info['can_thien']}/{info['can_dia']}{void_str}")
+            poi_desc.append(desc)
 
-**NGUYÊN TẮC LUẬN GIẢI:**
-- CHỈ phân tích các cung có Dụng Thần hoặc Bản Thân. KHÔNG liệt kê các cung khác.
-- SO SÁNH các Dụng Thần với nhau (ví dụ: Người mua so với Giá bán, hoặc Công việc so với Tiền bạc).
-- SỬ DỤNG gợi ý sau để định hướng: "{topic_hints}"
+        prompt = f"""{self.get_context_prompt()}Bạn là bậc thầy Kỳ Môn Độn Giáp cao cấp. Hãy thực hiện LUẬN GIẢI CHUYÊN SÂU ĐA TẦNG cho chủ đề: **{topic}**.
 
-**THÔNG TIN BÀN CỜ:**
-1. **Bản Thân (Can Ngày):** Cung {self_palace} (Sao {chart_data.get('thien_ban', {}).get(int(self_palace) if self_palace.isdigit() else 1)}, Môn {chart_data.get('nhan_ban', {}).get(int(self_palace) if self_palace.isdigit() else 1)}).
-2. **Các Nhân Tố Dụng Thần ({topic}):** 
-   {chr(10).join([f"- {d['dt']} tại Cung {d['palace']} (Môn {d['door']}, Thần {d['deity']}{', KHÔNG VONG' if d['void'] else ''})" for d in dung_than_details])}
-3. **Diễn biến (Can Giờ):** Cung {process_palace}.
-4. **Cơ cấu lãnh đạo:** {truc_phu} (Xu thế), {truc_su} (Chấp hành).
+**NGUYÊN TẮC LUẬN GIẢI BẮT BUỘC:**
+1. **Phân tích Nội Tại (Quan trọng)**: Trước khi so sánh, hãy đánh giá "sức mạnh nội tại" của từng cung dưới đây. Xem Sao/Môn/Thần bên trong cung đó có đang "đồng lòng" hay "xung đột" (ví dụ: Môn khắc Cung, hoặc Thần trợ Tinh).
+2. **Xác định vai trò**: Dựa vào nhãn Dụng Thần (ví dụ: Khai Môn, Can Giờ...), hãy chỉ rõ cung đó đại diện cho ai/cái gì trong chủ đề "{topic}".
+3. **Kết luận logic**: Một cung mạnh sinh cho bạn thì rất tốt, nhưng một cung yếu sinh cho bạn thì chỉ là hữu danh vô thực. Hãy đánh giá kỹ điều này.
 
-**YÊU CẦU NỘI DUNG (SÚC TÍCH):**
+**DỮ LIỆU CÁC CUNG TRỌNG TÂM:**
+{chr(10).join(poi_desc)}
 
-- **PHẦN 1: TƯƠNG QUAN DỤNG THẦN (Cốt lõi):** So sánh quan hệ giữa các nhân tố trên. Ví dụ: Dụng thần Người mua có phối hợp với Dụng thần Giá bán không? Cả hai có Sinh cho Bản thân không?
-- **PHẦN 2: KẾT LUẬN & CHIẾN THUẬT:** Dựa trên gợi ý "{topic_hints}", hãy cho biết kết quả là thắng hay bại? Phải làm gì để chốt hạ vấn đề?
-- **PHẦN 3: ỨNG KỲ:** Thời điểm chính xác (Dựa trên Cung Can Giờ {process_palace}).
+**THẾ TRẬN TỔNG THỂ:**
+- Xu thế (Trực Phù): {truc_phu}
+- Chấp hành (Trực Sử): {truc_su}
+- Gợi ý định hướng: "{topic_hints}"
 
-Trả lời sắc bén, lạnh lùng, tập trung 100% vào việc ra quyết định."""
+**NỘI DUNG BÁO CÁO (SÚC TÍCH - SẮC BÉN):**
+
+- **PHẦN 1: ĐÁNH GIÁ NỘI TẠI CUNG**: Mỗi cung được liệt kê ở trên đang Mạnh hay Yếu? Sự vận hành bên trong cung đó báo hiệu điều gì cho nhân tố nó đại diện?
+- **PHẦN 2: TƯƠNG TÁC ĐA DIỆN**: Sự tương tác giữa các cung này (Sinh/Khắc). Bản thân bạn có nắm được "thiên thời, địa lợi" từ các cung Dụng Thần không?
+- **PHẦN 3: PHÁN QUYẾT & CHIẾN THUẬT**: Kết quả cuối cùng là gì? Dựa trên bối cảnh "{topic_hints}", bạn cần hành động thế nào để thắng thế?
+- **PHẦN 4: ỨNG KỲ**: Thời điểm mấu chốt.
+
+Trả lời bằng phong thái chuyên gia, ngôn ngữ sắc bén, tập trung hoàn toàn vào việc giải quyết vấn đề."""
 
         try:
             return self._call_ai(prompt)

@@ -149,6 +149,7 @@ st.set_page_config(
 # PREMIUM CUSTOM CSS
 # ======================================================================
 st.markdown("""
+<style>
     /* Glassmorphism & 3D Wow Factor */
     .stApp {
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -277,76 +278,6 @@ st.markdown("""
     
     .animated-panel {
         animation: fadeIn 0.6s ease-out forwards;
-    }
-    
-    .animated-panel {
-        animation: fadeIn 0.6s ease-out forwards;
-    }
-
-    /* 3D Palace Card Styles */
-    .palace-3d {
-        perspective: 1200px;
-        margin-bottom: 30px;
-    }
-    
-    .palace-inner {
-        transform-style: preserve-3d;
-        transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s;
-        border-radius: 16px;
-        position: relative;
-    }
-    
-    .palace-inner:before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        border-radius: 16px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
-        z-index: 0;
-        backdrop-filter: blur(5px);
-    }
-    
-    .palace-inner:hover {
-        transform: rotateX(5deg) rotateY(5deg) scale(1.03) translateY(-10px);
-        box-shadow: 20px 20px 40px rgba(0,0,0,0.3), -5px -5px 15px rgba(255,255,255,0.5) !important;
-        z-index: 10;
-    }
-    
-    .element-icon-3d {
-        filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
-        transition: transform 0.4s;
-    }
-    
-    .palace-inner:hover .element-icon-3d {
-        transform: scale(1.2) rotate(10deg);
-    }
-    
-    /* Interpret Box for better readability */
-    .interpret-box {
-        background: #f8fafc;
-        border-radius: 12px;
-        border: 2px solid #e2e8f0;
-        padding: 20px;
-        margin: 15px 0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        max-height: 500px;
-        overflow-y: auto;
-        font-size: 15px;
-        line-height: 1.7;
-        color: #1e293b;
-        width: 100% !important;
-        box-sizing: border-box;
-    }
-    
-    .interpret-title {
-        font-weight: 800;
-        color: #334155;
-        border-bottom: 2px solid #cbd5e1;
-        padding-bottom: 8px;
-        margin-bottom: 12px;
-        text-transform: uppercase;
-        font-size: 13px;
-        letter-spacing: 1px;
     }
     
     /* Dụng Thần info box */

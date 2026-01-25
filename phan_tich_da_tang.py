@@ -43,7 +43,7 @@ def phan_tich_tuong_tac_giua_cac_cung(cung1_idx, cung2_idx):
 
 def phan_tich_yeu_to_thoi_gian(hanh, mua):
     """Đánh giá ngũ hành theo mùa (Vượng, Tướng, Hưu, Tù, Tử)."""
-    return AN_HUONG_MUA.get(mua, {}).get(hanh, "Bình")
+    return ANH_HUONG_MUA.get(mua, {}).get(hanh, "Bình")
 
 def tinh_diem_tong_hop(analysis_results):
     """Tính toán điểm số cuối cùng dựa trên trọng số."""

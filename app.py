@@ -192,43 +192,58 @@ st.markdown("""
         background-color: white;
     }
 
-    /* Grid Layout & Text Clarity */
+    /* Grid Layout & Precision Alignment */
     .palace-grid-container {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 1fr 1fr 1fr;
-        height: 200px;
+        height: 220px;
         position: relative;
-        padding: 5px 15px;
+        padding: 2px 10px; /* Tight padding for edge alignment */
         margin-top: 5px;
     }
 
     .grid-cell {
         display: flex;
-        align-items: center;
-        justify-content: center;
         font-weight: 900;
-        font-size: 1.8rem; /* Scale everything up! */
-        text-shadow: 0 0 12px white, 0 0 6px white;
+        font-size: 1.85rem;
+        text-shadow: 0 0 12px white, 0 0 8px white, 0 0 4px white;
         z-index: 2;
-        transition: all 0.2s;
     }
 
-    /* Position Mappings with Ultra Sizes */
-    .top-right { grid-area: 1 / 3 / 2 / 4; justify-content: flex-end; align-items: flex-start; font-size: 1.8rem; }
-    .mid-left { grid-area: 2 / 1 / 3 / 2; justify-content: flex-start; font-size: 1.8rem; }
+    /* Precision Alignment: Sát lề (Flush to Edges) */
+    .top-right { 
+        grid-area: 1 / 3 / 2 / 4; 
+        justify-content: flex-end; 
+        align-self: start; 
+        text-align: right;
+    }
+    .mid-left { 
+        grid-area: 2 / 1 / 3 / 2; 
+        justify-content: flex-start; 
+        align-self: center; 
+        text-align: left;
+    }
     .center-deity { 
         grid-area: 2 / 2 / 3 / 3; 
-        font-size: 2.2rem !important; 
+        justify-content: center;
+        align-self: center;
+        font-size: 2.3rem !important; 
         color: #1e293b;
         filter: drop-shadow(0 0 10px rgba(255,255,255,1));
     }
-    .bot-center { grid-area: 3 / 2 / 4 / 3; align-items: flex-end; font-size: 1.9rem; }
+    .bot-center { 
+        grid-area: 3 / 2 / 4 / 3; 
+        justify-content: center;
+        align-self: flex-end; 
+        text-align: center;
+    }
     .bot-right { 
         grid-area: 3 / 3 / 4 / 4; 
         justify-content: flex-end; 
-        align-items: flex-end; 
-        font-size: 2.3rem; 
+        align-self: flex-end; 
+        font-size: 2.5rem; 
+        text-align: right;
     }
 
     .palace-header-row {
@@ -820,12 +835,20 @@ if st.session_state.current_view == "ky_mon":
                         c_cua = get_qmdg_color(cua, "door")
                         c_than = get_qmdg_color(than, "deity")
                         c_thien = get_qmdg_color(can_thien, "stem")
-                        c_dia = get_qmdg_color(can_dia, "stem")
+                        # Handle Palace 5 (Trung Cung) specific logic for Heaven Plate
+                        if palace_num == 5:
+                            # Central Palace Heaven Plate is often its original Earth Plate or follows the Leader
+                            if can_thien == "N/A":
+                                can_thien = can_dia # Showing Earth Plate as a reference for "What is Heaven Plate in 5"
 
-                        p_full_name = f"{palace_num} {QUAI_TUONG.get(palace_num, '')}" if palace_num != 5 else "5 Trung Cung"
+                        # Status Badge
                         status_badge = f'<span class="status-badge" style="background: {strength_color}; color: white;">{strength}</span>'
 
-                        # --- RENDER PALACE CARD (ULTRA-BOLD & MAX VISIBILITY) ---
+                        # Palace Name & Alignment Refinement
+                        p_full_name = f"{palace_num} {QUAI_TUONG.get(palace_num, '')}"
+                        if palace_num == 5: p_full_name = "5 Trung Cung"
+
+                        # --- RENDER PALACE CARD (MAX ALIGNMENT & CLARITY) ---
                         palace_html = f"""<div class="palace-3d animated-panel">
 <div class="palace-inner {'dung-than-active' if has_dung_than else ''}" style="{bg_style} border: {border_width} solid {element_configs['border']}; min-height: 280px;">
 <div class="glass-overlay"></div>

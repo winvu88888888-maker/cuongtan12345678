@@ -762,7 +762,9 @@ if st.session_state.current_view == "ky_mon":
                         has_dung_than = any(dt in [sao, cua, than, can_thien, can_dia] for dt in dung_than_list)
                         
                         # Determine Strength based on month
-                        month = selected_datetime.month
+                        from datetime import datetime
+                        now_dt = datetime.now()
+                        month = now_dt.month
                         season_map = {1:"Xuân", 2:"Xuân", 3:"Xuân", 4:"Hạ", 5:"Hạ", 6:"Hạ", 7:"Thu", 8:"Thu", 9:"Thu", 10:"Đông", 11:"Đông", 12:"Đông"}
                         current_season = season_map.get(month, "Xuân")
                         strength = phan_tich_yeu_to_thoi_gian(hanh, current_season) if USE_MULTI_LAYER_ANALYSIS else "Bình"
@@ -780,7 +782,7 @@ if st.session_state.current_view == "ky_mon":
                             "Thủy": {"border": "#3b82f6", "icon": "💧"}
                         }.get(hanh, {"border": "#475569", "icon": "✨"})
 
-                        border_width = "3px" if has_dung_than else "1px"
+                        border_width = "4px" if has_dung_than else "1px"
 
                         # --- NEW: Auspicious Color Asset Mapping ---
                         def get_qmdg_color(name, category):
@@ -813,37 +815,39 @@ if st.session_state.current_view == "ky_mon":
                         p_full_name = f"{palace_num} {p_name}" if palace_num != 5 else "5 Trung Cung"
 
                         # --- RENDER PALACE CARD ---
-                        st.markdown(f"""
-                        <div class="palace-3d animated-panel">
-                            <div class="palace-inner {'dung-than-active' if has_dung_than else ''}" style="border: {border_width} solid {element_configs['border']}; min-height: 220px;">
-                                <div class="palace-header-row">
-                                    <span class="palace-title">{p_full_name}</span>
-                                    {status_badge}
-                                </div>
-                                
-                                <div class="palace-grid-container">
-                                    <!-- Top Right: Thiên Bàn -->
-                                    <div class="grid-cell top-right" style="color: {c_thien};">{can_thien}</div>
+                        import textwrap
+                        palace_html = textwrap.dedent(f"""
+                            <div class="palace-3d animated-panel">
+                                <div class="palace-inner {'dung-than-active' if has_dung_than else ''}" style="border: {border_width} solid {element_configs['border']}; min-height: 220px;">
+                                    <div class="palace-header-row">
+                                        <span class="palace-title">{p_full_name}</span>
+                                        {status_badge}
+                                    </div>
                                     
-                                    <!-- Middle Left: Tinh -->
-                                    <div class="grid-cell mid-left" style="color: {c_sao};">{sao.replace('Thiên ', '')}</div>
-                                    
-                                    <!-- Center: Thần (CHỮ TO) -->
-                                    <div class="grid-cell center-deity" style="color: {c_than};">{than}</div>
-                                    
-                                    <!-- Bottom Center: Môn -->
-                                    <div class="grid-cell bot-center" style="color: {c_cua}; font-size: 1.1rem;">{cua.replace(' Môn', '')}</div>
-                                    
-                                    <!-- Bottom Right: Địa Bàn (ĐẬM TO) -->
-                                    <div class="grid-cell bot-right" style="color: {c_dia}; font-weight: 900; font-size: 1.8rem;">{can_dia}</div>
-                                </div>
-                                <div class="palace-footer-markers">
-                                    {f'<span style="color:#64748b; font-size:0.7rem;">⚪ Không Vong</span>' if palace_num in chart['khong_vong'] else ''}
-                                    {f'<span style="color:#f59e0b; font-size:0.7rem;">🐎 Dịch Mã</span>' if palace_num == chart['dich_ma'] else ''}
+                                    <div class="palace-grid-container">
+                                        <!-- Top Right: Thiên Bàn -->
+                                        <div class="grid-cell top-right" style="color: {c_thien};">{can_thien}</div>
+                                        
+                                        <!-- Middle Left: Tinh -->
+                                        <div class="grid-cell mid-left" style="color: {c_sao};">{sao.replace('Thiên ', '')}</div>
+                                        
+                                        <!-- Center: Thần (CHỮ TO) -->
+                                        <div class="grid-cell center-deity" style="color: {c_than};">{than}</div>
+                                        
+                                        <!-- Bottom Center: Môn -->
+                                        <div class="grid-cell bot-center" style="color: {c_cua}; font-size: 1.1rem;">{cua.replace(' Môn', '')}</div>
+                                        
+                                        <!-- Bottom Right: Địa Bàn (ĐẬM TO) -->
+                                        <div class="grid-cell bot-right" style="color: {c_dia}; font-weight: 900; font-size: 1.8rem;">{can_dia}</div>
+                                    </div>
+                                    <div class="palace-footer-markers">
+                                        {f'<span style="color:#64748b; font-size:0.7rem;">⚪ Không Vong</span>' if palace_num in chart['khong_vong'] else ''}
+                                        {f'<span style="color:#f59e0b; font-size:0.7rem;">🐎 Dịch Mã</span>' if palace_num == chart['dich_ma'] else ''}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        """)
+                        st.markdown(palace_html, unsafe_allow_html=True)
 
                         
                         # Expander for detailed analysis

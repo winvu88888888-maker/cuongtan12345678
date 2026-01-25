@@ -762,7 +762,6 @@ if st.session_state.current_view == "ky_mon":
                         has_dung_than = any(dt in [sao, cua, than, can_thien, can_dia] for dt in dung_than_list)
                         
                         # Determine Strength based on month
-                        from datetime import datetime
                         now_dt = datetime.now()
                         month = now_dt.month
                         season_map = {1:"Xuân", 2:"Xuân", 3:"Xuân", 4:"Hạ", 5:"Hạ", 6:"Hạ", 7:"Thu", 8:"Thu", 9:"Thu", 10:"Đông", 11:"Đông", 12:"Đông"}
@@ -773,7 +772,11 @@ if st.session_state.current_view == "ky_mon":
                             "Vượng": "#ef4444", "Tướng": "#f59e0b", "Hưu": "#10b981", "Tù": "#3b82f6", "Tử": "#64748b"
                         }.get(strength, "#475569")
 
-                        # Element Styles & Backgrounds
+                        # Get door properties for analysis (Required for NameError fix)
+                        door_data = KY_MON_DATA["DU_LIEU_DUNG_THAN_PHU_TRO"]["BAT_MON"].get(cua if " Môn" in cua else cua + " Môn", {})
+                        cat_hung = door_data.get("Cát_Hung", "Bình")
+
+                        # Element Styles
                         element_configs = {
                             "Mộc": {"border": "#10b981", "icon": "🌿"},
                             "Hỏa": {"border": "#ef4444", "icon": "🔥"},
@@ -784,69 +787,43 @@ if st.session_state.current_view == "ky_mon":
 
                         border_width = "4px" if has_dung_than else "1px"
 
-                        # --- NEW: Auspicious Color Asset Mapping ---
+                        # Color Mapping
                         def get_qmdg_color(name, category):
-                            """Determine color: Red (#ff4d4d) for Good, Black (#1e293b) for others."""
                             good_stars = ["Thiên Phụ", "Thiên Nhậm", "Thiên Tâm", "Thiên Cầm"]
                             good_doors = ["Khai", "Hưu", "Sinh", "Khai Môn", "Hưu Môn", "Sinh Môn"]
                             good_deities = ["Trực Phù", "Thái Âm", "Lục Hợp", "Cửu Địa", "Cửu Thiên"]
                             good_stems = ["Giáp", "Ất", "Bính", "Đinh", "Mậu"]
-                            
                             is_good = False
                             if category == "star": is_good = any(gs in name for gs in good_stars)
                             elif category == "door": is_good = any(gd in name for gd in good_doors)
                             elif category == "deity": is_good = any(gt in name for gt in good_deities)
                             elif category == "stem": is_good = any(gs in name for gs in good_stems)
-                            
                             return "#ff4d4d" if is_good else "#1e293b"
 
-                        # Extract and Colorize
                         c_sao = get_qmdg_color(sao, "star")
                         c_cua = get_qmdg_color(cua, "door")
                         c_than = get_qmdg_color(than, "deity")
                         c_thien = get_qmdg_color(can_thien, "stem")
                         c_dia = get_qmdg_color(can_dia, "stem")
 
-                        # Status Badge
+                        p_full_name = f"{palace_num} {QUAI_TUONG.get(palace_num, '')}" if palace_num != 5 else "5 Trung Cung"
                         status_badge = f'<span class="status-badge" style="background: {strength_color}; color: white;">{strength}</span>'
 
-                        # Palace Name Header
-                        p_name = QUAI_TUONG.get(palace_num, f"Cung {palace_num}")
-                        p_full_name = f"{palace_num} {p_name}" if palace_num != 5 else "5 Trung Cung"
-
-                        # --- RENDER PALACE CARD ---
-                        import textwrap
-                        palace_html = textwrap.dedent(f"""
-                            <div class="palace-3d animated-panel">
-                                <div class="palace-inner {'dung-than-active' if has_dung_than else ''}" style="border: {border_width} solid {element_configs['border']}; min-height: 220px;">
-                                    <div class="palace-header-row">
-                                        <span class="palace-title">{p_full_name}</span>
-                                        {status_badge}
-                                    </div>
-                                    
-                                    <div class="palace-grid-container">
-                                        <!-- Top Right: Thiên Bàn -->
-                                        <div class="grid-cell top-right" style="color: {c_thien};">{can_thien}</div>
-                                        
-                                        <!-- Middle Left: Tinh -->
-                                        <div class="grid-cell mid-left" style="color: {c_sao};">{sao.replace('Thiên ', '')}</div>
-                                        
-                                        <!-- Center: Thần (CHỮ TO) -->
-                                        <div class="grid-cell center-deity" style="color: {c_than};">{than}</div>
-                                        
-                                        <!-- Bottom Center: Môn -->
-                                        <div class="grid-cell bot-center" style="color: {c_cua}; font-size: 1.1rem;">{cua.replace(' Môn', '')}</div>
-                                        
-                                        <!-- Bottom Right: Địa Bàn (ĐẬM TO) -->
-                                        <div class="grid-cell bot-right" style="color: {c_dia}; font-weight: 900; font-size: 1.8rem;">{can_dia}</div>
-                                    </div>
-                                    <div class="palace-footer-markers">
-                                        {f'<span style="color:#64748b; font-size:0.7rem;">⚪ Không Vong</span>' if palace_num in chart['khong_vong'] else ''}
-                                        {f'<span style="color:#f59e0b; font-size:0.7rem;">🐎 Dịch Mã</span>' if palace_num == chart['dich_ma'] else ''}
-                                    </div>
-                                </div>
-                            </div>
-                        """)
+                        # --- RENDER PALACE CARD (UNINDENTED TO PREVENT CODE BLOCK) ---
+                        palace_html = f"""<div class="palace-3d animated-panel">
+<div class="palace-inner {'dung-than-active' if has_dung_than else ''}" style="border: {border_width} solid {element_configs['border']}; min-height: 220px;">
+<div class="palace-header-row"><span class="palace-title">{p_full_name}</span>{status_badge}</div>
+<div class="palace-grid-container">
+<div class="grid-cell top-right" style="color: {c_thien};">{can_thien}</div>
+<div class="grid-cell mid-left" style="color: {c_sao};">{sao.replace('Thiên ', '')}</div>
+<div class="grid-cell center-deity" style="color: {c_than};">{than}</div>
+<div class="grid-cell bot-center" style="color: {c_cua}; font-size: 1.1rem;">{cua.replace(' Môn', '')}</div>
+<div class="grid-cell bot-right" style="color: {c_dia}; font-weight: 900; font-size: 1.8rem;">{can_dia}</div>
+</div>
+<div class="palace-footer-markers">
+{f'<span style="color:#64748b; font-size:0.7rem;">⚪ Không Vong</span>' if palace_num in chart['khong_vong'] else ''}
+{f'<span style="color:#f59e0b; font-size:0.7rem;">🐎 Dịch Mã</span>' if palace_num == chart['dich_ma'] else ''}
+</div></div></div>"""
                         st.markdown(palace_html, unsafe_allow_html=True)
 
                         

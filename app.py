@@ -1694,6 +1694,30 @@ elif st.session_state.current_view == "mai_hoa":
         </div>
         """, unsafe_allow_html=True)
         
+        # Add visual lines for Mai Hoa
+        col_mh_v1, col_mh_v2 = st.columns(2)
+        with col_mh_v1:
+            if 'lines' in res:
+                st.markdown('<div class="hex-visual-stack">', unsafe_allow_html=True)
+                for line in reversed(res['lines']):
+                    cls = "yang-line-pro" if line == 1 else "yin-line-pro"
+                    if line == 1:
+                        st.markdown(f'<div class="hao-line-pro {cls}"></div>', unsafe_allow_html=True)
+                    else:
+                        st.markdown(f'<div class="{cls}"><div class="yin-half-pro"></div><div class="yin-half-pro"></div></div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+        
+        with col_mh_v2:
+            if 'lines_bien' in res:
+                st.markdown('<div class="hex-visual-stack">', unsafe_allow_html=True)
+                for line in reversed(res['lines_bien']):
+                    cls = "yang-line-pro" if line == 1 else "yin-line-pro"
+                    if line == 1:
+                        st.markdown(f'<div class="hao-line-pro {cls}"></div>', unsafe_allow_html=True)
+                    else:
+                        st.markdown(f'<div class="{cls}"><div class="yin-half-pro"></div><div class="yin-half-pro"></div></div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+        
         st.success(f"💡 **Luận giải:** {res.get('interpretation', 'Đang phân tích...')}")
         st.markdown('<div class="footer-stamp">Copyright © 2026 MAI HOA DICH SO PRO</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -1712,7 +1736,8 @@ elif st.session_state.current_view == "luc_hao":
         try:
             now = datetime.now()
             can_ngay = st.session_state.chart_data.get('can_ngay', 'Giáp') if 'chart_data' in st.session_state else "Giáp"
-            st.session_state.luc_hao_result = lap_qua_luc_hao(now.year, now.month, now.day, now.hour, selected_topic, can_ngay)
+            # Fixed call with explicit keyword arguments to resolve argument count mismatch
+            st.session_state.luc_hao_result = lap_qua_luc_hao(now.year, now.month, now.day, now.hour, topic=selected_topic, can_ngay=can_ngay)
         except Exception as e:
             st.error(f"Lỗi: {e}")
 

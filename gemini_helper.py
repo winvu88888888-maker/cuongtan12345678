@@ -245,10 +245,43 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
         except Exception as e:
             return f"❌ Lỗi khi gọi AI: {str(e)}\n\nVui lòng kiểm tra API key hoặc thử lại."
     
+    def calculate_seasonal_vitality(self, palace_element, current_month):
+        """
+        Determine strength: Vượng, Tướng, Hưu, Tù, Tử.
+        Standard seasonal rules:
+        - Spring (1,2): Wood vượng, Fire tướng, Water hưu, Metal tù, Earth tử.
+        - Summer (4,5): Fire vượng, Earth tướng, Wood hưu, Water tù, Metal tử.
+        - Autumn (7,8): Metal vượng, Water tướng, Earth hưu, Fire tù, Wood tử.
+        - Winter (10,11): Water vượng, Wood tướng, Metal hưu, Earth tù, Fire tử.
+        - Four Seasons (3,6,9,12): Earth vượng, Metal tướng, Fire hưu, Wood tù, Water tử.
+        """
+        # Element of the month
+        month_map = {
+            1: "Mộc", 2: "Mộc", 3: "Thổ",
+            4: "Hỏa", 5: "Hỏa", 6: "Thổ",
+            7: "Kim", 8: "Kim", 9: "Thổ",
+            10: "Thủy", 11: "Thủy", 12: "Thổ"
+        }
+        month_element = month_map.get(current_month, "Thổ")
+        
+        rules = {
+            "Mộc": {"Mộc": "Vượng", "Hỏa": "Tướng", "Thủy": "Hưu", "Kim": "Tù", "Thổ": "Tử"},
+            "Hỏa": {"Hỏa": "Vượng", "Thổ": "Tướng", "Mộc": "Hưu", "Thủy": "Tù", "Kim": "Tử"},
+            "Thổ": {"Thổ": "Vượng", "Kim": "Tướng", "Hỏa": "Hưu", "Mộc": "Tù", "Thủy": "Tử"},
+            "Kim": {"Kim": "Vượng", "Thủy": "Tướng", "Thổ": "Hưu", "Hỏa": "Tù", "Mộc": "Tử"},
+            "Thủy": {"Thủy": "Vượng", "Mộc": "Tướng", "Kim": "Hưu", "Thổ": "Tù", "Hỏa": "Tử"}
+        }
+        
+        return rules.get(month_element, {}).get(palace_element, "Bình")
+
     def comprehensive_analysis(self, chart_data, topic, dung_than_info=None, topic_hints="", subj_stem=None, obj_stem=None, subj_label="Bản thân"):
-        """
-        Expert Consultation: Human-Centric Narrative with Deep Elemental Detail.
-        """
+        """Expert Consultation with Synthesis and Color-Coding Logic."""
+        import json
+        from datetime import datetime
+        curr_month = 1 # Update with real data if possible, default to Spring (Mộc)
+        try: curr_month = datetime.now().month
+        except: pass
+
         # Update context
         self.update_context(
             topic=topic,
@@ -257,23 +290,16 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
             last_action=f"Tư vấn chuyên sâu cho {subj_label}"
         )
         
-        can_ngay = chart_data.get('can_ngay', 'N/A')
-        can_gio = chart_data.get('can_gio', 'N/A')
-        truc_phu = chart_data.get('truc_phu_ten', 'N/A')
-        truc_su = chart_data.get('truc_su_ten', 'N/A')
-        khong_vong_list = chart_data.get('khong_vong', [])
-        dich_ma_cung = chart_data.get('dich_ma', None)
-        
         # Determine actual actors for this session
-        final_subj_stem = subj_stem if subj_stem else can_ngay
-        final_obj_stem = obj_stem if obj_stem else can_gio
+        final_subj_stem = subj_stem if subj_stem else chart_data.get('can_ngay', 'N/A')
+        final_obj_stem = obj_stem if obj_stem else chart_data.get('can_gio', 'N/A')
         
         # Mapping for human-centric roles
         role_map = {
             final_subj_stem: subj_label,
             # If the user is asking about someone else, Day Stem might still be "Bạn (Người hỏi)"
-            can_ngay: "Bạn (Người hỏi)" if final_subj_stem != can_ngay else subj_label,
-            final_obj_stem: "Đối tượng/Người mua/Đối phương" if final_obj_stem != can_gio else "Đối tượng (Can Giờ)"
+            chart_data.get('can_ngay'): "Bạn (Người hỏi)" if final_subj_stem != chart_data.get('can_ngay') else subj_label,
+            final_obj_stem: "Đối tượng/Mục tiêu" if final_obj_stem != chart_data.get('can_gio') else "Đối tượng (Can Giờ)"
         }
         
         # 1. GROUP DATA BY PALACE
@@ -289,8 +315,8 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
                     'can_thien': chart_data.get('can_thien_ban', {}).get(p_num, 'N/A'),
                     'can_dia': chart_data.get('dia_can', {}).get(p_num, 'N/A'),
                     'hanh': CUNG_NGU_HANH.get(p_num, 'N/A'),
-                    'void': p_num in khong_vong_list,
-                    'horse': p_num == dich_ma_cung
+                    'void': p_num in chart_data.get('khong_vong', []),
+                    'horse': p_num == chart_data.get('dich_ma')
                 }
             if label not in palaces_of_interest[p_num]['labels']:
                 palaces_of_interest[p_num]['labels'].append(label)
@@ -316,12 +342,18 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
         # 2. CONTEXTUAL PROMPT
         poi_desc = []
         from qmdg_data import KY_MON_DATA
+        # Vitality check
+        from datetime import datetime
+        curr_month = datetime.now().month
         
         for p_num, info in palaces_of_interest.items():
             labels_str = ", ".join(info['labels'])
             void_str = " [📍 KHÔNG VONG - Sự việc bế tắc/Trống rỗng]" if info['void'] else ""
             horse_str = " [🐎 DỊCH MÃ - Sự chuyển dịch/Nhanh chóng]" if info['horse'] else ""
             p_name = CUNG_TEN.get(p_num, f"Cung {p_num}")
+            
+            # Seasonal Strength
+            vit = self.calculate_seasonal_vitality(info['hanh'], curr_month)
             
             # Detailed Symbolism Lookup
             star_prop = KY_MON_DATA['DU_LIEU_DUNG_THAN_PHU_TRO']['CUU_TINH'].get(info['star'], {}).get('Tính_Chất', 'Bình')
@@ -332,24 +364,21 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
             desc = (f"- **{p_name} (Cung {p_num})**: Đại diện cho **{labels_str}**.\n"
                     f"  + Thành phần: Sao {info['star']} ({star_prop}), Môn {info['door']} ({door_prop}), Thần {info['deity']} ({deity_prop}).\n"
                     f"  + Thiên Can: {info['can_thien']} ({can_prop}) lâm trên {info['can_dia']}.\n"
-                    f"  + Đặc tính: {info['hanh']}{void_str}{horse_str}.")
+                    f"  + Trạng thái: {vit}, {info['hanh']}{void_str}{horse_str}.")
             poi_desc.append(desc)
 
-        prompt = f"""{self.get_context_prompt()}Bạn là bậc thầy Kỳ Môn Độn Giáp tư vấn riêng cho **{subj_label}**. Hãy thực hiện LUẬN GIẢI CHI TIẾT NHÂN QUẢ cho chủ đề: **{topic}**.
+        prompt = f"""{self.get_context_prompt()}Bạn là một Bậc Thầy Kỳ Môn Độn Giáp chuyên nghiệp. Hãy thực hiện LUẬN GIẢI CHI TIẾT NHÂN QUẢ cho **{subj_label}** về chủ đề: **{topic}**.
 
-**NGUYÊN TẮC NGÔN NGỮ BẮT BUỘC:**
-1. **Dùng tên gọi gần gũi**: Tuyệt đối không gọi là "Chủ thể", "Khách". Hãy gọi là **"{subj_label}"**, **"Người mua"**, **"Ngôi nhà"**, **"Công việc"**... tùy theo ngữ cảnh.
-2. **Tư duy Ngũ Hành**: Khi phân tích một cung, hãy giải thích: "Vì Sao/Môn này thuộc hành X, tương tác với cung Y nên kết quả là Z". 
-3. **Phân tích Động cơ (Lý do)**: Dựa vào các tính chất Sao/Môn/Thần, hãy chỉ rõ lý do tại sao sự việc diễn ra (Ví dụ: Vì có Bạch Hổ nên {subj_label} đang gặp áp lực rất lớn về nợ nần/sức khỏe).
+**NGUYÊN TẮC LUẬN GIẢI SIÊU VIỆT VÀ DỊCH NGHĨA THỰC TẾ:**
+1. **Dịch nghĩa thực tế (Meaning Translation)**: Không chỉ liệt kê tính chất. 
+   - Nếu có **Mã Tinh**: Trả lời rõ {subj_label} đi xa hay gần? Gấp hay từ từ?
+   - Nếu có **Khai Môn**: Công việc mới là gì? Có quyền lực không? Tốt hay xấu?
+   - Nếu có **Sinh Môn**: Có lợi nhuận không? Ngôi nhà/vốn đó thế nào?
+   - Nếu có **Trực Phù/Thiên Tâm**: Có lãnh đạo bảo trợ hay người có tâm giúp đỡ không?
+2. **Luận giải tổng hợp (Synthesis)**: Xâu chuỗi tất cả yếu tố đỏ/đen (Cát/Hung) trong cung. Nếu cung vượng và có nhiều cát tinh (màu đỏ) thì phán quyết đại cát.
+3. **Ngôn ngữ nhân văn**: Luôn dùng đúng danh xưng **"{subj_label}"**.
 
-**CẤU TRÚC BÁO CÁO:**
-
-**1. ĐỊNH VỊ NHÂN VẬT & MỤC TIÊU** (Liệt kê rõ ai/cái gì ở cung nào, số mấy).
-**2. PHÂN TÍCH CHI TIẾT NỘI TẠI** (Bóc tách Ngũ hành, Sao/Môn/Thần và các dấu hiệu Dịch Mã/Không Vong để nói rõ trạng thái tâm lý/năng lực của {subj_label} và đối tác).
-**3. LUẬN GIẢI TƯƠNG TÁC (NHÂN - QUẢ)** (Sự kết nối giữa các cung vị đã nêu).
-**4. LỜI KHUYÊN CHIẾN THUẬT & PHÁN QUYẾT** (Kết quả cuối cùng và bước đi thông minh nhất).
-
-**DỮ LIỆU CUNG VỊ CHI TIẾT:**
+**DỮ LIỆU CÁC CUNG QUAN TRỌNG:**
 {chr(10).join(poi_desc)}
 
 **THẾ TRẬN TỔNG QUAN:**

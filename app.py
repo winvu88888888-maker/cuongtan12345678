@@ -269,6 +269,15 @@ st.markdown("""
         font-size: 13px;
         letter-spacing: 1px;
     }
+    
+    /* Dụng Thần info box */
+    .dung-than-box {
+        background: #fffbeb;
+        border-left: 5px solid #f59e0b;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
 </style>
 """, unsafe_allow_html=True)
 # Initialize zoom level in session state
@@ -839,17 +848,32 @@ if st.session_state.current_view == "ky_mon":
                         # Expander for detailed analysis
                         with st.expander(f"📖 Chi tiết Cung {palace_num}"):
                             # Basic info
-                            st.markdown(f"**Quái tượng:** {QUAI_TUONG.get(palace_num, 'N/A')}")
-                            st.markdown(f"**Ngũ hành:** {hanh}")
-                            st.markdown(f"**Cát/Hung:** {cat_hung}")
+                            col_info1, col_info2 = st.columns(2)
+                            with col_info1:
+                                st.markdown(f"**Quái tượng:** {QUAI_TUONG.get(palace_num, 'N/A')}")
+                                st.markdown(f"**Ngũ hành:** {hanh}")
+                            with col_info2:
+                                st.markdown(f"**Cát/Hung:** {cat_hung}")
+                                st.markdown(f"**Trạng thái:** {strength}")
                             
-                            # Check Dụng Thần
-                            if has_dung_than:
-                                found_dt = [dt for dt in dung_than_list if dt in [sao, cua, than, can_thien, can_dia]]
-                                st.success(f"✅ Cung này chứa Dụng Thần: **{', '.join(found_dt)}**")
-                                st.info(f"Đây là cung QUAN TRỌNG cho chủ đề **'{selected_topic}'**")
-                            else:
-                                st.warning("⚠️ Cung này không chứa Dụng Thần chính")
+                            st.markdown("---")
+                            
+                            # Check Dụng Thần with clearer explanation
+                            topic_data = TOPIC_INTERPRETATIONS.get(selected_topic, {})
+                            dung_than_list = topic_data.get("Dụng_Thần", [])
+                            found_dt = [dt for dt in dung_than_list if dt in [sao, cua, than, can_thien, can_dia]]
+                            
+                            dt_html = f"""
+                            <div class="dung-than-box">
+                                <div style="font-weight: 800; color: #92400e; margin-bottom: 5px;">📍 PHÂN TÍCH DỤNG THẦN</div>
+                                <div style="font-size: 14px;"><strong>Chủ đề:</strong> {selected_topic}</div>
+                                <div style="font-size: 14px;"><strong>Dụng thần cần tìm:</strong> {', '.join(dung_than_list)}</div>
+                                <div style="margin-top: 10px; font-weight: 700; color: {'#15803d' if found_dt else '#b91c1c'};">
+                                    {f'✅ Tìm thấy: {", ".join(found_dt)}' if found_dt else '⚠️ Cung này không chứa Dụng Thần chính'}
+                                </div>
+                            </div>
+                            """
+                            st.markdown(dt_html, unsafe_allow_html=True)
                             
                             # Star description
                             star_data = KY_MON_DATA['DU_LIEU_DUNG_THAN_PHU_TRO']['CUU_TINH'].get(sao, {})

@@ -776,14 +776,23 @@ if st.session_state.current_view == "ky_mon":
                         door_data = KY_MON_DATA["DU_LIEU_DUNG_THAN_PHU_TRO"]["BAT_MON"].get(cua if " Môn" in cua else cua + " Môn", {})
                         cat_hung = door_data.get("Cát_Hung", "Bình")
 
-                        # Element Styles
+                        # Element Styles & Aesthetics
                         element_configs = {
-                            "Mộc": {"border": "#10b981", "icon": "🌿"},
-                            "Hỏa": {"border": "#ef4444", "icon": "🔥"},
-                            "Thổ": {"border": "#f59e0b", "icon": "⛰️"},
-                            "Kim": {"border": "#94a3b8", "icon": "⚔️"},
-                            "Thủy": {"border": "#3b82f6", "icon": "💧"}
-                        }.get(hanh, {"border": "#475569", "icon": "✨"})
+                            "Mộc": {"border": "#10b981", "icon": "🌿", "img": "moc.png"},
+                            "Hỏa": {"border": "#ef4444", "icon": "🔥", "img": "hoa.png"},
+                            "Thổ": {"border": "#f59e0b", "icon": "⛰️", "img": "tho.png"},
+                            "Kim": {"border": "#94a3b8", "icon": "⚔️", "img": "kim.png"},
+                            "Thủy": {"border": "#3b82f6", "icon": "💧", "img": "thuy.png"}
+                        }.get(hanh, {"border": "#475569", "icon": "✨", "img": "tho.png"})
+
+                        # Base64 Background Logic
+                        bg_path = os.path.join(os.path.dirname(__file__), "web", "static", "img", "elements", element_configs.get('img', 'tho.png'))
+                        bg_base64 = get_base64_image(bg_path)
+                        
+                        if bg_base64:
+                            bg_style = f"background: url('data:image/png;base64,{bg_base64}') center/cover no-repeat;"
+                        else:
+                            bg_style = "background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);"
 
                         border_width = "4px" if has_dung_than else "1px"
 
@@ -798,7 +807,7 @@ if st.session_state.current_view == "ky_mon":
                             elif category == "door": is_good = any(gd in name for gd in good_doors)
                             elif category == "deity": is_good = any(gt in name for gt in good_deities)
                             elif category == "stem": is_good = any(gs in name for gs in good_stems)
-                            return "#ff4d4d" if is_good else "#1e293b"
+                            return "#ef4444" if is_good else "#1e293b" # Red vs Dark Slate
 
                         c_sao = get_qmdg_color(sao, "star")
                         c_cua = get_qmdg_color(cua, "door")
@@ -809,11 +818,13 @@ if st.session_state.current_view == "ky_mon":
                         p_full_name = f"{palace_num} {QUAI_TUONG.get(palace_num, '')}" if palace_num != 5 else "5 Trung Cung"
                         status_badge = f'<span class="status-badge" style="background: {strength_color}; color: white;">{strength}</span>'
 
-                        # --- RENDER PALACE CARD (UNINDENTED TO PREVENT CODE BLOCK) ---
+                        # --- RENDER PALACE CARD (PREMIUM AESTHETICS) ---
                         palace_html = f"""<div class="palace-3d animated-panel">
-<div class="palace-inner {'dung-than-active' if has_dung_than else ''}" style="border: {border_width} solid {element_configs['border']}; min-height: 220px;">
-<div class="palace-header-row"><span class="palace-title">{p_full_name}</span>{status_badge}</div>
-<div class="palace-grid-container">
+<div class="palace-inner {'dung-than-active' if has_dung_than else ''}" style="{bg_style} border: {border_width} solid {element_configs['border']}; min-height: 250px; position: relative; overflow: hidden; border-radius: 12px;">
+<div style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(2px); z-index: 0;"></div>
+<div style="position: relative; z-index: 1; padding: 10px;">
+<div class="palace-header-row"><span class="palace-title" style="color: #475569;">{p_full_name}</span>{status_badge}</div>
+<div class="palace-grid-container" style="height: 160px;">
 <div class="grid-cell top-right" style="color: {c_thien};">{can_thien}</div>
 <div class="grid-cell mid-left" style="color: {c_sao};">{sao.replace('Thiên ', '')}</div>
 <div class="grid-cell center-deity" style="color: {c_than};">{than}</div>
@@ -821,9 +832,9 @@ if st.session_state.current_view == "ky_mon":
 <div class="grid-cell bot-right" style="color: {c_dia}; font-weight: 900; font-size: 1.8rem;">{can_dia}</div>
 </div>
 <div class="palace-footer-markers">
-{f'<span style="color:#64748b; font-size:0.7rem;">⚪ Không Vong</span>' if palace_num in chart['khong_vong'] else ''}
-{f'<span style="color:#f59e0b; font-size:0.7rem;">🐎 Dịch Mã</span>' if palace_num == chart['dich_ma'] else ''}
-</div></div></div>"""
+{f'<span style="color:#64748b; font-size:0.75rem;">⚪ {palace_num} KV</span>' if palace_num in chart['khong_vong'] else ''}
+{f'<span style="color:#f59e0b; font-size:0.75rem;">🐎 Mã</span>' if palace_num == chart['dich_ma'] else ''}
+</div></div></div></div>"""
                         st.markdown(palace_html, unsafe_allow_html=True)
 
                         

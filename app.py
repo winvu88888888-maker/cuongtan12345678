@@ -897,6 +897,75 @@ if st.session_state.current_view == "ky_mon":
                             topic_data = TOPIC_INTERPRETATIONS.get(selected_topic, {})
                             dung_than_list = topic_data.get("Dụng_Thần", [])
                             
+                            # --- PART 1: RELATIONSHIP ANALYSIS (SUBJECT VS OBJECT) ---
+                            st.subheader("🎯 Phân tích Tương tác Dụng Thần")
+                            
+                            # Determine Subject (Bản thân) Stem Palace
+                            subject_palace = 0
+                            # Assuming 'dia_can' holds the Earth Stems for each palace
+                            # We need to find the palace where the 'can_ngay' (subject's stem) resides
+                            for p_num, d_can in chart['dia_can'].items():
+                                if d_can == actual_can_ngay:
+                                    subject_palace = p_num
+                                    break
+                            
+                            # Determine Object (Dụng Thần) Palace (Current Palace)
+                            object_palace = palace_num
+                            
+                            s_hanh = CUNG_NGU_HANH.get(subject_palace, "Thổ")
+                            o_hanh = CUNG_NGU_HANH.get(object_palace, "Thổ")
+                            
+                            interaction = SINH_KHAC_MATRIX.get(s_hanh, {}).get(o_hanh, "Bình Hòa")
+                            
+                            # Visual Interaction Report
+                            col_rel1, col_rel2, col_rel3 = st.columns([2, 1, 2])
+                            with col_rel1:
+                                st.info(f"👤 **Bản thân**\n\nCung {subject_palace} ({s_hanh})")
+                            with col_rel2:
+                                st.markdown(f"<div style='text-align:center; font-size:1.5rem; padding-top:10px;'>{'➡️' if 'Sinh' in interaction else '⚔️' if 'Khắc' in interaction else '🤝'}</div>", unsafe_allow_html=True)
+                                st.caption(f"<div style='text-align:center;'>{interaction}</div>", unsafe_allow_html=True)
+                            with col_rel3:
+                                st.success(f"🎯 **Đối tượng**\n\nCung {object_palace} ({o_hanh})")
+                            
+                            st.write(f"**Kết luận nhanh:** {rel_label} và Đối tượng có mối quan hệ **{interaction}**. " + 
+                                     ("Đây là dấu hiệu thuận lợi, năng lượng lưu thông." if "Sinh" in interaction or "Bình" in interaction 
+                                      else "Cần thận trọng vì có sự xung đột hoặc cản trở về mặt năng lượng."))
+
+                            st.markdown("---")
+                            
+                            # --- PART 2: TECHNICAL ELEMENT LOOKUPS ---
+                            st.subheader("🔍 Chi tiết Tác động của Thần - Tinh - Môn")
+                            
+                            # Create a clean table for lookups
+                            tech_data = {
+                                "Yếu tố": ["Thần (Deity)", "Tinh (Star)", "Môn (Door)", "Thiên Can", "Địa Can"],
+                                "Tên": [than, sao, cua, can_thien, can_dia],
+                                "Ý nghĩa & Tác động": [
+                                    KY_MON_DATA["DU_LIEU_DUNG_THAN_PHU_TRO"]["BAT_THAN"].get(than, {}).get("Tính_Chất", "N/A"),
+                                    KY_MON_DATA["DU_LIEU_DUNG_THAN_PHU_TRO"]["CUU_TINH"].get(sao, {}).get("Tính_Chất", "N/A"),
+                                    KY_MON_DATA["DU_LIEU_DUNG_THAN_PHU_TRO"]["BAT_MON"].get(cua if " Môn" in cua else cua + " Môn", {}).get("Luận_Đoán", "N/A"),
+                                    KY_MON_DATA["CAN_CHI_LUAN_GIAI"].get(can_thien, {}).get("Tính_Chất", "N/A"),
+                                    KY_MON_DATA["CAN_CHI_LUAN_GIAI"].get(can_dia, {}).get("Tính_Chất", "N/A")
+                                ]
+                            }
+                            st.table(tech_data)
+                            
+                            # --- PART 3: TOPIC-SPECIFIC ANALYSIS ---
+                            st.subheader(f"💡 Phân tích theo chủ đề: {selected_topic}")
+                            topic_detail = topic_data.get("Diễn_Giải", "Đang cập nhật...")
+                            st.write(topic_detail)
+                            
+                            # Combinatorial Analysis (Cách Cục)
+                            combo_key = f"{can_thien}{can_dia}"
+                            combo_info = KY_MON_DATA["TRUCTU_TRANH"].get(combo_key)
+                            if combo_info:
+                                st.warning(f"🎭 **Cách cục: {combo_info['Tên_Cách_Cục']} ({combo_info['Cát_Hung']})**")
+                                st.write(combo_info['Luận_Giải'])
+                            
+                            # Final Advice
+                            st.markdown("---")
+                            st.info("**Lời khuyên từ chuyên gia:** Dựa trên sự tương tác giữa Bản thân và Dụng Thần, bạn nên chủ động nắm bắt cơ hội nếu có sự tương sinh, hoặc lùi lại quan sát nếu gặp sự hình khắc mạnh.")
+                            
                             # Advanced Matching Logic
                             found_dt = []
                             actual_can_gio = chart.get('can_gio', 'N/A')

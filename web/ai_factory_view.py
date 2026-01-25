@@ -5,13 +5,25 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add project root to path (absolute)
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if root_path not in sys.path:
+    sys.path.insert(0, root_path)
 
 # Import modules from ai_modules
 from ai_modules.orchestrator import AIOrchestrator
 from ai_modules.memory_system import MemorySystem
-from n8n_integration import N8NClient, setup_n8n_config
+try:
+    from n8n_integration import N8nClient as N8NClient, setup_n8n_config
+except ImportError:
+    # Fallback if module is named differently or not found
+    st.error("⚠️ Không thể tìm thấy module n8n_integration.py")
+    class N8NClient:
+        def __init__(self, *args, **kwargs): pass
+        def test_connection(self): return False
+        def get_workflow_statistics(self): return {'total_workflows': 0, 'active_workflows': 0}
+        def get_execution_statistics(self): return {'total_executions': 0, 'successful': 0}
+    def setup_n8n_config(*args): pass
 
 def render_ai_factory_view():
     """Renders the AI Factory Dashboard within the main application."""

@@ -7,13 +7,14 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from PIL import Image
 
-# Add dist directory to Python path
-dist_path = os.path.join(os.path.dirname(__file__), 'dist')
-ai_modules_path = os.path.join(os.path.dirname(__file__), 'ai_modules')
-if dist_path not in sys.path:
-    sys.path.insert(0, dist_path)
-if ai_modules_path not in sys.path:
-    sys.path.insert(0, ai_modules_path)
+# Add project root and dist directory to Python path
+root_path = os.path.dirname(os.path.abspath(__file__))
+dist_path = os.path.join(root_path, 'dist')
+ai_modules_path = os.path.join(root_path, 'ai_modules')
+
+for path in [root_path, dist_path, ai_modules_path]:
+    if path not in sys.path:
+        sys.path.insert(0, path)
 
 # Import modules from dist directory
 try:

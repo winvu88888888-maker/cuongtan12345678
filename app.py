@@ -897,6 +897,35 @@ if st.session_state.current_view == "ky_mon":
                             topic_data = TOPIC_INTERPRETATIONS.get(selected_topic, {})
                             dung_than_list = topic_data.get("Dụng_Thần", [])
                             
+                            # --- PRE-CALCULATE CORE VARIABLES (FIXES NAMEERROR) ---
+                            actual_can_gio = chart.get('can_gio', 'N/A')
+                            actual_can_ngay = chart.get('can_ngay', 'N/A')
+                            actual_can_thang = chart.get('can_thang', 'N/A')
+                            actual_can_nam = chart.get('can_nam', 'N/A')
+                            
+                            # Resolve Relation (Lục Thân) stem
+                            rel_type = st.session_state.get('selected_doi_tuong', "🧑 Bản thân")
+                            target_can_representative = actual_can_ngay # Default to Self
+                            rel_label = "Bản thân"
+                            
+                            if "Anh chị em" in rel_type:
+                                target_can_representative = actual_can_thang
+                                rel_label = "Anh chị em"
+                            elif "Bố mẹ" in rel_type:
+                                target_can_representative = actual_can_nam
+                                rel_label = "Bố mẹ"
+                            elif "Con cái" in rel_type:
+                                target_can_representative = actual_can_gio
+                                rel_label = "Con cái"
+                            elif "Người lạ" in rel_type:
+                                custom_val = st.session_state.get('target_stem_name_custom', "Giáp")
+                                if "Không rõ" in custom_val:
+                                    target_can_representative = actual_can_gio
+                                    rel_label = "Đối tượng (Can Giờ)"
+                                else:
+                                    target_can_representative = custom_val
+                                    rel_label = f"Đối tượng ({target_can_representative})"
+
                             # --- PART 1: RELATIONSHIP ANALYSIS (SUBJECT VS OBJECT) ---
                             st.subheader("🎯 Phân tích Tương tác Dụng Thần")
                             
@@ -968,34 +997,6 @@ if st.session_state.current_view == "ky_mon":
                             
                             # Advanced Matching Logic
                             found_dt = []
-                            actual_can_gio = chart.get('can_gio', 'N/A')
-                            actual_can_ngay = chart.get('can_ngay', 'N/A')
-                            actual_can_thang = chart.get('can_thang', 'N/A')
-                            actual_can_nam = chart.get('can_nam', 'N/A')
-                            
-                            # Resolve Relation (Lục Thân) stem
-                            rel_type = st.session_state.get('selected_doi_tuong', "🧑 Bản thân")
-                            target_can_representative = actual_can_ngay # Default to Self
-                            rel_label = "Bản thân"
-                            
-                            if "Anh chị em" in rel_type:
-                                target_can_representative = actual_can_thang
-                                rel_label = "Anh chị em"
-                            elif "Bố mẹ" in rel_type:
-                                target_can_representative = actual_can_nam
-                                rel_label = "Bố mẹ"
-                            elif "Con cái" in rel_type:
-                                target_can_representative = actual_can_gio
-                                rel_label = "Con cái"
-                            elif "Người lạ" in rel_type:
-                                custom_val = st.session_state.get('target_stem_name_custom', "Giáp")
-                                if "Không rõ" in custom_val:
-                                    target_can_representative = actual_can_gio
-                                    rel_label = "Đối tượng (Can Giờ)"
-                                else:
-                                    target_can_representative = custom_val
-                                    rel_label = f"Đối tượng ({target_can_representative})"
-                            
                             for dt in dung_than_list:
                                 is_match = False
                                 display_name = dt

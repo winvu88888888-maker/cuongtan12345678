@@ -761,82 +761,89 @@ if st.session_state.current_view == "ky_mon":
                         dung_than_list = topic_data.get("Dụng_Thần", [])
                         has_dung_than = any(dt in [sao, cua, than, can_thien, can_dia] for dt in dung_than_list)
                         
-                        # Determine color based on auspiciousness
-                        door_data = KY_MON_DATA["DU_LIEU_DUNG_THAN_PHU_TRO"]["BAT_MON"].get(cua + " Môn", {})
-                        cat_hung = door_data.get("Cát_Hung", "Bình")
-                        
-                        if cat_hung in ["Đại Cát", "Cát"]:
-                            bg_color = "#d4edda"  # Light green
-                            border_color = "#28a745"
-                        elif cat_hung in ["Hung", "Đại Hung"]:
-                            bg_color = "#f8d7da"  # Light red
-                            border_color = "#dc3545"
-                        else:
-                            bg_color = "#fff3cd"  # Light yellow
-                            border_color = "#ffc107"
-                        
-                        # Highlight if has Dụng Thần
-                        if has_dung_than:
-                            border_color = "#007bff"
-                            border_width = "3px"
-                        else:
-                            border_width = "2px"
-                        
-                        # Special markers
-                        markers = []
-                        if palace_num in chart['khong_vong']:
-                            markers.append("🌑 Không Vong")
-                        if palace_num == chart['dich_ma']:
-                            markers.append("🐎 Dịch Mã")
-                        marker_text = " ".join(markers) if markers else ""
-                        
                         # Determine Strength based on month
-                        # Simple mapping for display
                         month = selected_datetime.month
                         season_map = {1:"Xuân", 2:"Xuân", 3:"Xuân", 4:"Hạ", 5:"Hạ", 6:"Hạ", 7:"Thu", 8:"Thu", 9:"Thu", 10:"Đông", 11:"Đông", 12:"Đông"}
                         current_season = season_map.get(month, "Xuân")
                         strength = phan_tich_yeu_to_thoi_gian(hanh, current_season) if USE_MULTI_LAYER_ANALYSIS else "Bình"
                         
-                        # Element Styles & Backgrounds
-                        element_configs = {
-                            "Mộc": {"img": "moc.png", "border": "#10b981", "glow": "rgba(16, 185, 129, 0.4)", "icon": "🌿"},
-                            "Hỏa": {"img": "hoa.png", "border": "#ef4444", "glow": "rgba(239, 68, 68, 0.4)", "icon": "🔥"},
-                            "Thổ": {"img": "tho.png", "border": "#f59e0b", "glow": "rgba(245, 158, 11, 0.4)", "icon": "⛰️"},
-                            "Kim": {"img": "kim.png", "border": "#94a3b8", "glow": "rgba(148, 163, 184, 0.4)", "icon": "⚔️"},
-                            "Thủy": {"img": "thuy.png", "border": "#3b82f6", "glow": "rgba(59, 130, 246, 0.4)", "icon": "💧"}
-                        }.get(hanh, {"img": "tho.png", "border": "#475569", "glow": "rgba(71, 85, 105, 0.4)", "icon": "✨"})
-
-                        # Load Background Image Base64 (Reliable Streamlit Method)
-                        bg_path = os.path.join(os.path.dirname(__file__), "web", "static", "img", "elements", element_configs['img'])
-                        bg_base64 = get_base64_image(bg_path)
-                        
-                        if bg_base64:
-                            bg_style = f"url('data:image/png;base64,{bg_base64}') center/cover no-repeat"
-                        else:
-                            # Fallback Gradient
-                            gradients = {
-                                "Mộc": "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-                                "Hỏa": "linear-gradient(135deg, #7f1d1d 0%, #ef4444 100%)",
-                                "Thổ": "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)",
-                                "Kim": "linear-gradient(135deg, #334155 0%, #94a3b8 100%)",
-                                "Thủy": "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)"
-                            }
-                            bg_style = gradients.get(hanh, "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)")
-
                         strength_color = {
                             "Vượng": "#ef4444", "Tướng": "#f59e0b", "Hưu": "#10b981", "Tù": "#3b82f6", "Tử": "#64748b"
                         }.get(strength, "#475569")
 
-                        # Hexagram Line Visualization
-                        palace_lines = [random.randint(0,1) for _ in range(3)]
-                        lines_html = "".join([f'<div style="color: {"#f87171" if l == 1 else "#60a5fa"}; font-size: 8px; line-height: 1.1;">{"━━━━━━" if l == 1 else "━━  ━━"}</div>' for l in palace_lines])
+                        # Element Styles & Backgrounds
+                        element_configs = {
+                            "Mộc": {"border": "#10b981", "icon": "🌿"},
+                            "Hỏa": {"border": "#ef4444", "icon": "🔥"},
+                            "Thổ": {"border": "#f59e0b", "icon": "⛰️"},
+                            "Kim": {"border": "#94a3b8", "icon": "⚔️"},
+                            "Thủy": {"border": "#3b82f6", "icon": "💧"}
+                        }.get(hanh, {"border": "#475569", "icon": "✨"})
 
-                        # Prepare markers HTML
-                        marker_html = f'<div style="margin-top: 15px; font-size: 11px; color: #c084fc; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 2px; filter: drop-shadow(0 0 5px rgba(192, 132, 252, 0.5));">✨ {marker_text}</div>' if marker_text else ''
+                        border_width = "3px" if has_dung_than else "1px"
 
-                        # PREMIUM PALACE CARD HTML - DEDENTED FOR STREAMLIT RENDER
-                        palace_html = f"""<div class="palace-3d"><div class="palace-inner" style="background: {bg_style}; border: {border_width} solid {element_configs['border']}; min-height: 380px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.1);"><div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.6)); z-index: 0;"></div><div style="position: relative; z-index: 1; padding: 22px; height: 100%; display: flex; flex-direction: column;"><div style="display: flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-weight: 900; font-size: 32px; color: #1e293b; line-height: 1; text-shadow: 0 0 10px rgba(255,255,255,0.8);">{palace_num}</div><div style="font-size: 15px; font-weight: 800; color: {element_configs['border']}; margin-top: 4px; letter-spacing: 1px;">{QUAI_TUONG.get(palace_num, '')}</div></div><div style="text-align: right;"><div style="background: {strength_color}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 900; text-transform: uppercase;">{strength}</div><div class="element-icon-3d" style="margin-top: 10px;">{element_configs['icon']}</div></div></div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;"><div style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(4px); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,0,0,0.05);"><div style="font-size: 9px; color: #64748b; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px;">TINH</div><div style="font-size: 18px; font-weight: 900; color: #1e293b;">{sao}</div></div><div style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(4px); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,0,0,0.05);"><div style="font-size: 9px; color: #64748b; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px;">MÔN</div><div style="font-size: 18px; font-weight: 900; color: #1e293b;">{cua}</div></div><div style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(4px); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,0,0,0.05);"><div style="font-size: 9px; color: #64748b; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px;">THẦN</div><div style="font-size: 18px; font-weight: 900; color: #1e293b;">{than}</div></div><div style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(4px); padding: 10px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.05);"><div style="font-size: 9px; color: #64748b; font-weight: 800; margin-bottom: 4px;">QUÁI</div><div style="margin-top: 2px;">{lines_html}</div></div></div><div style="margin-top: auto; padding-top: 15px;"><div style="background: rgba(0,0,0,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between;"><div><div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">THIÊN</div><div style="font-size: 22px; font-weight: 900; color: #b45309; line-height: 1;">{can_thien}</div></div><div style="text-align: right;"><div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">ĐỊA</div><div style="font-size: 22px; font-weight: 900; color: #475569; line-height: 1;">{can_dia}</div></div></div>{marker_html}</div></div></div></div>"""
-                        st.markdown(palace_html, unsafe_allow_html=True)
+                        # --- NEW: Auspicious Color Asset Mapping ---
+                        def get_qmdg_color(name, category):
+                            """Determine color: Red (#ff4d4d) for Good, Black (#1e293b) for others."""
+                            good_stars = ["Thiên Phụ", "Thiên Nhậm", "Thiên Tâm", "Thiên Cầm"]
+                            good_doors = ["Khai", "Hưu", "Sinh", "Khai Môn", "Hưu Môn", "Sinh Môn"]
+                            good_deities = ["Trực Phù", "Thái Âm", "Lục Hợp", "Cửu Địa", "Cửu Thiên"]
+                            good_stems = ["Giáp", "Ất", "Bính", "Đinh", "Mậu"]
+                            
+                            is_good = False
+                            if category == "star": is_good = any(gs in name for gs in good_stars)
+                            elif category == "door": is_good = any(gd in name for gd in good_doors)
+                            elif category == "deity": is_good = any(gt in name for gt in good_deities)
+                            elif category == "stem": is_good = any(gs in name for gs in good_stems)
+                            
+                            return "#ff4d4d" if is_good else "#1e293b"
+
+                        # Extract and Colorize
+                        c_sao = get_qmdg_color(sao, "star")
+                        c_cua = get_qmdg_color(cua, "door")
+                        c_than = get_qmdg_color(than, "deity")
+                        c_thien = get_qmdg_color(can_thien, "stem")
+                        c_dia = get_qmdg_color(can_dia, "stem")
+
+                        # Status Badge
+                        status_badge = f'<span class="status-badge" style="background: {strength_color}; color: white;">{strength}</span>'
+
+                        # Palace Name Header
+                        p_name = QUAI_TUONG.get(palace_num, f"Cung {palace_num}")
+                        p_full_name = f"{palace_num} {p_name}" if palace_num != 5 else "5 Trung Cung"
+
+                        # --- RENDER PALACE CARD ---
+                        st.markdown(f"""
+                        <div class="palace-3d animated-panel">
+                            <div class="palace-inner {'dung-than-active' if has_dung_than else ''}" style="border: {border_width} solid {element_configs['border']}; min-height: 220px;">
+                                <div class="palace-header-row">
+                                    <span class="palace-title">{p_full_name}</span>
+                                    {status_badge}
+                                </div>
+                                
+                                <div class="palace-grid-container">
+                                    <!-- Top Right: Thiên Bàn -->
+                                    <div class="grid-cell top-right" style="color: {c_thien};">{can_thien}</div>
+                                    
+                                    <!-- Middle Left: Tinh -->
+                                    <div class="grid-cell mid-left" style="color: {c_sao};">{sao.replace('Thiên ', '')}</div>
+                                    
+                                    <!-- Center: Thần (CHỮ TO) -->
+                                    <div class="grid-cell center-deity" style="color: {c_than};">{than}</div>
+                                    
+                                    <!-- Bottom Center: Môn -->
+                                    <div class="grid-cell bot-center" style="color: {c_cua}; font-size: 1.1rem;">{cua.replace(' Môn', '')}</div>
+                                    
+                                    <!-- Bottom Right: Địa Bàn (ĐẬM TO) -->
+                                    <div class="grid-cell bot-right" style="color: {c_dia}; font-weight: 900; font-size: 1.8rem;">{can_dia}</div>
+                                </div>
+                                <div class="palace-footer-markers">
+                                    {f'<span style="color:#64748b; font-size:0.7rem;">⚪ Không Vong</span>' if palace_num in chart['khong_vong'] else ''}
+                                    {f'<span style="color:#f59e0b; font-size:0.7rem;">🐎 Dịch Mã</span>' if palace_num == chart['dich_ma'] else ''}
+                                </div>
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
 
                         
                         # Expander for detailed analysis

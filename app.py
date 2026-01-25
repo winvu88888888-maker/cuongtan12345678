@@ -294,6 +294,108 @@ st.markdown("""
         border-width: 4px !important;
         box-shadow: 0 0 30px rgba(245, 158, 11, 0.3) !important;
     }
+
+    /* --- I-CHING & MAI HOA PROFESSIONAL UI --- */
+    .iching-container {
+        background: white;
+        border: 2px solid #22c55e;
+        border-radius: 12px;
+        padding: 2.5rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    }
+
+    .hex-header-row {
+        display: flex;
+        justify-content: space-around;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .hex-title-pro {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #b91c1c;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 0.5rem;
+    }
+
+    .hex-subtitle {
+        font-size: 1.1rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .hex-visual-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: center;
+        margin: 20px 0;
+    }
+
+    .hao-line-pro {
+        height: 14px;
+        width: 140px;
+        border-radius: 3px;
+    }
+
+    .yang-line-pro {
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+    }
+
+    .yin-line-pro {
+        display: flex;
+        gap: 20px;
+        width: 140px;
+    }
+
+    .yin-half-pro {
+        flex: 1;
+        height: 14px;
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+        border-radius: 3px;
+    }
+
+    .hao-table-pro {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+        margin-top: 1.5rem;
+    }
+
+    .hao-table-pro th {
+        background: #f8fafc;
+        color: #1e293b;
+        font-weight: 800;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+    .hao-table-pro td {
+        padding: 10px;
+        border: 1px solid #e2e8f0;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .highlight-red {
+        color: #ef4444;
+        font-weight: 800 !important;
+    }
+
+    .status-footer-pro {
+        background: #f1f5f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 2rem;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-around;
+        border-left: 5px solid #b91c1c;
+    }
 </style>
 """, unsafe_allow_html=True)
 # Initialize zoom level in session state
@@ -1555,228 +1657,134 @@ PHÂN TÍCH LIÊN MẠCH:
 
 
 elif st.session_state.current_view == "mai_hoa":
-    st.markdown("## 📖 MAI HOA DỊCH SỐ - 64 QUẺ KINH DỊCH")
+    st.markdown("## 🌸 MAI HOA DỊCH SỐ - TAM TÀI HỢP NHẤT")
     
     if not USE_MAI_HOA:
-        st.error("❌ Module Mai Hoa Dịch Số không khả dụng. Vui lòng kiểm tra file mai_hoa_dich_so.py trong thư mục dist.")
+        st.error("❌ Module Mai Hoa Dịch Số không khả dụng.")
         st.stop()
     
     st.markdown(f"### 🎯 Chủ đề: **{selected_topic}**")
-    st.caption("Mai Hoa Dịch Số sẽ phân tích theo chủ đề đã chọn")
     
-    st.markdown("### Chọn phương pháp tính quẻ:")
+    method = st.radio("Phương pháp:", ["Thời gian", "Ngẫu hứng"], horizontal=True, key="mh_method")
     
-    method = st.radio("", ["Theo thời gian", "Ngẫu nhiên"], key="mai_hoa_method")
-    
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 2])
-    
-    with col_btn1:
-        btn_time = st.button("🎲 Lập Quẻ Theo Thời Gian", use_container_width=True) if method == "Theo thời gian" else False
-    
-    with col_btn2:
-        btn_random = st.button("🎲 Lập Quẻ Ngẫu Nhiên", use_container_width=True) if method == "Ngẫu nhiên" else False
-    
-    if btn_time or btn_random:
-        try:
-            now = datetime.now()
-            
-            if btn_time:
-                qua_result = tinh_qua_theo_thoi_gian(now.year, now.month, now.day, now.hour)
-            else:
-                qua_result = tinh_qua_ngau_nhien()
-            
-            # Get interpretation for selected topic
-            giai_qua_result = giai_qua(qua_result, selected_topic)
-            qua_result['interpretation'] = giai_qua_result
-            
-            # Store in session state
-            st.session_state.mai_hoa_result = qua_result
-            
-        except Exception as e:
-            st.error(f"Lỗi lập quẻ: {e}")
-            import traceback
-            st.code(traceback.format_exc())
-    
-    # Display results if available
-    if 'mai_hoa_result' in st.session_state:
-        qua_result = st.session_state.mai_hoa_result
-        
-        st.success("✅ Đã lập quẻ thành công!")
-        
-        # Display hexagrams visually
-        st.markdown("### 📊 Quẻ Tượng")
-        
-        col_ban, col_ho, col_bien = st.columns(3)
-        
-        # Helper function to display hexagram
-        def display_hexagram(qua_name, title, column):
-            with column:
-                st.markdown(f"**{title}**")
-                st.markdown(f"<div style='text-align: center; font-size: 24px; font-weight: bold; color: #2c3e50;'>{qua_name}</div>", unsafe_allow_html=True)
-                
-                # Display trigrams (simplified)
-                st.markdown("<div style='text-align: center; font-size: 14px; color: #7f8c8d;'>☰☷☲☳☴☵☶☱</div>", unsafe_allow_html=True)
-        
-        if 'ban_qua' in qua_result:
-            display_hexagram(qua_result['ban_qua'], "🎯 Bản Quẻ", col_ban)
-        
-        if 'ho_qua' in qua_result:
-            display_hexagram(qua_result['ho_qua'], "🤝 Hỗ Quẻ", col_ho)
-        
-        if 'bien_qua' in qua_result:
-            display_hexagram(qua_result['bien_qua'], "🔄 Biến Quẻ", col_bien)
-        
-        # Display detailed information
-        st.markdown("---")
-        st.markdown("### 📋 Thông Tin Chi Tiết")
-        
-        info_col1, info_col2 = st.columns(2)
-        
-        with info_col1:
-            if 'thuong_qua' in qua_result:
-                st.info(f"**Thượng Quái:** {qua_result['thuong_qua']}")
-            if 'ha_qua' in qua_result:
-                st.info(f"**Hạ Quái:** {qua_result['ha_qua']}")
-        
-        with info_col2:
-            if 'dong_hao' in qua_result:
-                st.warning(f"**Động Hào:** {qua_result['dong_hao']}")
-            if 'ngu_hanh' in qua_result:
-                st.success(f"**Ngũ Hành:** {qua_result['ngu_hanh']}")
-        
-        # Display interpretation
-        st.markdown("---")
-        st.markdown(f"### 📜 Giải Quẻ Theo Chủ Đề: **{selected_topic}**")
-        
-        if 'interpretation' in qua_result:
-            st.markdown(qua_result['interpretation'])
+    if st.button("🌸 LẬP QUẺ MAI HOA PRO", type="primary", use_container_width=True):
+        now = datetime.now()
+        if method == "Thời gian":
+            res = tinh_qua_theo_thoi_gian(now.year, now.month, now.day, now.hour)
         else:
-            st.write("Chưa có giải quẻ chi tiết.")
+            res = tinh_qua_ngau_nhien()
         
-        # Display raw data in expander
-        with st.expander("🔍 Xem Dữ Liệu Thô"):
-            st.json(qua_result)
+        # Add interpretation
+        res['interpretation'] = giai_qua(res, selected_topic)
+        st.session_state.mai_hoa_result = res
+
+    if 'mai_hoa_result' in st.session_state:
+        res = st.session_state.mai_hoa_result
+        st.markdown('<div class="iching-container">', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="hex-header-row">
+            <div>
+                <div class="hex-title-pro">{res.get('ten_qua', 'Quẻ Chính')}</div>
+                <div class="hex-subtitle">Quẻ Chủ / Hỗ</div>
+            </div>
+            <div>
+                <div class="hex-title-pro">BIẾN CÁT TƯỜNG</div>
+                <div class="hex-subtitle">Động hào {res.get('dong_hao', '?')}</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.success(f"💡 **Luận giải:** {res.get('interpretation', 'Đang phân tích...')}")
+        st.markdown('<div class="footer-stamp">Copyright © 2026 MAI HOA DICH SO PRO</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
 elif st.session_state.current_view == "luc_hao":
-    st.markdown("## ☯️ LỤC HÀO KINH DỊCH")
+    st.markdown("## ☯️ LỤC HÀO KINH DỊCH - CHUYÊN SÂU")
     
     if not USE_LUC_HAO:
-        st.error("❌ Module Lục Hào Kinh Dịch không khả dụng. Vui lòng kiểm tra file luc_hao_kinh_dich.py trong thư mục dist.")
+        st.error("❌ Module Lục Hào Kinh Dịch không khả dụng.")
         st.stop()
     
     st.markdown(f"### 🎯 Chủ đề: **{selected_topic}**")
-    st.caption("Lục Hào Kinh Dịch sẽ phân tích theo chủ đề đã chọn")
     
-    if st.button("🎲 Lập Quẻ Lục Hào", type="primary", use_container_width=False):
+    if st.button("🎲 LẬP QUẺ LỤC HÀO PRO", type="primary", use_container_width=True):
         try:
             now = datetime.now()
-            luc_hao_result = lap_qua_luc_hao(now.year, now.month, now.day, now.hour, selected_topic)
-            
-            # Store in session state
-            st.session_state.luc_hao_result = luc_hao_result
-            
+            can_ngay = st.session_state.chart_data.get('can_ngay', 'Giáp') if 'chart_data' in st.session_state else "Giáp"
+            st.session_state.luc_hao_result = lap_qua_luc_hao(now.year, now.month, now.day, now.hour, selected_topic, can_ngay)
         except Exception as e:
-            st.error(f"Lỗi lập quẻ: {e}")
-            import traceback
-            st.code(traceback.format_exc())
-    
-    # Display results if available
-    if 'luc_hao_result' in st.session_state:
-        luc_hao_result = st.session_state.luc_hao_result
-        
-        st.success("✅ Đã lập quẻ thành công!")
-        
-        # Display hexagram visually
-        st.markdown("### 📊 Quẻ Tượng")
-        
-        col_ban, col_bien = st.columns(2)
-        
-        with col_ban:
-            st.markdown("<div style='text-align: center; margin-bottom: 20px;'><strong>🎯 Bản Quẻ</strong></div>", unsafe_allow_html=True)
-            if 'ban_qua_ten' in luc_hao_result:
-                st.markdown(f"<div style='text-align: center; font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 15px;'>{luc_hao_result['ban_qua_ten']}</div>", unsafe_allow_html=True)
-            
-            # Premium 6-line display
-            if 'ban_qua_lines' in luc_hao_result:
-                lines = luc_hao_result['ban_qua_lines']
-                details = luc_hao_result.get('phan_tich_tung_hao', [])
-                
-                for i in range(6):
-                    line = lines[i]
-                    detail = details[i] if i < len(details) else {}
-                    
-                    line_html = "━━━━━━" if line == 1 else "━━  ━━"
-                    line_color = "#ef4444" if line == 1 else "#3b82f6" # Red for Yang, Blue for Yin
-                    
-                    st.markdown(f"""
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px;">
-                        <div style="font-size: 11px; font-weight: 700; color: #64748b; width: 60px; text-align: right;">{detail.get('luc_thu', '')}</div>
-                        <div style="font-size: 18px; font-weight: 900; color: {line_color}; letter-spacing: -2px;">{line_html}</div>
-                        <div style="font-size: 11px; font-weight: 700; color: #1e293b; width: 60px; text-align: left;">{detail.get('luc_than', '')}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+            st.error(f"Lỗi: {e}")
 
-        with col_bien:
-            st.markdown("<div style='text-align: center; margin-bottom: 20px;'><strong>🔄 Biến Quẻ</strong></div>", unsafe_allow_html=True)
-            if 'bien_qua_ten' in luc_hao_result:
-                st.markdown(f"<div style='text-align: center; font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 15px;'>{luc_hao_result['bien_qua_ten']}</div>", unsafe_allow_html=True)
-            
-            if 'bien_qua_lines' in luc_hao_result:
-                lines_bien = luc_hao_result['bien_qua_lines']
-                for i, line in enumerate(lines_bien):
-                    line_html = "━━━━━━" if line == 1 else "━━  ━━"
-                    line_color = "#ef4444" if line == 1 else "#3b82f6"
-                    st.markdown(f"""
-                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                        <div style="font-size: 18px; font-weight: 900; color: {line_color}; letter-spacing: -2px;">{line_html}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+    if 'luc_hao_result' in st.session_state:
+        res = st.session_state.luc_hao_result
+        st.markdown('<div class="iching-container">', unsafe_allow_html=True)
         
-        # Display detailed information
-        st.markdown("---")
-        st.markdown("### 📋 Thông Tin Chi Tiết")
-        
-        col1, col2, col3 = st.columns(3)
-        
+        st.markdown(f"""
+        <div class="hex-header-row">
+            <div>
+                <div class="hex-title-pro">{res['ban']['name']}</div>
+                <div class="hex-subtitle">Họ {res['ban']['palace']}</div>
+            </div>
+            <div>
+                <div class="hex-title-pro">{res['bien']['name']}</div>
+                <div class="hex-subtitle">Quẻ Biến</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col1, col2 = st.columns(2)
         with col1:
-            if 'the_ung' in luc_hao_result:
-                st.info(f"**Thế Ứng:** {luc_hao_result['the_ung']}")
-            if 'dong_hao' in luc_hao_result:
-                st.warning(f"**Động Hào:** {luc_hao_result['dong_hao']}")
-        
+            st.markdown('<div class="hex-visual-stack">', unsafe_allow_html=True)
+            for line in reversed(res['ban']['lines']):
+                cls = "yang-line-pro" if line == 1 else "yin-line-pro"
+                if line == 1:
+                    st.markdown(f'<div class="hao-line-pro {cls}"></div>', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'<div class="{cls}"><div class="yin-half-pro"></div><div class="yin-half-pro"></div></div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            st.markdown('<table class="hao-table-pro"><tr><th>Hào</th><th>Lục Thân</th><th>Can Chi</th><th>TK</th></tr>', unsafe_allow_html=True)
+            for d in reversed(res['ban']['details']):
+                h_cls = "highlight-red" if d['is_moving'] else ""
+                # Simple logic for markers
+                marker = ""
+                if f"Hào {d['hao']}" in res['the_ung']:
+                    marker = " (T)" if "Thế" in res['the_ung'].split(',')[0] and f"{d['hao']}" in res['the_ung'].split(',')[0] else " (Ứ)"
+                
+                st.markdown(f'<tr class="{h_cls}"><td>{d["hao"]}{marker}</td><td>{d["luc_than"]}</td><td>{d["can_chi"]}</td><td>{d["loc_ma"]}</td></tr>', unsafe_allow_html=True)
+            st.markdown('</table>', unsafe_allow_html=True)
+
         with col2:
-            if 'luc_than' in luc_hao_result:
-                st.success(f"**Lục Thân:** {luc_hao_result['luc_than']}")
-            if 'luc_thu' in luc_hao_result:
-                st.info(f"**Lục Thú:** {luc_hao_result['luc_thu']}")
+            st.markdown('<div class="hex-visual-stack">', unsafe_allow_html=True)
+            for line in reversed(res['bien']['lines']):
+                cls = "yang-line-pro" if line == 1 else "yin-line-pro"
+                if line == 1:
+                    st.markdown(f'<div class="hao-line-pro {cls}"></div>', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'<div class="{cls}"><div class="yin-half-pro"></div><div class="yin-half-pro"></div></div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            st.markdown('<table class="hao-table-pro"><tr><th>Hào</th><th>Lục Thân</th><th>Can Chi</th><th>Lục Thú</th></tr>', unsafe_allow_html=True)
+            for d in reversed(res['bien']['details']):
+                st.markdown(f'<tr><td>{d["hao"]}</td><td>{d["luc_than"]}</td><td>{d["can_chi"]}</td><td>{d["luc_thu"]}</td></tr>', unsafe_allow_html=True)
+            st.markdown('</table>', unsafe_allow_html=True)
+
+        # Expert Footer
+        st.markdown(f"""
+        <div class="status-footer-pro">
+            <span>🔹 {res['the_ung']}</span>
+            <span>📍 Dụng Thần: {res['ban']['details'][2]['luc_than']}</span>
+            <span>📌 {res['conclusion'].split('.')[1]}</span>
+        </div>
+        """, unsafe_allow_html=True)
+        st.markdown('<div class="footer-stamp">Copyright © 2026 KY MON DON GIAP PRO</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
-        with col3:
-            if 'vuong_suy' in luc_hao_result:
-                st.success(f"**Vượng Suy:** {luc_hao_result['vuong_suy']}")
-            if 'dong_tinh' in luc_hao_result:
-                st.warning(f"**Động Tĩnh:** {luc_hao_result['dong_tinh']}")
-        
-        # Display interpretation
-        st.markdown("---")
-        st.markdown(f"### 📜 Giải Quẻ Theo Chủ Đề: **{selected_topic}**")
-        
-        if 'giai_qua' in luc_hao_result:
-            st.markdown(luc_hao_result['giai_qua'])
-        elif 'interpretation' in luc_hao_result:
-            st.markdown(luc_hao_result['interpretation'])
-        else:
-            st.write("Chưa có giải quẻ chi tiết.")
-        
-        # Detailed analysis by lines
-        if 'phan_tich_tung_hao' in luc_hao_result:
-            with st.expander("🔍 Phân Tích Từng Hào"):
-                for hao_info in luc_hao_result['phan_tich_tung_hao']:
-                    st.markdown(f"**{hao_info.get('ten', 'N/A')}:** {hao_info.get('y_nghia', 'N/A')}")
-        
-        # Display raw data in expander
-        with st.expander("🔍 Xem Dữ Liệu Thô"):
-            st.json(luc_hao_result)
+        if st.button("🤖 AI Luận Quẻ", key="ai_iching_btn"):
+            with st.spinner("AI đang giải mã..."):
+                ans = st.session_state.gemini_helper.answer_question(f"Luận quẻ {res['ban']['name']} biến {res['bien']['name']} cho việc {selected_topic}")
+                st.info(ans)
 
 
 # ======================================================================

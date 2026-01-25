@@ -244,28 +244,30 @@ st.markdown("""
     
     /* Interpret Box for better readability */
     .interpret-box {
-        background: #fdfdfd;
+        background: #f8fafc;
         border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        padding: 15px;
-        margin: 10px 0;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        max-height: 400px;
+        border: 2px solid #e2e8f0;
+        padding: 20px;
+        margin: 15px 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        max-height: 500px;
         overflow-y: auto;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #2d3748;
+        font-size: 15px;
+        line-height: 1.7;
+        color: #1e293b;
+        width: 100% !important;
+        box-sizing: border-box;
     }
     
     .interpret-title {
-        font-weight: 700;
-        color: #4a5568;
-        border-bottom: 2px solid #edf2f7;
-        padding-bottom: 5px;
-        margin-bottom: 10px;
+        font-weight: 800;
+        color: #334155;
+        border-bottom: 2px solid #cbd5e1;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
         text-transform: uppercase;
-        font-size: 12px;
-        letter-spacing: 0.5px;
+        font-size: 13px;
+        letter-spacing: 1px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -856,16 +858,15 @@ if st.session_state.current_view == "ky_mon":
                                 with col_sao_1:
                                     st.markdown(f"**⭐ {sao}:** {star_data.get('Tính_Chất', 'N/A')}")
                                 with col_sao_2:
+                                    show_star_exp = False
                                     if 'gemini_helper' in st.session_state:
                                         if st.button(f"🤖 Giải thích {sao}", key=f"ai_star_{palace_num}_{sao}"):
-                                            with st.spinner(f"AI đang giải thích về sao {sao}..."):
-                                                explanation = st.session_state.gemini_helper.explain_element('star', sao)
-                                                st.markdown(f"""
-                                                <div class="interpret-box">
-                                                    <div class="interpret-title">Luận Giải Sao {sao}</div>
-                                                    {explanation}
-                                                </div>
-                                                """, unsafe_allow_html=True)
+                                            show_star_exp = True
+                                
+                                if show_star_exp:
+                                    with st.spinner(f"AI đang giải thích về sao {sao}..."):
+                                        explanation = st.session_state.gemini_helper.explain_element('star', sao)
+                                        st.markdown(f"""<div class="interpret-box"><div class="interpret-title">Luận Giải Sao {sao}</div>{explanation}</div>""", unsafe_allow_html=True)
                             
                             # Door description
                             if door_data:
@@ -873,34 +874,32 @@ if st.session_state.current_view == "ky_mon":
                                 with col_door_1:
                                     st.markdown(f"**🚪 {cua} Môn:** {door_data.get('Tính_Chất', 'N/A')}")
                                 with col_door_2:
+                                    show_door_exp = False
                                     if 'gemini_helper' in st.session_state:
                                         if st.button(f"🤖 Giải thích {cua}", key=f"ai_door_{palace_num}_{cua}"):
-                                            with st.spinner(f"AI đang giải thích về cửa {cua}..."):
-                                                explanation = st.session_state.gemini_helper.explain_element('door', cua)
-                                                st.markdown(f"""
-                                                <div class="interpret-box">
-                                                    <div class="interpret-title">Luận Giải Cửa {cua}</div>
-                                                    {explanation}
-                                                </div>
-                                                """, unsafe_allow_html=True)
+                                            show_door_exp = True
+                                
+                                if show_door_exp:
+                                    with st.spinner(f"AI đang giải thích về cửa {cua}..."):
+                                        explanation = st.session_state.gemini_helper.explain_element('door', cua)
+                                        st.markdown(f"""<div class="interpret-box"><div class="interpret-title">Luận Giải Cửa {cua}</div>{explanation}</div>""", unsafe_allow_html=True)
                             
                             # Deity description
                             deity_data = KY_MON_DATA['DU_LIEU_DUNG_THAN_PHU_TRO']['BAT_THAN'].get(than, {})
                             if deity_data:
                                 col_than_1, col_than_2 = st.columns([3, 1])
                                 with col_than_1:
-                                    st.markdown(f"**�️ {than}:** {deity_data.get('Tính_Chất', 'N/A')}")
+                                    st.markdown(f"**🛡️ {than}:** {deity_data.get('Tính_Chất', 'N/A')}")
                                 with col_than_2:
+                                    show_than_exp = False
                                     if 'gemini_helper' in st.session_state:
                                         if st.button(f"🤖 Giải thích {than}", key=f"ai_deity_{palace_num}_{than}"):
-                                            with st.spinner(f"AI đang giải thích về thần {than}..."):
-                                                explanation = st.session_state.gemini_helper.explain_element('deity', than)
-                                                st.markdown(f"""
-                                                <div class="interpret-box">
-                                                    <div class="interpret-title">Luận Giải Thần {than}</div>
-                                                    {explanation}
-                                                </div>
-                                                """, unsafe_allow_html=True)
+                                            show_than_exp = True
+                                
+                                if show_than_exp:
+                                    with st.spinner(f"AI đang giải thích về thần {than}..."):
+                                        explanation = st.session_state.gemini_helper.explain_element('deity', than)
+                                        st.markdown(f"""<div class="interpret-box"><div class="interpret-title">Luận Giải Thần {than}</div>{explanation}</div>""", unsafe_allow_html=True)
                             
                             # Stem combination
                             cach_cuc_key = can_thien + can_dia

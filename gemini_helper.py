@@ -27,8 +27,9 @@ class GeminiQMDGHelper:
         """Initialize Gemini with API key"""
         self.api_key = api_key
         genai.configure(api_key=api_key)
+        self._failed_models = set() # Track exhausted models
         
-        # Context tracking - Initialize BEFORE model selection
+        # Context tracking
         self.current_context = {
             'topic': None,
             'palace': None,
@@ -62,6 +63,7 @@ class GeminiQMDGHelper:
         
         last_error = "Unknown error"
         for model_name in models_to_try:
+            if model_name in self._failed_models: continue # Skip known broken models
             try:
                 model = genai.GenerativeModel(model_name)
                 # Quick test with low tokens
@@ -69,6 +71,8 @@ class GeminiQMDGHelper:
                 return model
             except Exception as e:
                 last_error = str(e)
+                if "429" in last_error or "quota" in last_error.lower():
+                    self._failed_models.add(model_name)
                 continue
         
         # Fallback to list models if configured ones fail
@@ -76,6 +80,7 @@ class GeminiQMDGHelper:
             for m in genai.list_models():
                 if 'generateContent' in m.supported_generation_methods:
                     name = m.name.split('/')[-1]
+                    if name in self._failed_models: continue
                     try:
                         model = genai.GenerativeModel(name)
                         model.generate_content("ping", generation_config={"max_output_tokens": 1})
@@ -90,20 +95,20 @@ class GeminiQMDGHelper:
     def test_connection(self):
         """Quickly test if the API key and model are working"""
         try:
-            response = self.model.generate_content("Xin chào, bạn có khỏe không?", generation_config={"max_output_tokens": 20})
+            response = self.model.generate_content("Xin chào?", generation_config={"max_output_tokens": 5})
             if response.text:
                 return True, "Kết nối thành công!"
             return False, "Không nhận được phản hồi từ AI."
         except Exception as e:
             error_msg = str(e)
             if "API_KEY_INVALID" in error_msg:
-                return False, "API Key không chính xác hoặc đã hết hạn."
-            elif "quota" in error_msg.lower():
-                return False, "Đã hết hạn mức sử dụng (Quota) cho Key này."
-            return False, f"Lỗi kết nối: {error_msg}"
+                return False, "API Key không chính xác."
+            elif "429" in error_msg or "quota" in error_msg.lower():
+                return False, "Đã hết hạn mức sử dụng (Quota) cho model này."
+            return False, f"Lỗi: {error_msg}"
 
     def _call_ai(self, prompt):
-        """Call AI via n8n or direct Gemini API"""
+        """Call AI with auto-switch fallback on quota failure"""
         # Option 1: Use n8n if configured
         if self.n8n_url:
             try:
@@ -123,33 +128,35 @@ class GeminiQMDGHelper:
                 print(f"n8n Exception: {e}")
                 # Fallback to local
         
-        # Option 2: Direct Gemini API
+        # Option 2: Direct Gemini API with Swapping
         import time
-        max_retries = 2
-        for attempt in range(max_retries):
+        for attempt in range(3): # 3 attempts, potentially 3 different models
             try:
                 response = self.model.generate_content(prompt)
                 if not response.text:
-                    return "⚠️ AI trả về kết quả trống. Thử lại sau hoặc kiểm tra API Key."
+                    return "⚠️ AI trả về kết quả trống."
                 return response.text
             except Exception as e:
                 error_msg = str(e)
-                # Handle Rate Limit (Quota)
-                if "429" in error_msg or "quota" in error_msg.lower():
-                    if attempt < max_retries - 1:
-                        time.sleep(1) # Wait 1 second and retry once
-                        continue
-                    return "🛑 **Hết hạn mức AI (Quota Exceeded):** Vui lòng đợi khoảng 20-30 giây rồi nhấn nút Luận giải lại. Bản miễn phí có giới hạn số lần gọi mỗi phút."
+                model_name = getattr(self.model, 'model_name', 'unknown').split('/')[-1]
                 
-                # Handle Safety
-                if "finish_reason: SAFETY" in error_msg or "blocked" in error_msg.lower():
-                    return "🛡️ Nội dung bị AI chặn do quy tắc an toàn. Thử đổi chủ đề hoặc đặt lại câu hỏi."
+                # Quota Failure (429) -> Switch Model
+                if "429" in error_msg or "quota" in error_msg.lower():
+                    self._failed_models.add(model_name)
+                    print(f"Model {model_name} exhausted. Switching...")
+                    self.model = self._get_best_model() # Try to get a NEW model
+                    time.sleep(1)
+                    continue
+                
+                # Safety Block
+                if "SAFETY" in error_msg or "blocked" in error_msg.lower():
+                    return "🛡️ Nội dung bị chặn do quy tắc an toàn. Thử đổi chủ đề."
                 
                 # If it's the last attempt or a different error, return or raise
-                if attempt == max_retries - 1:
-                    return f"❌ Lỗi khi gọi AI: {error_msg}\n\nVui lòng kiểm tra API key hoặc thử lại sau vài giây."
+                if attempt == 2:
+                    return f"❌ Lỗi AI: {error_msg}\n\nVui lòng đợi hoặc đổi API Key."
                 time.sleep(0.5)
-        return "❌ Không thể nhận phản hồi từ AI sau nhiều lần thử."
+        return "🛑 **Hết hạn mức AI trên tất cả các dòng model:** Bạn đã dùng hết quota MIỄN PHÍ hằng ngày. Vui lòng thử lại vào ngày mai hoặc dùng API Key khác."
     
     def update_context(self, **kwargs):
         """Update current context"""

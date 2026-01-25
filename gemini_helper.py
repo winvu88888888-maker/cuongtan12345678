@@ -20,6 +20,18 @@ CUNG_NGU_HANH = {
     9: "Hỏa"
 }
 
+CUNG_TEN = {
+    1: "Khảm (Thủy)",
+    2: "Khôn (Thổ)",
+    3: "Chấn (Mộc)",
+    4: "Tốn (Mộc)",
+    5: "Trung Cung (Thổ)",
+    6: "Càn (Kim)",
+    7: "Đoài (Kim)",
+    8: "Cấn (Thổ)",
+    9: "Ly (Hỏa)"
+}
+
 class GeminiQMDGHelper:
     """Helper class with context awareness for QMDG analysis"""
     
@@ -300,20 +312,19 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
         for p_num, info in palaces_of_interest.items():
             labels_str = ", ".join(info['labels'])
             void_str = " [KHÔNG VONG]" if info['void'] else ""
-            desc = (f"Cung {p_num} ({info['hanh']}): Chứa {labels_str}. "
+            p_name = CUNG_TEN.get(p_num, f"Cung {p_num}")
+            desc = (f"Cung {p_num} ({p_name}): Chứa {labels_str}. "
                     f"Trận thế: {info['star']} - {info['door']} - {info['deity']}. "
                     f"Cặp Can: {info['can_thien']}/{info['can_dia']}{void_str}")
             poi_desc.append(desc)
 
-        prompt = f"""{self.get_context_prompt()}Bạn là bậc thầy Kỳ Môn Độn Giáp cao cấp. Hãy thực hiện LUẬN GIẢI CHUYÊN SÂU TAM GIÁC cho chủ đề: **{topic}**.
+        prompt = f"""{self.get_context_prompt()}Bạn là bậc thầy Kỳ Môn Độn Giáp cao cấp. Hãy thực hiện LUẬN GIẢI CHUYÊN SÂU TAM GIÁC (Structured Analysis) cho chủ đề: **{topic}**.
 
-**NGUYÊN TẮC LUẬN GIẢI BẮT BUỘC:**
-1. **Phân tích Nội Tại (Quan trọng)**: Đánh giá sức mạnh nội tại của **Chủ Thể ({final_subj_stem})** - người chúng ta đang hỏi giúp. Họ có đủ lực, đủ thuận lợi để thực hiện việc này không?
-2. **Luận giải Tam Giác (Triangular Logic)**: Phân tích sự tương tác giữa 3 đỉnh: 
-   - Đỉnh 1: **Chủ Thể ({final_subj_stem})** - Đại diện cho người thân/người hỏi.
-   - Đỉnh 2: **Đối Tượng ({final_obj_stem})** - Đại diện cho người mua/đối thủ/người lạ.
-   - Đỉnh 3: **Dụng Thần Topic** - Đại diện cho cái nhà/tiền bạc/kết quả ({topic}).
-3. **Kết luận logic**: Liệu Chủ Thể có thắng được Đối Tượng để chiếm lấy kết quả không?
+**NGUYÊN TẮC LUẬN GIẢI BẮT BUỘC (THEO THỨ TỰ):**
+1. **NHẬN DIỆN VỊ TRÍ**: Xác định rõ từng nhân tố đại diện nằm ở Cung nào (Ví dụ: Chủ thể ở cung Chấn, Đối tượng ở cung Đoài...).
+2. **PHÂN TÍCH NỘI TẠI & ĐỘNG CƠ**: Đánh giá "chất lượng" từng cung. Sao/Môn/Thần/Can đang nói gì về trạng thái và lý do hành động của nhân tố đó? Họ có đủ lực không?
+3. **TƯƠNG TÁC TAM GIÁC**: So sánh Sinh/Khắc/Xung/Hợp giữa: **Chủ Thể ({final_subj_stem})**, **Đối Tượng ({final_obj_stem})** và **Dụng Thần Topic**.
+4. **CHIẾN THUẬT & PHÁN QUYẾT**: Câu trả lời cuối cùng là gì? Cần làm gì để xoay chuyển tình thế?
 
 **DỮ LIỆU CÁC CUNG TRỌNG TÂM:**
 {chr(10).join(poi_desc)}
@@ -323,14 +334,14 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
 - Chấp hành (Trực Sử): {truc_su}
 - Gợi ý chuyên môn: "{topic_hints}"
 
-**NỘI DUNG BÁO CÁO (SÚC TÍCH - QUYỀN LỰC):**
+**NỘI DUNG BÁO CÁO (CHUYÊN NGHIỆP - QUYỀN LỰC):**
 
-- **PHẦN 1: TRẠNG THÁI CỦA NGƯỜI ĐƯỢC XEM ({final_subj_stem})**: Người này đang mạnh hay yếu? Cung của họ có thuận lợi hay đang gặp khó khăn nội tại?
-- **PHẦN 2: TƯƠNG TÁC TAM GIÁC**: Phân tích quan hệ Sinh/Khắc giữa Người này vs Đối tượng vs Dụng thần chủ đề.
-- **PHẦN 3: PHÁN QUYẾT CUỐI CÙNG**: Dựa trên bối cảnh "{topic_hints}", người này có đạt được mục đích không? Tại sao?
-- **PHẦN 4: CHIẾN THUẬT & ỨNG KỲ**: Phải làm gì để giúp người này đạt mục tiêu nhanh nhất? Khi nào?
+- **PHẦN 1: NHẬN DIỆN VỊ TRÍ**: Nêu tên cung vị của từng nhân tố.
+- **PHẦN 2: ĐÁNH GIÁ NĂNG LỰC & ĐỘNG CƠ**: Phân tích sâu nội tại của từng cung trọng tâm.
+- **PHẦN 3: DIỄN BIẾN TƯƠNG TÁC**: Mô tả quá trình tương tác giữa các bên và mục tiêu.
+- **PHẦN 4: KẾT LUẬN & CHIẾN THUẬT**: Phán quyết cuối cùng và lời khuyên hành động cụ thể.
 
-Trả lời bằng phong thái chuyên gia, tập trung hoàn toàn vào việc giải quyết vấn đề cho Chủ Thể."""
+Trả lời bằng phong thái chuyên gia, ngôn ngữ sắc bén, tập trung hoàn toàn vào việc giải quyết vấn đề cho Chủ Thể."""
 
         try:
             return self._call_ai(prompt)

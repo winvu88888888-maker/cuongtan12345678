@@ -2,6 +2,7 @@ import streamlit as st
 import sys
 import os
 import random
+import textwrap
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from PIL import Image
@@ -798,72 +799,77 @@ if st.session_state.current_view == "ky_mon":
                         palace_lines = [random.randint(0,1) for _ in range(3)]
                         lines_html = "".join([f'<div style="color: {"#FF4D4D" if l == 1 else "#3B82F6"}; font-size: 7px; line-height: 1;">{"━━━━━━" if l == 1 else "━━  ━━"}</div>' for l in palace_lines])
 
-                        # 3D Palace Card HTML
-                        st.markdown(f"""
-                        <div class="palace-3d" style="margin-bottom: 25px;">
-                        <div class="palace-inner" style="
-                            background: {bg_style};
-                            border: {border_width} solid {element_configs['border']};
-                            border-radius: 16px;
-                            padding: 20px;
-                            min-height: 320px;
-                            box-shadow: 10px 10px 20px rgba(0,0,0,0.2), inset 0 0 60px rgba(255,255,255,0.2);
-                            position: relative;
-                            display: flex;
-                            flex-direction: column;
-                            border-bottom: 10px solid {element_configs['border']};
-                            overflow: hidden;
-                        ">
-                            <!-- Overlay for readability -->
-                            <div style="position: absolute; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); z-index: 0;"></div>
-                            
-                            <div style="position: relative; z-index: 1;">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <div>
-                                        <div style="font-weight: 900; font-size: 26px; color: {element_configs['border']}; line-height: 1;">{palace_num}</div>
-                                        <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">{QUAI_TUONG.get(palace_num, '')}</div>
-                                    </div>
-                                    <div style="text-align: right;">
-                                        <div style="background: {strength_color}; color: white; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;">{strength}</div>
-                                        <div style="font-size: 20px; margin-top: 5px;" class="element-icon-3d">{element_configs['icon']}</div>
-                                    </div>
-                                </div>
+                        # Prepare markers HTML
+                        marker_html = f'<div style="margin-top: 12px; font-size: 11px; color: #6d28d9; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1px;">✨ {marker_text}</div>' if marker_text else ''
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-                                    <div style="background: rgba(255,255,255,0.8); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid {element_configs['border']}44; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                                        <div style="font-size: 10px; color: {element_configs['border']}; font-weight: 800; letter-spacing: 1px;">TINH</div>
-                                        <div style="font-size: 16px; font-weight: 900; color: #1a202c;">{sao}</div>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.8); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid {element_configs['border']}44; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                                        <div style="font-size: 10px; color: {element_configs['border']}; font-weight: 800; letter-spacing: 1px;">MÔN</div>
-                                        <div style="font-size: 16px; font-weight: 900; color: #1a202c;">{cua}</div>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.8); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid {element_configs['border']}44; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                                        <div style="font-size: 10px; color: {element_configs['border']}; font-weight: 800; letter-spacing: 1px;">THẦN</div>
-                                        <div style="font-size: 16px; font-weight: 900; color: #1a202c;">{than}</div>
-                                    </div>
-                                    <div style="background: rgba(255,255,255,0.8); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid {element_configs['border']}44; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
-                                        <div style="font-size: 9px; color: {element_configs['border']}; font-weight: 800;">QUÁI</div>
-                                        <div style="margin-top: 4px;">{lines_html}</div>
-                                    </div>
-                                </div>
-
-                                <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                                    <div>
-                                        <span style="font-size: 10px; font-weight: 800; color: #64748b;">THIÊN:</span>
-                                        <span style="font-size: 18px; font-weight: 900; color: #D97706; margin-left: 5px;">{can_thien}</span>
-                                    </div>
-                                    <div>
-                                        <span style="font-size: 10px; font-weight: 800; color: #64748b;">ĐỊA:</span>
-                                        <span style="font-size: 18px; font-weight: 900; color: #475569; margin-left: 5px;">{can_dia}</span>
-                                    </div>
-                                </div>
+                        # Construct Palace Card HTML
+                        palace_html = textwrap.dedent(f"""
+                            <div class="palace-3d" style="margin-bottom: 25px;">
+                            <div class="palace-inner" style="
+                                background: {bg_style};
+                                border: {border_width} solid {element_configs['border']};
+                                border-radius: 16px;
+                                padding: 20px;
+                                min-height: 320px;
+                                box-shadow: 10px 10px 20px rgba(0,0,0,0.2), inset 0 0 60px rgba(255,255,255,0.2);
+                                position: relative;
+                                display: flex;
+                                flex-direction: column;
+                                border-bottom: 10px solid {element_configs['border']};
+                                overflow: hidden;
+                            ">
+                                <!-- Overlay for readability -->
+                                <div style="position: absolute; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); z-index: 0;"></div>
                                 
-                                {f'<div style="margin-top: 12px; font-size: 11px; color: #6d28d9; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 1px;">✨ {marker_text}</div>' if marker_text else ''}
+                                <div style="position: relative; z-index: 1;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <div>
+                                            <div style="font-weight: 900; font-size: 26px; color: {element_configs['border']}; line-height: 1;">{palace_num}</div>
+                                            <div style="font-size: 14px; font-weight: 700; color: #1e293b; margin-top: 2px;">{QUAI_TUONG.get(palace_num, '')}</div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="background: {strength_color}; color: white; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;">{strength}</div>
+                                            <div style="font-size: 20px; margin-top: 5px;" class="element-icon-3d">{element_configs['icon']}</div>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                                        <div style="background: rgba(255,255,255,0.8); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid {element_configs['border']}44; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                                            <div style="font-size: 10px; color: {element_configs['border']}; font-weight: 800; letter-spacing: 1px;">TINH</div>
+                                            <div style="font-size: 16px; font-weight: 900; color: #1a202c;">{sao}</div>
+                                        </div>
+                                        <div style="background: rgba(255,255,255,0.8); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid {element_configs['border']}44; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                                            <div style="font-size: 10px; color: {element_configs['border']}; font-weight: 800; letter-spacing: 1px;">MÔN</div>
+                                            <div style="font-size: 16px; font-weight: 900; color: #1a202c;">{cua}</div>
+                                        </div>
+                                        <div style="background: rgba(255,255,255,0.8); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid {element_configs['border']}44; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                                            <div style="font-size: 10px; color: {element_configs['border']}; font-weight: 800; letter-spacing: 1px;">THẦN</div>
+                                            <div style="font-size: 16px; font-weight: 900; color: #1a202c;">{than}</div>
+                                        </div>
+                                        <div style="background: rgba(255,255,255,0.8); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid {element_configs['border']}44; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);">
+                                            <div style="font-size: 9px; color: {element_configs['border']}; font-weight: 800;">QUÁI</div>
+                                            <div style="margin-top: 4px;">{lines_html}</div>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <span style="font-size: 10px; font-weight: 800; color: #64748b;">THIÊN:</span>
+                                            <span style="font-size: 18px; font-weight: 900; color: #D97706; margin-left: 5px;">{can_thien}</span>
+                                        </div>
+                                        <div>
+                                            <span style="font-size: 10px; font-weight: 800; color: #64748b;">ĐỊA:</span>
+                                            <span style="font-size: 18px; font-weight: 900; color: #475569; margin-left: 5px;">{can_dia}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {marker_html}
+                                </div>
                             </div>
-                        </div>
-                        </div>
-                        """, unsafe_allow_html=True)
+                            </div>
+                        """)
+                        
+                        st.markdown(palace_html, unsafe_allow_html=True)
 
                         
                         # Expander for detailed analysis

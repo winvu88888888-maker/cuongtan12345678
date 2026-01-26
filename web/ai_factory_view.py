@@ -4,7 +4,7 @@ import os
 import json
 from pathlib import Path
 from datetime import datetime
-from web.ai_factory_tabs import render_universal_data_hub_tab, render_system_management_tab
+
 
 # Add project root to path (absolute)
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -12,6 +12,14 @@ if root_path not in sys.path:
     sys.path.insert(0, root_path)
 
 # Import modules from ai_modules
+# Import sub-tabs
+try:
+    from web.ai_factory_tabs import render_universal_data_hub_tab, render_system_management_tab
+except ImportError:
+    st.error("⚠️ Không thể tìm thấy module web/ai_factory_tabs.py")
+    def render_universal_data_hub_tab(): st.error("Tab Dữ Liệu lỗi")
+    def render_system_management_tab(): st.error("Tab Quản Trị lỗi")
+
 from ai_modules.orchestrator import AIOrchestrator
 from ai_modules.memory_system import MemorySystem
 try:

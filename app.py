@@ -514,6 +514,37 @@ st.markdown("""
         font-style: italic;
     }
 
+    .action-card {
+        background: rgba(255, 251, 235, 0.9);
+        border-left: 8px solid #f59e0b;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .action-title {
+        color: #92400e;
+        font-weight: 800;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+    .action-item {
+        margin: 8px 0;
+        padding-left: 25px;
+        position: relative;
+        font-weight: 600;
+        color: #451a03;
+        list-style: none;
+    }
+    .action-item::before {
+        content: "⚡";
+        position: absolute;
+        left: 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 # Initialize zoom level in session state
@@ -920,6 +951,8 @@ with st.sidebar:
         hub_topics = list(set([e['title'] for e in search_index()]))
     except Exception: pass
     st.session_state.all_topics_full = sorted(list(set(core_topics + hub_topics)))
+
+    search_term = st.text_input("🔍 Tìm kiếm chủ đề:", "")
 
     if search_term:
         filtered_topics = [t for t in st.session_state.all_topics_full if search_term.lower() in t.lower()]
@@ -1645,6 +1678,19 @@ if st.session_state.current_view == "ky_mon":
                                     obj_stem=obj_stem,
                                     subj_label=role_label
                                 )
+                                
+                                # 2. GENERATE QUICK ACTIONS (High-impact tips)
+                                quick_actions = st.session_state.gemini_helper.generate_quick_actions(analysis, selected_topic)
+                                
+                                # Display Quick Actions First
+                                st.markdown(f"""
+                                <div class="action-card">
+                                    <div class="action-title">🚀 HÀNH ĐỘNG NHANH CẦN LÀM NGAY</div>
+                                    {chr(10).join([f'<div class="action-item">{line.strip("- ").strip()}</div>' for line in quick_actions.strip().split(chr(10)) if line.strip()])}
+                                </div>
+                                """, unsafe_allow_html=True)
+                                
+                                # Display Detailed Analysis
                                 st.markdown(f'<div class="expert-box">{analysis}</div>', unsafe_allow_html=True)
                             except Exception as e:
                                 st.error(f"❌ Lỗi AI: {str(e)}")

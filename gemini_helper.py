@@ -247,6 +247,21 @@ YÊU CẦU NÂNG CẤP:
 Phong cách: Sắc bén, thực dụng, ngôn ngữ của một bậc thầy tư vấn cấp cao.
 """
         return self._call_ai(prompt, use_hub=True)
+
+    def generate_quick_actions(self, analysis, topic):
+        """Extracts 3-5 immediate, high-impact action steps."""
+        prompt = f"""
+Dựa trên luận giải: {analysis}
+Hãy trích xuất RA NGAY 3-5 HÀNH ĐỘNG KHẨN CẤP và HIỆU QUẢ NHẤT cho chủ đề: **{topic}**.
+
+YÊU CẦU:
+1. **Ngắn gọn**: Mỗi hành động tối đa 1 dòng.
+2. **Thực thi**: Phải là việc làm được ngay (Ví dụ: 'Gọi điện lúc 10h15', 'Đặt cây cảnh hướng Đông').
+3. **Màu sắc**: Phân loại mức độ quan trọng (Cao, Trung bình, Thấp).
+
+Trả lời dưới dạng danh sách gạch đầu dòng, không dẫn nhập.
+"""
+        return self._call_ai(prompt, use_hub=False)
     
     def analyze_palace(self, palace_data, topic):
         """
@@ -411,7 +426,9 @@ Trả lời súc tích, đi thẳng vào vấn đề, không chào hỏi, không
    - Nếu có **Sinh Môn**: Có lợi nhuận không? Ngôi nhà/vốn đó thế nào?
    - Nếu có **Trực Phù/Thiên Tâm**: Có lãnh đạo bảo trợ hay người có tâm giúp đỡ không?
 2. **Luận giải tổng hợp (Synthesis)**: Xâu chuỗi tất cả yếu tố đỏ/đen (Cát/Hung) trong cung. Nếu cung vượng và có nhiều cát tinh (màu đỏ) thì phán quyết đại cát.
-3. **Ngôn ngữ nhân văn**: Luôn dùng đúng danh xưng **"{subj_label}"**.
+3. **Ví dụ thực tế**: BẮT BUỘC đưa ra ít nhất 1 ví dụ cụ thể về tình huống tương tự có thể xảy ra trong đời thực cho chủ đề "{topic}".
+4. **Hành động sâu**: Gợi ý tư duy hoặc thái độ cần có để chuyển Hung thành Cát.
+5. **Ngôn ngữ nhân văn**: Luôn dùng đúng danh xưng **"{subj_label}"**.
 
 **DỮ LIỆU CÁC CUNG QUAN TRỌNG:**
 {chr(10).join(poi_desc)}

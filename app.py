@@ -1947,7 +1947,7 @@ elif st.session_state.current_view == "luc_hao":
                     st.markdown(f'<div class="hao-line-pro {cls} {dong_cls}"></div>', unsafe_allow_html=True)
                 else:
                     st.markdown(f'<div class="{cls}"><div class="yin-half-pro {dong_cls}"></div><div class="yin-half-pro {dong_cls}"></div></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="hao-info-pro">{d.get("luc_than","")} | {d.get("can_chi","")} {d.get("marker","")}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="hao-info-pro">{d.get("luc_than","")} | {d.get("can_chi","")} | {d.get("luc_thu","")} | {d.get("strength","")} {d.get("marker","")}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1974,7 +1974,7 @@ elif st.session_state.current_view == "luc_hao":
                     st.markdown(f'<div class="hao-line-pro {cls}"></div>', unsafe_allow_html=True)
                 else:
                     st.markdown(f'<div class="{cls}"><div class="yin-half-pro"></div><div class="yin-half-pro"></div></div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="hao-info-pro">{d.get("luc_than","")} | {d.get("can_chi","")} | {d.get("luc_thu","")}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="hao-info-pro">{d.get("luc_than","")} | {d.get("can_chi","")} | {d.get("luc_thu","")} | {d.get("strength","")}</div>', unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 

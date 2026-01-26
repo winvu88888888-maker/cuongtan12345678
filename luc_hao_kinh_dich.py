@@ -50,6 +50,24 @@ def get_hex_name(lines):
     upper = lines_to_quai_num(lines[3:])
     return HEXAGRAM_NAMES.get((upper, lower), f"Quẻ {upper}-{lower}")
 
+def get_element_strength(h_element, month):
+    # month is 1-12
+    # Simple mapping: 1,2: Mộc, 4,5: Hỏa, 7,8: Kim, 10,11: Thủy, 3,6,9,12: Thổ
+    month_element_map = {
+        1: "Mộc", 2: "Mộc", 4: "Hỏa", 5: "Hỏa", 7: "Kim", 8: "Kim", 10: "Thủy", 11: "Thủy",
+        3: "Thổ", 6: "Thổ", 9: "Thổ", 12: "Thổ"
+    }
+    m_el = month_element_map.get(month, "Thổ")
+    
+    strengths = {
+        "Mộc": {"Mộc": "Vượng", "Hỏa": "Tướng", "Thủy": "Hưu", "Thổ": "Tù", "Kim": "Tử"},
+        "Hỏa": {"Hỏa": "Vượng", "Thổ": "Tướng", "Mộc": "Hưu", "Kim": "Tù", "Thủy": "Tử"},
+        "Thổ": {"Thổ": "Vượng", "Kim": "Tướng", "Hỏa": "Hưu", "Thủy": "Tù", "Mộc": "Tử"},
+        "Kim": {"Kim": "Vượng", "Thủy": "Tướng", "Thổ": "Hưu", "Mộc": "Tù", "Hỏa": "Tử"},
+        "Thủy": {"Thủy": "Vượng", "Mộc": "Tướng", "Kim": "Hưu", "Hỏa": "Tù", "Thổ": "Tử"},
+    }
+    return strengths.get(m_el, {}).get(h_element, "Bình")
+
 def get_luc_than(h_element, p_element):
     relations = {
         "Kim": {"Kim": "Huynh Đệ", "Mộc": "Thê Tài", "Hỏa": "Quan Quỷ", "Thủy": "Tử Tôn", "Thổ": "Phụ Mẫu"},
@@ -82,9 +100,11 @@ def lap_qua_luc_hao(year, month, day, hour, topic="Chung", can_ngay="Giáp", **k
     for i in range(6):
         cc = nap_giap[i]; c_element = cc.split("-")[1]
         lt = get_luc_than(c_element, p_element)
+        strength = get_element_strength(c_element, month)
         details_ban.append({
             'hao': i+1, 'line': ban_lines[i], 'is_moving': hao_results[i] in [6, 9],
             'luc_than': lt, 'can_chi': cc, 'luc_thu': LUC_THU[(start_thu+i)%6],
+            'strength': strength,
             'marker': " (T)" if (i+1)==the_pos else " (Ứ)" if (i+1)==ung_pos else ""
         })
         
@@ -94,9 +114,11 @@ def lap_qua_luc_hao(year, month, day, hour, topic="Chung", can_ngay="Giáp", **k
         # For simplicity, we use same palace's nap giap but can be improved
         cc = nap_giap[i]; c_element = cc.split("-")[1]
         lt = get_luc_than(c_element, p_element)
+        strength = get_element_strength(c_element, month)
         details_bien.append({
             'hao': i+1, 'line': bien_lines[i], 'is_moving': False,
             'luc_than': lt, 'can_chi': cc, 'luc_thu': LUC_THU[(start_thu+i)%6],
+            'strength': strength,
             'marker': ""
         })
         

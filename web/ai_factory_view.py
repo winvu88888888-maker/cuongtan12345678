@@ -19,13 +19,14 @@ except Exception:
 # --- ROBUST IMPORTS ---
 try:
     try:
-        from web.ai_factory_tabs import render_universal_data_hub_tab, render_system_management_tab
+        from web.ai_factory_tabs import render_universal_data_hub_tab, render_system_management_tab, add_to_hub
     except ImportError:
-        from ai_factory_tabs import render_universal_data_hub_tab, render_system_management_tab
+        from ai_factory_tabs import render_universal_data_hub_tab, render_system_management_tab, add_to_hub
 except ImportError as e:
     st.error(f"⚠️ Lỗi nạp Tab bổ trợ: {e}")
     def render_universal_data_hub_tab(): st.error("Tab Dữ Liệu lỗi")
     def render_system_management_tab(): st.error("Tab Quản Trị lỗi")
+    def add_to_hub(*args, **kwargs): return False
 
 # Import modules from ai_modules
 try:
@@ -190,6 +191,32 @@ def render_create_code_tab():
                         user_request,
                         auto_execute=auto_execute
                     )
+                    
+                    # AUTO-ARCHIVE TO UNIVERSAL HUB
+                    project_name = result.get('plan', {}).get('project_name', 'Unnamed Project')
+                    
+                    # Archive request and plan
+                    add_to_hub(
+                        title=f"Yêu cầu: {project_name}",
+                        category="Nghiên Cứu",
+                        content=f"**Yêu cầu:** {user_request}\n\n**Kế hoạch:**\n{json.dumps(result.get('plan', {}), indent=2, ensure_ascii=False)}",
+                        tags=["research", project_name]
+                    )
+                    
+                    # Archive each file
+                    for file in result.get('execution', {}).get('created_files', []):
+                        if os.path.exists(file):
+                            try:
+                                with open(file, 'r', encoding='utf-8') as f:
+                                    content = f.read()
+                                add_to_hub(
+                                    title=f"Source: {os.path.basename(file)} ({project_name})",
+                                    category="Mã Nguồn",
+                                    content=f"```python\n{content}\n```",
+                                    tags=["source_code", project_name]
+                                )
+                            except: pass
+
                     st.session_state.last_generation_result = result
                     st.rerun()
                 except Exception as e:
@@ -198,7 +225,7 @@ def render_create_code_tab():
     # Display results OUTSIDE the form
     if st.session_state.last_generation_result:
         result = st.session_state.last_generation_result
-        st.success("✅ Quy trình hoàn tất!")
+        st.success("✅ Quy trình hoàn tất! Dữ liệu đã được tự động lưu vào Kho Vô Tận.")
         
         # Display results summary
         c1, c2, c3 = st.columns(3)

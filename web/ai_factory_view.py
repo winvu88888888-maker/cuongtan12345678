@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-
 # --- ROBUST PATH INITIALIZATION ---
 try:
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -166,6 +165,9 @@ def render_create_code_tab():
         st.warning("⚠️ Vui lòng nhập Gemini API key ở thanh bên trái (Sidebar) để sử dụng tính năng này.")
         return
 
+    if 'last_generation_result' not in st.session_state:
+        st.session_state.last_generation_result = None
+
     with st.form("code_generation_form"):
         st.markdown("### 📝 Mô Tả Yêu Cầu")
         
@@ -188,42 +190,50 @@ def render_create_code_tab():
                         user_request,
                         auto_execute=auto_execute
                     )
-                    
-                    st.success("✅ Quy trình hoàn tất!")
-                    
-                    # Display results summary
-                    c1, c2, c3 = st.columns(3)
-                    c1.metric("Files Created", len(result.get('execution', {}).get('created_files', [])))
-                    c2.metric("Errors Fixed", result.get('fixes', {}).get('total_fixes', 0))
-                    c3.metric("Total Time", f"{result.get('total_time', 0):.2f}s")
-                    
-                    # Download button
-                    if result.get('package') and os.path.exists(result['package']):
-                        with open(result['package'], "rb") as f:
-                            st.download_button(
-                                "📥 Tải về Project (.zip)", 
-                                f, 
-                                file_name=os.path.basename(result['package']),
-                                mime="application/zip"
-                            )
-                    
-                    # Plan Details
-                    with st.expander("📋 Xem Kế Hoạch Chi Tiết"):
-                        st.json(result.get('plan', {}))
-                        
-                    # Files Created
-                    if result.get('execution', {}).get('created_files'):
-                        st.markdown("### 📁 Files Đã Tạo")
-                        for file in result['execution']['created_files']:
-                            with st.expander(f"📄 {os.path.basename(file)}"):
-                                try:
-                                    with open(file, "r", encoding="utf-8") as f:
-                                        st.code(f.read())
-                                except:
-                                    st.warning(f"Không thể đọc file {file}")
-
+                    st.session_state.last_generation_result = result
+                    st.rerun()
                 except Exception as e:
                     st.error(f"❌ Lỗi trong quá trình xử lý: {str(e)}")
+
+    # Display results OUTSIDE the form
+    if st.session_state.last_generation_result:
+        result = st.session_state.last_generation_result
+        st.success("✅ Quy trình hoàn tất!")
+        
+        # Display results summary
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Files Created", len(result.get('execution', {}).get('created_files', [])))
+        c2.metric("Errors Fixed", result.get('fixes', {}).get('total_fixes', 0))
+        c3.metric("Total Time", f"{result.get('total_time', 0):.2f}s")
+        
+        # Download button
+        if result.get('package') and os.path.exists(result['package']):
+            try:
+                with open(result['package'], "rb") as f:
+                    st.download_button(
+                        "📥 Tải về Project (.zip)", 
+                        f, 
+                        file_name=os.path.basename(result['package']),
+                        mime="application/zip"
+                    )
+            except Exception as e:
+                st.warning(f"Không thể chuẩn bị file tải về: {e}")
+        
+        # Plan Details
+        with st.expander("📋 Xem Kế Hoạch Chi Tiết"):
+            st.json(result.get('plan', {}))
+            
+        # Files Created
+        if result.get('execution', {}).get('created_files'):
+            st.markdown("### 📁 Files Đã Tạo")
+            for file in result['execution']['created_files']:
+                if os.path.exists(file):
+                    with st.expander(f"📄 {os.path.basename(file)}"):
+                        try:
+                            with open(file, "r", encoding="utf-8") as f:
+                                st.code(f.read())
+                        except:
+                            st.warning(f"Không thể đọc file {file}")
 
 def render_knowledge_base_tab():
     st.subheader("Cơ Sở Tri Thức AI")

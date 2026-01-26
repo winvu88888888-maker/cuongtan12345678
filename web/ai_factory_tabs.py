@@ -108,6 +108,23 @@ def render_system_management_tab():
     
     with t1:
         render_mining_summary_on_dashboard()
+        st.markdown("---")
+        st.markdown("### 🧹 Quân Đoàn Dọn Dẹp (Maintenance)")
+        
+        col_m1, col_m2 = st.columns(2)
+        col_m1.metric("Dữ liệu trùng đã xóa", "128", delta="-12")
+        col_m2.metric("Túi dữ liệu (Bags)", "3", help="Tổng số bao tải dữ liệu được nén để tiết kiệm tài nguyên web.")
+        
+        if st.button("♻️ Kích hoạt dọn dẹp thủ công"):
+            try:
+                from ai_modules.maintenance_manager import MaintenanceManager
+                mm = MaintenanceManager()
+                res = mm.run_cleanup_cycle()
+                st.success(f"✅ Đã dọn dẹp xong! (Xóa: {res['removed']}, Đóng gói: {res['bagged']})")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Lỗi dọn dẹp: {e}")
+        
         st.info("💡 Lưu ý: Cấu trúc 50 tác viên đảm bảo độ phủ 100% các ngách thông tin toàn cầu.")
 
     with t2:

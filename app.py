@@ -954,6 +954,11 @@ with st.sidebar:
 
     search_term = st.text_input("🔍 Tìm kiếm chủ đề:", "")
     
+    # NEW: Topic Counter Button
+    if st.button("📊 Đếm tổng số chủ đề đang có"):
+        total_count = len(st.session_state.all_topics_full)
+        st.success(f"📈 Hiện hệ thống đang có tổng cộng: **{total_count}** chủ đề tri thức!")
+    
     with st.expander("✍️ Đặt câu hỏi riêng & Kích hoạt AI Mining"):
         with st.form("custom_topic_form"):
             new_q = st.text_area("Nhập vấn đề/câu hỏi bạn đang quan tâm:", placeholder="Ví dụ: Đầu tư vàng năm 2026, Phân tích quẻ gieo cho sức khỏe bố mẹ...")

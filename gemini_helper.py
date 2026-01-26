@@ -396,6 +396,54 @@ Trả lời bằng phong thái chuyên gia tư vấn tận tâm, ngôn ngữ gi�
         except Exception as e:
             return f"❌ Lỗi khi gọi AI: {str(e)}"
     
+    def analyze_mai_hoa(self, mai_hoa_res, topic="Chung"):
+        """
+        Analyze Mai Hoa Dich So data with AI
+        """
+        # Determine The/Dung
+        # If dong_hao is 1,2,3 -> Lower is Dung, Upper is The
+        # If dong_hao is 4,5,6 -> Upper is Dung, Lower is The
+        if mai_hoa_res['dong_hao'] <= 3:
+            the_quai = mai_hoa_res['upper']
+            dung_quai = mai_hoa_res['lower']
+            the_name = "Thượng Quái"
+            dung_name = "Hạ Quái (Động)"
+        else:
+            the_quai = mai_hoa_res['lower']
+            dung_quai = mai_hoa_res['upper']
+            the_name = "Hạ Quái"
+            dung_name = "Thượng Quái (Động)"
+            
+        the_element = QUAI_ELEMENTS.get(the_quai, "N/A")
+        dung_element = QUAI_ELEMENTS.get(dung_quai, "N/A")
+        
+        prompt = f"""Bạn là bậc thầy Mai Hoa Dịch Số. Hãy luận giải quẻ này cho việc: **{topic}**.
+
+**DỮ LIỆU QUẺ:**
+- **Quẻ Chủ**: {mai_hoa_res['ten']} ({mai_hoa_res['upper_symbol']} trên {mai_hoa_res['lower_symbol']})
+- **Hào Động**: Hào {mai_hoa_res['dong_hao']}
+- **Quẻ Hỗ**: {mai_hoa_res['ten_ho']}
+- **Quẻ Biến**: {mai_hoa_res['ten_qua_bien']}
+
+**THẾ/DỤNG:**
+- **Thể (Bản thân/Chủ thể)**: {QUAI_NAMES[the_quai]} (Hành {the_element}) - Tại {the_name}
+- **Dụng (Sự việc/Đối tượng)**: {QUAI_NAMES[dung_quai]} (Hành {dung_element}) - Tại {dung_name}
+
+**YÊU CẦU LUẬN GIẢI:**
+1. **Tương quan Thể Dụng**: Hành của Thể và Dụng sinh khắc thế nào? (Thể khắc Dụng, Dụng sinh Thể là tốt; Thể sinh Dụng, Dụng khắc Thể là xấu).
+2. **Ý nghĩa Quẻ Chủ, Hỗ, Biến**: 
+    - Quẻ Chủ báo hiệu giai đoạn đầu.
+    - Quẻ Hỗ báo hiệu diễn biến trung gian.
+    - Quẻ Biến báo hiệu kết quả cuối cùng.
+3. **Lời khuyên**: Hành động thế nào cho thuận theo quẻ?
+
+**PHONG CÁCH**: Chuyên nghiệp, súc tích, giàu triết lý nhưng thực tế. Trả lời rõ ràng Cát hay Hung."""
+
+        try:
+            return self._call_ai(prompt)
+        except Exception as e:
+            return f"❌ Lỗi khi gọi AI: {str(e)}"
+    
     def analyze_luc_hao(self, luc_hao_res, topic="Chung"):
         """
         Analyze Luc Hao (I Ching) data with AI. 

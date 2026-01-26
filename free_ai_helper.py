@@ -155,3 +155,30 @@ Tuy nhiên, bạn có thể sử dụng các nút chức năng có sẵn trên g
         report.append(f"\n**Kết luận:** Chủ đề '{topic}' đang ở trạng thái {status}. Hãy xem bảng chi tiết hào để biết thêm về các yếu tố Lục Thân và Lục Thú.")
         
         return "\n".join(report)
+
+    def analyze_mai_hoa(self, mai_hoa_res, topic="Chung"):
+        """Offline analysis for Mai Hoa"""
+        # Determine The/Dung
+        if mai_hoa_res['dong_hao'] <= 3:
+            the_quai, dung_quai = mai_hoa_res['upper'], mai_hoa_res['lower']
+        else:
+            the_quai, dung_quai = mai_hoa_res['lower'], mai_hoa_res['upper']
+            
+        from mai_hoa_dich_so import QUAI_ELEMENTS, QUAI_NAMES
+        the_el = QUAI_ELEMENTS.get(the_quai)
+        dung_el = QUAI_ELEMENTS.get(dung_quai)
+        
+        report = [
+            f"### 🌸 Luận Giải Mai Hoa (Offline) - Việc: {topic}",
+            f"**Quẻ Chủ:** {mai_hoa_res['ten']}",
+            f"**Hào Động:** {mai_hoa_res['dong_hao']}",
+            f"**Quẻ Biến:** {mai_hoa_res['ten_qua_bien']}",
+            f"\n**Phân tích Thể/Dụng:**",
+            f"- **Thể (Ta):** {QUAI_NAMES[the_quai]} ({the_el})",
+            f"- **Dụng (Việc):** {QUAI_NAMES[dung_quai]} ({dung_el})",
+            f"\n**💡 Ý nghĩa:**",
+            f"- Quẻ chủ **{mai_hoa_res['ten']}** báo hiệu sự việc hiện tại: {mai_hoa_res['nghĩa']}",
+            f"- Diễn biến hướng về quẻ **{mai_hoa_res['ten_qua_bien']}**."
+        ]
+        
+        return "\n".join(report)

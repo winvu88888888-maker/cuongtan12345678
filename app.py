@@ -704,7 +704,7 @@ with st.sidebar:
     
     # Gemini AI Configuration - Auto-load if available
     # Force re-init if existing helper is missing new methods (e.g. from old session)
-    if 'gemini_helper' not in st.session_state or not hasattr(st.session_state.gemini_helper, 'analyze_luc_hao'):
+    if 'gemini_helper' not in st.session_state or not hasattr(st.session_state.gemini_helper, 'analyze_mai_hao') or not hasattr(st.session_state.gemini_helper, 'analyze_mai_hoa'):
         # Load from custom_data.json first
         custom_data = load_custom_data()
         saved_key = custom_data.get("GEMINI_API_KEY")
@@ -720,7 +720,7 @@ with st.sidebar:
             except Exception: pass
         
         # 2. Fallback to Free/Offline if still nothing
-        if 'gemini_helper' not in st.session_state or not hasattr(st.session_state.gemini_helper, 'analyze_luc_hao'):
+        if 'gemini_helper' not in st.session_state or not hasattr(st.session_state.gemini_helper, 'analyze_mai_hao') or not hasattr(st.session_state.gemini_helper, 'analyze_mai_hoa'):
             if FREE_AI_AVAILABLE:
                 st.session_state.gemini_helper = FreeAIHelper()
                 st.session_state.ai_type = "Free AI (Offline)"
@@ -1860,6 +1860,15 @@ elif st.session_state.current_view == "mai_hoa":
                 st.markdown('</div>', unsafe_allow_html=True)
         
         st.info(f"💡 **Luận giải chi tiết:** {res.get('interpretation', 'Đang phân tích...')}")
+
+        if st.button("🤖 AI Luận Quẻ Mai Hoa", key="ai_mai_hoa_btn"):
+            with st.spinner("AI đang giải mã Mai Hoa..."):
+                ans = st.session_state.gemini_helper.analyze_mai_hoa(res, selected_topic)
+                st.markdown(f"""
+                <div class="interpret-box" style="background: white; border-top: 5px solid #b91c1c;">
+                    {ans}
+                </div>
+                """, unsafe_allow_html=True)
 
         st.markdown('<div class="footer-stamp">Copyright © 2026 MAI HOA DICH SO PRO</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)

@@ -4,6 +4,7 @@ import os
 import json
 from pathlib import Path
 from datetime import datetime
+from web.ai_factory_tabs import render_universal_data_hub_tab, render_system_management_tab
 
 # Add project root to path (absolute)
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,10 +20,13 @@ except ImportError:
     # Fallback if module is named differently or not found
     st.error("⚠️ Không thể tìm thấy module n8n_integration.py")
     class N8NClient:
-        def __init__(self, *args, **kwargs): pass
+        def __init__(self, base_url="http://localhost:5678", api_key=None):
+            self.base_url = base_url
+            self.api_key = api_key
         def test_connection(self): return False
         def get_workflow_statistics(self): return {'total_workflows': 0, 'active_workflows': 0}
-        def get_execution_statistics(self): return {'total_executions': 0, 'successful': 0}
+        def get_execution_statistics(self): return {'total_executions': 0, 'successful': 0, 'executions': []}
+        def get_workflows(self): return []
     def setup_n8n_config(*args): pass
 
 def render_ai_factory_view():
@@ -43,10 +47,20 @@ def render_ai_factory_view():
         st.session_state.memory = MemorySystem()
         
     if 'n8n_client' not in st.session_state:
-        st.session_state.n8n_client = N8NClient()
+        # Load from secrets or default
+        n8n_url = st.secrets.get("N8N_BASE_URL", "http://localhost:5678")
+        n8n_key = st.secrets.get("N8N_API_KEY", None)
+        st.session_state.n8n_client = N8NClient(n8n_url, n8n_key)
 
     # Sub-navigation for AI Factory
-    tab1, tab2, tab3, tab4 = st.tabs(["🏠 Dashboard", "✍️ Tạo Code & Dự Án", "📚 Knowledge Base", "⚙️ Workflows"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "🏠 Dashboard", 
+        "✍️ Tạo Code & Dự Án", 
+        "📚 Knowledge Base", 
+        "🌐 Kho Dữ Liệu Vô Tận",
+        "⚙️ Workflows",
+        "🛠️ Quản Trị Hệ Thống"
+    ])
 
     with tab1:
         render_dashboard_tab()
@@ -58,7 +72,13 @@ def render_ai_factory_view():
         render_knowledge_base_tab()
         
     with tab4:
+        render_universal_data_hub_tab()
+        
+    with tab5:
         render_workflows_tab()
+
+    with tab6:
+        render_system_management_tab()
 
 def render_dashboard_tab():
     st.subheader("Thống Kê Hoạt Động")

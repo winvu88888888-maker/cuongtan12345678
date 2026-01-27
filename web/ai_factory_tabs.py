@@ -23,10 +23,12 @@ try:
     from shard_manager import add_entry, search_index, get_full_entry, delete_entry, get_hub_stats
     from autonomous_miner import run_mining_cycle, run_daemon, load_config, save_config
     from factory_manager import init_global_factory
+    from qmdg_data import load_custom_data
 except ImportError:
     from ai_modules.shard_manager import add_entry, search_index, get_full_entry, delete_entry, get_hub_stats
     from ai_modules.autonomous_miner import run_mining_cycle, run_daemon, load_config, save_config
     from ai_modules.factory_manager import init_global_factory
+    from qmdg_data import load_custom_data # Should be in root
 
 # --- TOP 5 HOT TOPICS LOGIC ---
 def get_top_5_hot_topics():
@@ -177,6 +179,15 @@ def render_mining_summary_on_dashboard(key_suffix=""):
         
         # Check if key exists before allowing activation
         current_key = st.session_state.get("gemini_key", "")
+        
+        # Fallback: check saved data
+        if not current_key:
+            try:
+                data = load_custom_data()
+                current_key = data.get("GEMINI_API_KEY", "")
+                if current_key:
+                    st.session_state.gemini_key = current_key
+            except: pass
         
         new_status = st.toggle("⚡ KÍCH HOẠT CHẾ ĐỘ TỰ TRỊ 24/7", value=is_active, key=toggle_key)
         

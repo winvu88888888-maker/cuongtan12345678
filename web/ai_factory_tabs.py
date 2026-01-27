@@ -107,15 +107,18 @@ def render_universal_data_hub_tab():
 
     categories = ["Mã Nguồn", "Nghiên Cứu", "Kiến Thức", "Kỳ Môn Độn Giáp", "Kinh Dịch", "Khác"]
 
-    with st.expander("📥 Nạp Dữ Liệu Mới Thủ Công"):
-        with st.form("sharded_hub_form_final"):
+    with st.expander("📥 Nạp Dữ Liệu Mới Thủ Công", key="exp_manual_entry"):
+        with st.form("sharded_hub_form_final", clear_on_submit=True):
             title = st.text_input("Tiêu đề/Chủ đề:")
             cat = st.selectbox("Phân loại:", categories)
             content = st.text_area("Nội dung chi tiết (Markdown):", height=150)
             if st.form_submit_button("🚀 Lưu vào Hệ Thống"):
                 if title and content:
                     id = add_entry(title, content, cat, source="Thủ công")
-                    if id: st.success(f"✅ Đã lưu! ID: {id}"); st.rerun()
+                    if id: 
+                        st.success(f"✅ Đã lưu! ID: {id}")
+                        time.sleep(0.5)
+                        st.rerun()
 
     st.markdown("---")
     
@@ -127,7 +130,7 @@ def render_universal_data_hub_tab():
     st.write(f"Đang hiển thị {len(index_results)} mục.")
     
     for e in index_results:
-        with st.expander(f"[{e['category']}] 📁 {e['title']} ({e['created_at'][:10]})"):
+        with st.expander(f"[{e['category']}] 📁 {e['title']} ({e['created_at'][:10]})", key=f"exp_hub_{e['id']}"):
             if st.button("👁️ Tải nội dung chi tiết", key=f"load_{e['id']}"):
                 full = get_full_entry(e['id'], e['shard'])
                 if full: 
@@ -240,7 +243,7 @@ def render_mining_summary_on_dashboard(key_suffix=""):
     if config.get("last_run"):
         st.caption(f"🕒 Lần cuối hoạt động: {config['last_run']} | Giãn cách: {config.get('interval_minutes')} phút")
     
-    with st.expander("🔍 Xem danh sách 50 Đặc phái viên đang thực nhiệm"):
+    with st.expander("🔍 Xem danh sách 50 Đặc phái viên đang thực nhiệm", key=f"exp_miners_{key_suffix}"):
         miners = get_50_miners()
         for m in miners:
             cx1, cx2, cx3 = st.columns([1, 2, 2])
@@ -255,12 +258,13 @@ def render_system_management_tab():
     with t1:
         render_mining_summary_on_dashboard(key_suffix="_mgmt")
         st.markdown("---")
-        if st.button("♻️ Kích hoạt Bảo trì Thủ công (Manual Sync)"):
+        if st.button("♻️ Kích hoạt Bảo trì Thủ công (Manual Sync)", key="btn_manual_sync"):
             try:
                 from ai_modules.maintenance_manager import MaintenanceManager
                 mm = MaintenanceManager()
                 res = mm.run_cleanup_cycle()
                 st.success(f"✅ Bảo trì hoàn tất! (Xóa: {res['removed']}, Đóng gói: {res['bagged']})")
+                time.sleep(0.5)
                 st.rerun()
             except Exception as e:
                 st.error(f"Lỗi: {e}")

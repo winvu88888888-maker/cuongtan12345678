@@ -1878,6 +1878,7 @@ elif st.session_state.current_view == "mai_hoa":
     
     method = st.radio("Phương pháp:", ["Thời gian", "Ngẫu hứng"], horizontal=True, key="mh_method")
     
+    if st.button("🌸 LẬP QUẺ MAI HOA PRO", type="primary", use_container_width=True):
         dt = selected_datetime
         if method == "Thời gian":
             res = tinh_qua_theo_thoi_gian(dt.year, dt.month, dt.day, dt.hour)

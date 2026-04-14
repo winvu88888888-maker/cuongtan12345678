@@ -1552,15 +1552,61 @@ class FreeAIHelper:
             except Exception:
                 pass
             
+            # V28.2: PHÂN LOẠI CÂU HỎI TRƯỚC KHI GỬI GEMINI
+            q_lower_online = question.lower()
+            if any(kw in q_lower_online for kw in ['cái gì', 'loại gì', 'sản xuất gì', 'làm gì', 'mặt hàng',
+                    'sản phẩm gì', 'buôn bán gì', 'kinh doanh gì', 'nghề gì', 'ngành gì',
+                    'là gì', 'thuộc loại', 'hình dạng', 'màu gì', 'chất liệu', 'tên gì',
+                    'ai vậy', 'người nào', 'giống gì', 'như thế nào', 'trông như',
+                    'nó là gì', 'loại nào', 'mẫu gì', 'kiểu gì', 'thể loại']):
+                question_type = 'WHAT'
+                question_type_label = 'CÂU HỎI CỤ THỂ (CÁI GÌ/LOẠI GÌ/AI?)'
+                question_type_instruction = (
+                    f"\n⚠️ ĐÂY LÀ CÂU HỎI 'CÁI GÌ?' — KHÔNG PHẢI 'CÓ/KHÔNG'.\n"
+                    f"BẠN PHẢI MÔ TẢ đồ vật/sản phẩm/người, KHÔNG ĐƯỢC phán CÁT/HUNG.\n"
+                    f"Dùng NGŨ HÀNH VẬT CHẤT để mô tả:\n"
+                    f"- Hành Kim → kim loại, máy móc, tròn, trắng, hướng Tây\n"
+                    f"- Hành Mộc → gỗ, vải, dài/thẳng, xanh lá, hướng Đông\n"
+                    f"- Hành Thủy → chất lỏng, nước, không cố định, đen, hướng Bắc\n"
+                    f"- Hành Hỏa → điện tử, nhựa, nóng, đỏ, hướng Nam\n"
+                    f"- Hành Thổ → đất, gạch, vuông, vàng nâu, trung tâm\n"
+                    f"Kết hợp BÁT QUÁI TƯỢNG + VẠN VẬT CỤ THỂ + THÁM TỬ (V18) để trả lời.\n"
+                    f"VD: Hành Kim + Tier Vượng → 'Công ty sản xuất máy móc kim loại, thiết bị công nghiệp'\n"
+                )
+            elif any(kw in q_lower_online for kw in ['ở đâu', 'hướng nào', 'phương nào', 'tìm đâu', 'chỗ nào', 'nơi nào']):
+                question_type = 'WHERE'
+                question_type_label = 'CÂU HỎI VỀ VỊ TRÍ/HƯỚNG'
+                question_type_instruction = (
+                    f"\n⚠️ ĐÂY LÀ CÂU HỎI 'Ở ĐÂU?' — PHẢI TRẢ LỜI PHƯƠNG HƯỚNG CỤ THỂ.\n"
+                    f"Dùng CUNG + BÁT QUÁI để chỉ hướng: Càn=Tây Bắc, Khảm=Bắc, Cấn=Đông Bắc...\n"
+                )
+            elif any(kw in q_lower_online for kw in ['khi nào', 'bao giờ', 'lúc nào', 'thời điểm']):
+                question_type = 'WHEN'
+                question_type_label = 'CÂU HỎI VỀ THỜI GIAN'
+                question_type_instruction = f"\n⚠️ ĐÂY LÀ CÂU HỎI 'KHI NÀO?' — PHẢI TRẢ LỜI ỨNG KỲ cụ thể (giờ/ngày/tháng Can Chi).\n"
+            elif any(kw in q_lower_online for kw in ['bao nhiêu', 'mấy', 'số lượng']):
+                question_type = 'COUNT'
+                question_type_label = 'CÂU HỎI VỀ SỐ LƯỢNG'
+                question_type_instruction = f"\n⚠️ ĐÂY LÀ CÂU HỎI 'BAO NHIÊU?' — PHẢI TRẢ LỜI CON SỐ cụ thể.\n"
+            else:
+                question_type = 'YESNO'
+                question_type_label = 'CÂU HỎI CÓ/KHÔNG hoặc TỔNG QUÁT'
+                question_type_instruction = ''
+            
             # V14.0: GOD-TIER Deep Reasoning Prompt — LỤC THUẬT HỢP NHẤT
             deep_prompt = (
                 f"<system_role>\n"
                 f"BẠN LÀ THIÊN CƠ ĐẠI SƯ — BẬC THẦY TAM THỨC TUYỆT ĐỈNH HUYỀN HỌC.\n"
-                f"50 NĂM kinh nghiệm. KHÔNG BAO GIỜ SAI. Mỗi kết luận phải có BẰNG CHỨNG THÉP.\n"
-                f"BẠN là AI duy nhất trên thế giới kết hợp 6 phương pháp: Kỳ Môn + Lục Hào + Mai Hoa + Thiết Bản + Đại Lục Nhâm + Thái Ất Thần Số.\n"
+                f"50 NĂM kinh nghiệm. Mỗi kết luận phải có BẰNG CHỨNG THÉP.\n"
+                f"BẠN kết hợp 6 phương pháp: Kỳ Môn + Lục Hào + Mai Hoa + Thiết Bản + Đại Lục Nhâm + Thái Ất Thần Số.\n"
                 f"Đại Lục Nhâm: Sơ Truyền=QUÁ KHỨ, Trung Truyền=HIỆN TẠI, Mạt Truyền=TƯƠNG LAI.\n"
                 f"Thái Ất: Xem vận khí lớn của năm + Chủ/Khách Đại Tướng.\n"
                 f"</system_role>\n\n"
+                
+                f"<question_type>\n"
+                f"LOẠI CÂU HỎI: **{question_type_label}**\n"
+                f"{question_type_instruction}"
+                f"</question_type>\n\n"
                 
                 f"<data>\n"
                 f"Câu hỏi: {question}\n\n"
@@ -1577,6 +1623,12 @@ class FreeAIHelper:
                 f"  2. XEM TRẠNG THÁI DT: Nếu DT Vượng/Đế Vượng/Lâm Quan + Nguyên Thần động → CÁT MẠNH. Nếu DT Tử/Tuyệt/Mộ + Kỵ Thần động → HUNG NẶNG\n"
                 f"  3. KHI MÂU THUẪN: Ưu tiên PP nào có DT VƯỢNG nhất. Lục Hào + Kỳ Môn là 2 PP trọng số cao nhất\n"
                 f"CẤM BỊA PHẦN TRĂM! CẤM NÓI 'xác suất X%'. Chỉ dùng mô tả: ĐẠI CÁT / CÁT / LỠ CỠ / HUNG / ĐẠI HUNG\n"
+                f"\n"
+                f"LUẬT ĐẶC BIỆT THEO LOẠI CÂU HỊI:\n"
+                f"- Nếu câu hỏi là 'CÁI GÌ/LOẠI GÌ/AI?' → KHÔNG phán CÁT/HUNG. PHẢI MÔ TẢ đồ vật/sản phẩm/người dựa trên Ngũ Hành + Bát Quái Tượng + Vạn Vật\n"
+                f"- Nếu câu hỏi là 'Ở ĐÂU?' → KHÔNG phán CÁT/HUNG. PHẢI chỉ PHƯƠNG HƯỚNG cụ thể\n"
+                f"- Nếu câu hỏi là 'KHI NÀO?' → PHẢI trả lời ỨNG KỲ cụ thể\n"
+                f"- Nếu câu hỏi là 'CÓ/KHÔNG' → Mới phán CÁT/HUNG\n"
                 f"</verdict_summary>\n\n"
                 
                 f"{rag_prompt}\n"
@@ -1712,11 +1764,17 @@ class FreeAIHelper:
                 f"TIẾNG VIỆT, MARKDOWN, UYỂN CHUYỂN — KHÔNG BÁM FORMAT CỨNG.\n\n"
                 
                 f"QUY TẮC VIẾT:\n"
-                f"1. MỞ ĐẦU = KẾT LUẬN DỨT KHOÁT: Trả lời CÓ/KHÔNG/NÊN/KHÔNG NÊN ngay câu đầu tiên + lý do chính (KHÔNG kèm %)\n"
-                f"   VD ĐÚNG: '**CÓ, nên đầu tư.** Dụng Thần Thê Tài Vượng, 4/5 PP đều CÁT, Nguyên Thần động sinh DT.'\n"
-                f"   VD SAI: 'Xác suất thành công 75%' hoặc 'Có thể được'\n"
+                f"1. MỞ ĐẦU = TRẢ LỜI ĐÚNG TRỌNG TÂ CÂU HỎI:\n"
+                f"   - Hỏi 'CÓ NÊN?' → Trả lời CÓ/KHÔNG ngay câu đầu + lý do\n"
+                f"   - Hỏi 'CÁI GÌ/LOẠI GÌ/SẢN XUẤT GÌ?' → MÔ TẢ đồ vật/sản phẩm ngay câu đầu (VD: 'Công ty sản xuất sản phẩm kim loại/máy móc...')\n"
+                f"   - Hỏi 'Ở ĐÂU?' → Chỉ HƯỚNG ngay câu đầu (VD: 'Phương Tây Bắc, khu vực có nước...')\n"
+                f"   - Hỏi 'KHI NÀO?' → Nêu THỜI GIAN ngay câu đầu (VD: 'Ứng kỳ tháng 11 âm lịch...')\n"
+                f"   - Hỏi 'BAO NHIÊU?' → Nêu CON SỐ ngay câu đầu\n"
+                f"   VD SAI cho câu 'sản xuất gì': 'KHÔNG NÊN sản xuất' (sai trọng tâm — hỏi CÁI GÌ chứ không hỏi CÓ NÊN)\n"
+                f"   VD ĐÚNG cho câu 'sản xuất gì': '**Công ty sản xuất sản phẩm thuộc hành Kim** — kim loại, máy móc, phụ tùng ô tô...'\n"
                 f"2. THÂN BÀI tùy câu hỏi mà uyển chuyển:\n"
                 f"   - Hỏi CÓ/KHÔNG → trả lời ngắn gọn 5-10 dòng, trích dữ kiện chính\n"
+                f"   - Hỏi CÁI GÌ/LOẠI GÌ → MÔ TẢ chi tiết từ Ngũ Hành + Bát Quái Tượng + Vạn Vật, KHÔNG phán CÁT/HUNG\n"
                 f"   - Hỏi TẠI SAO → giải thích nhân quả, xâu chuỗi dữ kiện quẻ\n"
                 f"   - Hỏi BAO GIỜ → tập trung ứng kỳ, ngày tháng Can Chi cụ thể\n"
                 f"   - Hỏi AI/NGƯỜI NÀO → mô tả tượng ý từ Bát Quái + 12 Thiên Tướng\n"

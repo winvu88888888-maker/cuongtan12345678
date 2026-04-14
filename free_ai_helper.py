@@ -1693,8 +1693,8 @@ class FreeAIHelper:
             # _get_paranoid_context chứa prompt CŨ ghi đè V28.9 → gây liệt kê PP, bịa %, CÁT/HUNG sai
             
             
-            # Gọi trực tiếp _call_ai_raw — KHÔNG qua answer_question (tránh 2 prompt xung đột)
-            result = gemini._call_ai_raw(deep_prompt)
+            # V29.3: Gọi _call_ai (ĐÚNG tên method) — _call_ai_raw KHÔNG TỒN TẠI!
+            result = gemini._call_ai(deep_prompt, use_hub=False)
             
             if result and len(str(result)) > 50:
                 self.log_step("Online AI", "DONE", f"Gemini trả lời {len(str(result))} ký tự")

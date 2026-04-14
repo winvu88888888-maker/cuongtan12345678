@@ -1665,20 +1665,9 @@ class FreeAIHelper:
 
 
             
-            # V14.0: Gọi Gemini TRỰC TIẾP — không qua answer_question (tránh double-wrapping prompt)
-            # Thêm RAW DATA từ _get_paranoid_context vào prompt
-            raw_que_data = ""
-            try:
-                raw_que_data = gemini._get_paranoid_context(
-                    chart_data, topic or "Chung", question, None, mai_hoa_data, luc_hao_data
-                )
-            except Exception:
-                pass
+            # V29.0: BỎ raw_que_data/_get_paranoid_context() — data ĐÃ CÓ ĐẦY ĐỦ trong offline_ctx + factors + answer_key
+            # _get_paranoid_context chứa prompt CŨ ghi đè V28.9 → gây liệt kê PP, bịa %, CÁT/HUNG sai
             
-            if raw_que_data:
-                deep_prompt += f"\n<raw_que_data>\n{raw_que_data}\n</raw_que_data>\n"
-            
-            # V14.0: LN+TA context đã được inject vào <data> block ở trên
             
             # Gọi trực tiếp _call_ai_raw — KHÔNG qua answer_question (tránh 2 prompt xung đột)
             result = gemini._call_ai_raw(deep_prompt)

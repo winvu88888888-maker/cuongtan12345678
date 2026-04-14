@@ -2543,6 +2543,66 @@ class FreeAIHelper:
                         factors.append(f"V27 KM Mua {mua_key}: DT {trang_thai}")
                     break
 
+        # V28.7 Factor 5: CÁCH CỤC — Thiên Can trên Thiên Bàn + Địa Bàn
+        if dt_cung and can_thien_ban:
+            thien_can_dt = can_thien_ban.get(dt_cung, can_thien_ban.get(str(dt_cung), ''))
+            # Địa bàn Can = Can gốc tại cung đó (tĩnh)
+            DIA_BAN_CAN = {1: 'Mậu', 2: 'Kỷ', 3: 'Canh', 4: 'Tân', 5: 'Mậu', 6: 'Nhâm', 7: 'Quý', 8: 'Ất', 9: 'Bính'}
+            dia_can_dt = DIA_BAN_CAN.get(dt_cung if isinstance(dt_cung, int) else int(dt_cung), '')
+            if thien_can_dt and dia_can_dt:
+                # Cát Cách
+                CAT_CACH = {
+                    ('Ất', 'Bính'): 'Nhật Kỳ → CÁT',
+                    ('Ất', 'Đinh'): 'Tinh Kỳ → CÁT',
+                    ('Bính', 'Đinh'): 'Nhật Nguyệt Kỳ → ĐẠI CÁT',
+                    ('Đinh', 'Ất'): 'Ngọc Nữ → CÁT',
+                }
+                # Hung Cách
+                HUNG_CACH = {
+                    ('Canh', 'Ất'): 'Bạch Hổ xướng cuồng → HUNG',
+                    ('Canh', 'Bính'): 'Phi Can Cách → HUNG',
+                    ('Canh', 'Đinh'): 'Thiên Ất → HUNG',
+                    ('Tân', 'Ất'): 'Thanh Long đào giấu → HUNG',
+                    ('Tân', 'Bính'): 'Đằng Xà yêu kiếp → HUNG',
+                    ('Tân', 'Đinh'): 'Chu Tước → HƯU',
+                }
+                key_cc = (str(thien_can_dt), str(dia_can_dt))
+                if key_cc in CAT_CACH:
+                    score += 6
+                    factors.append(f"V28 KM Cách Cục: {CAT_CACH[key_cc]} +6 ({thien_can_dt}/{dia_can_dt})")
+                elif key_cc in HUNG_CACH:
+                    score -= 6
+                    factors.append(f"V28 KM Cách Cục: {HUNG_CACH[key_cc]} -6 ({thien_can_dt}/{dia_can_dt})")
+        
+        # V28.7 Factor 6: TAM KỲ nhập cung DT — Ất/Bính/Đinh ở cung DT = CÁT LỰC
+        if dt_cung and can_thien_ban:
+            thien_can_at_dt = can_thien_ban.get(dt_cung, can_thien_ban.get(str(dt_cung), ''))
+            if thien_can_at_dt in ('Ất', 'Bính', 'Đinh'):
+                score += 5
+                tam_ky_name = {'Ất': 'Nhật Kỳ', 'Bính': 'Nguyệt Kỳ', 'Đinh': 'Tinh Kỳ'}.get(thien_can_at_dt, '')
+                factors.append(f"V28 KM Tam Kỳ: {tam_ky_name}({thien_can_at_dt}) nhập cung DT +5")
+        
+        # V28.7 Factor 7: CUNG SỰ VIỆC (Can giờ) — so sánh BT vs SV
+        sv_cung = None
+        can_gio = chart_data.get('can_gio', '')
+        if can_gio and can_thien_ban:
+            for cung_num, can_val in can_thien_ban.items():
+                if can_val == can_gio:
+                    sv_cung = int(cung_num) if cung_num else None
+                    break
+        if sv_cung and bt_cung and sv_cung != bt_cung:
+            sv_hanh = CUNG_NGU_HANH.get(sv_cung, '')
+            if bt_hanh and sv_hanh:
+                if KHAC.get(bt_hanh) == sv_hanh:
+                    score += 5
+                    factors.append(f"V28 KM BT khắc Cung SV → chủ THẮNG +5")
+                elif KHAC.get(sv_hanh) == bt_hanh:
+                    score -= 5
+                    factors.append(f"V28 KM Cung SV khắc BT → bị THUA -5")
+                elif SINH.get(sv_hanh) == bt_hanh:
+                    score += 3
+                    factors.append(f"V28 KM Cung SV sinh BT → được giúp +3")
+
         return score, summary, factors
 
     def _luc_hao_scoring(self, luc_hao_data, dung_than):
@@ -2889,6 +2949,18 @@ class FreeAIHelper:
                     else:
                         score -= 3
                         factors.append(f"KT({kt_hanh}) khắc NT({nt_hanh}) → chain -3")
+                        
+                # ㉒ THAM SINH VONG KHẮC — KT + NT cùng ĐỘNG → KT tham sinh NT → quên khắc DT → HÓA CÁT!
+                if nt_found and kt_found and dong_hao:
+                    nt_idx_chk = haos.index(nt_found) + 1
+                    kt_idx_chk = haos.index(kt_found) + 1
+                    if nt_idx_chk in dong_hao and kt_idx_chk in dong_hao:
+                        # KT sinh NT? (VD: KT=Mộc, NT=Hỏa → Mộc sinh Hỏa → KT tham sinh)
+                        nt_h = nt_found.get('ngu_hanh', '')
+                        kt_h = kt_found.get('ngu_hanh', '')
+                        if SINH.get(kt_h) == nt_h:
+                            score += 10
+                            factors.append(f"⚡ THAM SINH VONG KHẮC: KT({kt_h}) tham sinh NT({nt_h}) → quên khắc DT → HÓA CÁT +10")
         
         # ㉓ Vị trí hào DT (ý nghĩa ngữ cảnh)
         if dt_idx:

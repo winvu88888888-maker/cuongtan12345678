@@ -1450,39 +1450,42 @@ class FreeAIHelper:
                     f"Thái Ất: {od.get('thai_at_verdict','?')} — {od.get('thai_at_reason','')}\n"
                 )
                 
-                # ALL impact evidence (hào động, sinh khắc DT, Nguyên/Kỵ Thần...)
-                if od.get('impact_evidence'):
-                    offline_ctx += f"\n--- YẾU TỐ TÁC ĐỘNG VÀO DỤNG THẦN ---\n"
-                    for e in od['impact_evidence']:
-                        offline_ctx += f"• {e}\n"
+                # V29.4: CHỈ inject chi tiết cho YESNO/TỔNG QUÁT — AGE/COUNT/WHAT/WHERE/WHEN chỉ cần verdict + factors
+                _q_lower_check = question.lower() if question else ''
+                _is_specific_q = any(kw in _q_lower_check for kw in ['tuổi','bao nhiêu','mấy','ở đâu','khi nào','cái gì','loại gì','là gì'])
                 
-                # Unified narrative (kết luận tổng hợp offline)
-                if od.get('unified_narrative'):
-                    offline_ctx += f"\n--- KẾT LUẬN OFFLINE ---\n{od['unified_narrative']}\n"
+                if not _is_specific_q:
+                    # Full context cho câu hỏi YES/NO
+                    if od.get('impact_evidence'):
+                        offline_ctx += f"\n--- YẾU TỐ TÁC ĐỘNG VÀO DỤNG THẦN ---\n"
+                        for e in od['impact_evidence']:
+                            offline_ctx += f"• {e}\n"
+                    if od.get('unified_narrative'):
+                        offline_ctx += f"\n--- KẾT LUẬN OFFLINE ---\n{od['unified_narrative']}\n"
                 
-                # V29.2: BỎ full_offline_report — chứa format cũ emoji 🎴☯️ khiến Gemini COPY
-                # Data đã có đầy đủ trong verdict_compact + factors + answer_key
+                # V29.2: BỎ full_offline_report
                 
-                if od.get('v15_bt_score') or od.get('v15_dt_score'):
-                    offline_ctx += f"\n--- V15 XÂU DƯỢC ---\n"
-                    if od.get('v15_bt_score'): offline_ctx += f"BT: {od['v15_bt_score']}\n"
-                    if od.get('v15_dt_score'): offline_ctx += f"DT: {od['v15_dt_score']}\n"
-                    if od.get('v15_timeline'): offline_ctx += f"Timeline: {od['v15_timeline']}\n"
-                    if od.get('v15_timing'): offline_ctx += f"Ứng Kỳ: {od['v15_timing']}\n"
-                
-                has_v16 = any(od.get(k) for k in ['v16_lh_score','v16_mh_score','v16_tb_score','v16_ln_score','v16_ta_score'])
-                if has_v16:
-                    offline_ctx += f"\n--- V16 SCORING ---\n"
-                    for k, lb in [('v16_lh_score','LH'),('v16_mh_score','MH'),('v16_tb_score','TB'),('v16_ln_score','LN'),('v16_ta_score','TA')]:
-                        if od.get(k): offline_ctx += f"{lb}: {od[k]}\n"
-                
-                if od.get('v17_routing'): offline_ctx += f"\n--- V17 ROUTING ---\n{od['v17_routing']}\n"
-                if od.get('v18_detective'): offline_ctx += f"\n--- V18 THÁM TỬ ---\n{od['v18_detective']}\n"
-                
-                if chart_data and isinstance(chart_data, dict):
-                    hanh_dt_v27 = od.get('v22_unified_strength', {}).get('hanh_dt', '')
-                    enhanced_det = self._enhanced_detective(chart_data, question, hanh_dt_v27)
-                    if enhanced_det: offline_ctx += enhanced_det
+                if not _is_specific_q:
+                    if od.get('v15_bt_score') or od.get('v15_dt_score'):
+                        offline_ctx += f"\n--- V15 XÂU DƯỢC ---\n"
+                        if od.get('v15_bt_score'): offline_ctx += f"BT: {od['v15_bt_score']}\n"
+                        if od.get('v15_dt_score'): offline_ctx += f"DT: {od['v15_dt_score']}\n"
+                        if od.get('v15_timeline'): offline_ctx += f"Timeline: {od['v15_timeline']}\n"
+                        if od.get('v15_timing'): offline_ctx += f"Ứng Kỳ: {od['v15_timing']}\n"
+                    
+                    has_v16 = any(od.get(k) for k in ['v16_lh_score','v16_mh_score','v16_tb_score','v16_ln_score','v16_ta_score'])
+                    if has_v16:
+                        offline_ctx += f"\n--- V16 SCORING ---\n"
+                        for k, lb in [('v16_lh_score','LH'),('v16_mh_score','MH'),('v16_tb_score','TB'),('v16_ln_score','LN'),('v16_ta_score','TA')]:
+                            if od.get(k): offline_ctx += f"{lb}: {od[k]}\n"
+                    
+                    if od.get('v17_routing'): offline_ctx += f"\n--- V17 ROUTING ---\n{od['v17_routing']}\n"
+                    if od.get('v18_detective'): offline_ctx += f"\n--- V18 THÁM TỬ ---\n{od['v18_detective']}\n"
+                    
+                    if chart_data and isinstance(chart_data, dict):
+                        hanh_dt_v27 = od.get('v22_unified_strength', {}).get('hanh_dt', '')
+                        enhanced_det = self._enhanced_detective(chart_data, question, hanh_dt_v27)
+                        if enhanced_det: offline_ctx += enhanced_det
                 
                 offline_ctx += f"=== HẾT OFFLINE ===\n\n"
             
@@ -1697,8 +1700,23 @@ class FreeAIHelper:
             result = gemini._call_ai(deep_prompt, use_hub=False)
             
             if result and len(str(result)) > 50:
-                self.log_step("Online AI", "DONE", f"Gemini trả lời {len(str(result))} ký tự")
-                return str(result)
+                # V29.4: Strip phần "old format" mà Gemini tự thêm (bỏ qua output_format constraint)
+                result_str = str(result)
+                CUT_MARKERS = [
+                    '📊 PHÂN TÍCH', '📊 PHÂ', 
+                    '\n🎴 1.', '\n☯️ 2.', '\n🌸 3.', '\n🏯 4.', '\n🌟 5.',
+                    '\n📝 TỔNG KẾT', '\n💡 HƯỚNG DẪN', '\n⏰ THỜI VẬN',
+                    '\n🔮 TỔNG HỢP', '\n🕵️ THÁM TỬ',
+                    '\n📋 TỔNG HỢP', '\nBẮT BUỘC DIỄN GIẢI',
+                ]
+                for marker in CUT_MARKERS:
+                    idx = result_str.find(marker)
+                    if idx > 100:  # chỉ cắt nếu đã có nội dung phía trước (>100 chars)
+                        result_str = result_str[:idx].rstrip()
+                        break
+                
+                self.log_step("Online AI", "DONE", f"Gemini trả lời {len(result_str)} ký tự (stripped)")
+                return result_str
             
             return None
             

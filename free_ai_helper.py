@@ -3393,6 +3393,77 @@ class FreeAIHelper:
         except Exception:
             pass
 
+        # V28.8: BỔ SUNG THẦN SÁT ĐẠI LỤC NHÂM
+        try:
+            # ⑥ DỊCH MÃ trong Tam Truyền (±4) — chỉ sự di chuyển, tốc độ
+            DICH_MA_MAP = {
+                'Thân': 'Dần', 'Tý': 'Dần', 'Thìn': 'Dần',
+                'Dần': 'Thân', 'Ngọ': 'Thân', 'Tuất': 'Thân',
+                'Tỵ': 'Hợi', 'Dậu': 'Hợi', 'Sửu': 'Hợi',
+                'Hợi': 'Tỵ', 'Mão': 'Tỵ', 'Mùi': 'Tỵ'
+            }
+            chi_ma_ln = DICH_MA_MAP.get(chi_ngay, '')
+            if chi_ma_ln:
+                so_chi = tam_truyen.get('so_truyen', '')
+                trung_chi = tam_truyen.get('trung_truyen', '')
+                mat_chi = tam_truyen.get('mat_truyen', '')
+                if chi_ma_ln in (so_chi, trung_chi, mat_chi):
+                    score += 4
+                    truyen_name = 'Sơ' if chi_ma_ln == so_chi else ('Trung' if chi_ma_ln == trung_chi else 'Mạt')
+                    factors.append(f"V28 LN Dịch Mã nhập {truyen_name} Truyền → tốc độ NHANH +4")
+            
+            # ⑦ LỘC THẦN trong Tam Truyền (+5) — chỉ tài lộc, phúc đức
+            LOC_THAN_MAP = {
+                'Giáp': 'Dần', 'Ất': 'Mão', 'Bính': 'Tỵ', 'Đinh': 'Ngọ',
+                'Mậu': 'Tỵ', 'Kỷ': 'Ngọ', 'Canh': 'Thân', 'Tân': 'Dậu',
+                'Nhâm': 'Hợi', 'Quý': 'Tý'
+            }
+            loc_chi = LOC_THAN_MAP.get(can_ngay, '')
+            if loc_chi:
+                so_chi = tam_truyen.get('so_truyen', '')
+                trung_chi = tam_truyen.get('trung_truyen', '')
+                mat_chi = tam_truyen.get('mat_truyen', '')
+                if loc_chi in (so_chi, trung_chi, mat_chi):
+                    score += 5
+                    truyen_name = 'Sơ' if loc_chi == so_chi else ('Trung' if loc_chi == trung_chi else 'Mạt')
+                    factors.append(f"V28 LN Lộc Thần nhập {truyen_name} Truyền → TÀI LỘC +5")
+            
+            # ⑧ Mạt Truyền lâm Tuần Không (-8) — kết quả trống rỗng
+            mat_chi = tam_truyen.get('mat_truyen', '')
+            if mat_chi and mat_chi in tuan_khong:
+                score -= 8
+                factors.append(f"V28 LN Mạt Truyền Tuần Không → KQ trống rỗng -8")
+            
+            # ⑨ Trung Truyền lâm Tuần Không (-4)
+            trung_chi = tam_truyen.get('trung_truyen', '')
+            if trung_chi and trung_chi in tuan_khong:
+                score -= 4
+                factors.append(f"V28 LN Trung Truyền Tuần Không → quá trình gián đoạn -4")
+            
+            # ⑩ KHÓA THỂ — xác định dạng quẻ (thông tin ngữ cảnh)
+            khoa_the = ln_data.get('khoa_the', '')
+            if khoa_the:
+                factors.append(f"V28 LN Khóa Thể: {str(khoa_the)[:60]}")
+            
+            # ⑪ Tam Truyền → VẠN VẬT LOẠI TƯỢNG (mapping chi → Bát Quái → đồ vật)
+            CHI_BAT_QUAI = {
+                'Tý': 'Khảm', 'Sửu': 'Cấn', 'Dần': 'Cấn', 'Mão': 'Chấn',
+                'Thìn': 'Tốn', 'Tỵ': 'Tốn', 'Ngọ': 'Ly', 'Mùi': 'Khôn',
+                'Thân': 'Khôn', 'Dậu': 'Đoài', 'Tuất': 'Càn', 'Hợi': 'Càn'
+            }
+            so_chi = tam_truyen.get('so_truyen', '')
+            mat_chi = tam_truyen.get('mat_truyen', '')
+            if so_chi:
+                quai_so = CHI_BAT_QUAI.get(so_chi, '')
+                if quai_so:
+                    factors.append(f"V28 LN Sơ Truyền({so_chi})={quai_so} → nguồn gốc/khởi đầu")
+            if mat_chi:
+                quai_mat = CHI_BAT_QUAI.get(mat_chi, '')
+                if quai_mat:
+                    factors.append(f"V28 LN Mạt Truyền({mat_chi})={quai_mat} → kết quả/đích đến")
+        except Exception:
+            pass
+
         return score, summary, factors
     
     def _thai_at_scoring(self, chart_data):
@@ -3515,6 +3586,78 @@ class FreeAIHelper:
                 elif hung_count > cat_count:
                     score -= 4
                     factors.append(f"V27 TA Bat Tuong Hung nhieu -4 ({cat_count}C/{hung_count}H)")
+        except Exception:
+            pass
+
+        # V28.8: BỔ SUNG THÁI ẤT
+        try:
+            # ⑤ THIÊN ẤT — tôn thần chủ chốt, vị trí quyết định đại cục
+            thien_at = bat_tuong.get('Thiên Ất', bat_tuong.get('Thái Ất', {}))
+            if thien_at and isinstance(thien_at, dict):
+                ta_hanh_thien = thien_at.get('hanh_cung', '')
+                can_h = CAN_NGU_HANH.get(can_ngay, '')
+                if ta_hanh_thien and can_h:
+                    if SINH.get(ta_hanh_thien) == can_h:
+                        score += 6
+                        factors.append(f"V28 TA Thiên Ất sinh Can Ngày → ĐẠI CÁT +6")
+                    elif KHAC.get(ta_hanh_thien) == can_h:
+                        score -= 6
+                        factors.append(f"V28 TA Thiên Ất khắc Can Ngày → ĐẠI HUNG -6")
+                    elif ta_hanh_thien == can_h:
+                        score += 3
+                        factors.append(f"V28 TA Thiên Ất đồng hành Can → CÁT +3")
+                ta_cat_hung = thien_at.get('cat_hung', '')
+                if 'Cát' in str(ta_cat_hung):
+                    score += 4
+                    factors.append(f"V28 TA Thiên Ất CÁT +4")
+                elif 'Hung' in str(ta_cat_hung):
+                    score -= 4
+                    factors.append(f"V28 TA Thiên Ất HUNG -4")
+            
+            # ⑥ THAM TƯỚNG Chủ/Khách — phụ tá cho Đại Tướng
+            tham_chu = bat_tuong.get('Chủ Tham Tướng', bat_tuong.get('Tham Tướng Chủ', {}))
+            tham_khach = bat_tuong.get('Khách Tham Tướng', bat_tuong.get('Tham Tướng Khách', {}))
+            if tham_chu and isinstance(tham_chu, dict):
+                tc_hanh = tham_chu.get('hanh_cung', '')
+                chu_h = chu.get('hanh_cung', '') if chu else ''
+                if tc_hanh and chu_h:
+                    if SINH.get(tc_hanh) == chu_h:
+                        score += 4
+                        factors.append(f"V28 TA Tham Tướng sinh Chủ → hỗ trợ +4")
+                    elif KHAC.get(tc_hanh) == chu_h:
+                        score -= 4
+                        factors.append(f"V28 TA Tham Tướng khắc Chủ → nội bộ bất hòa -4")
+            
+            # ⑦ DƯƠNG CỬU / BÁCH LỤC — hạn vận lớn
+            duong_cuu = ta_data.get('duong_cuu', '')
+            bach_luc = ta_data.get('bach_luc', '')
+            if duong_cuu and 'hạn' in str(duong_cuu).lower():
+                score -= 8
+                factors.append(f"V28 TA Dương Cửu hạn kỳ → tai ách -8")
+            if bach_luc and 'hạn' in str(bach_luc).lower():
+                score -= 8
+                factors.append(f"V28 TA Bách Lục hạn kỳ → tai họa -8")
+            
+            # ⑧ VĂN XƯƠNG chi tiết — vị trí + cát hung
+            if van_xuong and isinstance(van_xuong, dict):
+                vx_cung = van_xuong.get('cung', '')
+                vx_ten = van_xuong.get('ten_cung', '')
+                vx_cat = van_xuong.get('cat_hung', '')
+                if vx_cung:
+                    factors.append(f"V28 TA Văn Xương tại cung {vx_cung}({vx_ten}) {'CÁT' if 'Cát' in str(vx_cat) else 'HUNG' if 'Hung' in str(vx_cat) else 'BÌNH'}")
+                    if 'Cát' in str(vx_cat):
+                        score += 3
+                    elif 'Hung' in str(vx_cat):
+                        score -= 3
+            
+            # ⑨ THÁI ẤT CUNG Không Vong (Tuần Không) (-6)
+            ta_cung_so = ta_cung.get('cung', 0) if ta_cung else 0
+            CUNG_CHI_TA = {1: 'Tý', 2: 'Sửu', 3: 'Dần', 4: 'Mão', 5: None, 6: 'Tuất', 7: 'Dậu', 8: 'Thìn', 9: 'Ngọ'}
+            ta_chi_mapped = CUNG_CHI_TA.get(int(ta_cung_so) if ta_cung_so else 0, '')
+            khong_vong_ta = _get_khong_vong(can_ngay, chi_ngay) if can_ngay and chi_ngay else []
+            if ta_chi_mapped and ta_chi_mapped in khong_vong_ta:
+                score -= 6
+                factors.append(f"V28 TA Thái Ất Cung lâm Không Vong → trì trệ -6")
         except Exception:
             pass
 

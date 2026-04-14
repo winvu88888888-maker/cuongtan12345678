@@ -1396,6 +1396,9 @@ class FreeAIHelper:
         elif any(kw in q_lower for kw in ['thế nào','như thế nào','ra sao','tình trạng']):
             primary_keys = [('v23_lh_factors','LH','Lục Hào'), ('v24_km_factors','KM','Kỳ Môn')]
             q_label = 'THẾ NÀO'
+        elif any(kw in q_lower for kw in ['cái nào','người nào','chọn','nên chọn','hay là','hoặc']):
+            primary_keys = [('v24_mh_factors','MH','Mai Hoa'), ('v24_km_factors','KM','Kỳ Môn')]
+            q_label = 'CÁI NÀO (CHỌN)'
         elif any(kw in q_lower for kw in ['bao nhiêu','mấy','số lượng']):
             primary_keys = [('v24_tb_factors','TB','Thiết Bản'), ('v24_mh_factors','MH','Mai Hoa')]
             q_label = 'SỐ LƯỢNG'
@@ -1775,6 +1778,13 @@ class FreeAIHelper:
                 f"  [Hào Động]→đang thay đổi | [DT Tĩnh]→ổn định ko đổi\n"
                 f"  MH: Thể↔Dụng→mối quan hệ hiện tại | KM: Cửa+Sao→cách giải quyết\n"
                 f"  KL: DT trạng thái + xu hướng + Cửa → mô tả CÁCH THỨC/TÌNH TRẠNG\n\n"
+                f"═══ SĐ16: CÁI NÀO / CHỌN LỌC (WHICH) ═══\n"
+                f"MH+KM+LH: So sánh các lựa chọn:\n"
+                f"  [Thể Quái]→mình | [Dụng Quái]→lựa chọn A | [Biến Quái]→lựa chọn B\n"
+                f"  Dụng sinh Thể=A tốt cho mình | Biến sinh Thể=B tốt cho mình\n"
+                f"  KM: So sánh Cung lựa chọn → cung nào CÁT hơn (Sao+Cửa+Thần)\n"
+                f"  LH: Hào nào Vượng+được sinh → lựa chọn đó TỐT hơn\n"
+                f"  KL: chọn lựa chọn nào SINH Thể/DT nhiều nhất\n\n"
                 f"═══ SĐ0: TỔNG QUÁT (ko thuộc loại nào) ═══\n"
                 f"[5 Verdicts]→Đếm CÁT/HUNG: ≥4CÁT=ĐẠI CÁT|≥3=CÁT|2/2=LỠ CỠ|≥3HUNG=HUNG|≥4=ĐẠI HUNG\n\n"
                 f"CÁCH DÙNG: <question_type>→chọn SƠ ĐỒ→đọc factors→theo mũi tên→KẾT LUẬN ≤300 chữ\n"

@@ -1367,18 +1367,24 @@ class FreeAIHelper:
         if od.get('v17_routing'):
             lines.append(f"V17: {od['v17_routing'][:400]}")
         
-        # 6) V18 Detective compact (chi 200 ky tu)
+        # 6) V18 Detective
         if od.get('v18_detective'):
-            lines.append(f"V18: {od['v18_detective'][:500]}")
+            lines.append(f"V18: {od['v18_detective']}")
         
-        # 7) Top factors (tat ca phuong phap, chi lay top 3 moi loai)
-        factor_parts = []
-        for fkey, flabel in [('v23_lh_factors','LH'),('v24_km_factors','KM'),('v24_mh_factors','MH'),('v24_ln_factors','LN'),('v24_ta_factors','TA')]:
+        # 7) TẤT CẢ factors từng PP (KHÔNG CẮT — AI Online phải đọc ĐẦY ĐỦ)
+        for fkey, flabel, fname in [
+            ('v24_km_factors','KM','Kỳ Môn'),
+            ('v23_lh_factors','LH','Lục Hào'),
+            ('v24_mh_factors','MH','Mai Hoa'),
+            ('v24_tb_factors','TB','Thiết Bản'),
+            ('v24_ln_factors','LN','Đại Lục Nhâm'),
+            ('v24_ta_factors','TA','Thái Ất')
+        ]:
             fdata = od.get(fkey, [])
             if fdata and isinstance(fdata, list) and len(fdata) > 0:
-                factor_parts.append(f"{flabel}:[{';'.join(str(f) for f in fdata[:10])}]")
-        if factor_parts:
-            lines.append(f"Factors: {' | '.join(factor_parts)}")
+                lines.append(f"\n--- {fname} ({len(fdata)} yếu tố) ---")
+                for f in fdata:
+                    lines.append(f"  • {f}")
         
         lines.append("=== [HET V27 COMPACT] ===\n")
         return "\n".join(lines)
@@ -1627,18 +1633,33 @@ class FreeAIHelper:
                 f"</method_strengths>\n\n"
                 
                 f"<reasoning_protocol>\n"
-                f"CÁCH LẬP LUẬN:\n"
+                f"CÁCH LẬP LUẬN (BẮT BUỘC):\n"
                 f"B0: Xem <question_type> → xác định câu hỏi thuộc loại gì.\n"
-                f"B1: Đọc <method_strengths> → chọn PP PHÙ HỢP NHẤT cho loại câu hỏi này làm PP CHÍNH.\n"
-                f"B2: Đọc <answer_key> + <data> → trích dữ kiện THEN CHỐT từ PP chính.\n"
-                f"B3: Đối chiếu với 2-3 PP phụ → tìm DỮ KIỆN BỔ SUNG hoặc XÁC NHẬN.\n"
-                f"B4: TỔNG HỢP → Viết câu trả lời TRỰC TIẾP ≤500 chữ.\n\n"
+                f"B1: Đọc <method_strengths> → chọn PP PHÙ HỢP NHẤT cho loại câu hỏi này làm PP CHÍNH (PP GỐC).\n"
+                f"B2: ĐỌC TẤT CẢ yếu tố (factors) của PP CHÍNH trong <data> → hiểu từng yếu tố tác động vào DT/BT như nào.\n"
+                f"     VD Lục Hào: Nguyệt sinh DT +8 → DT được trợ giúp mạnh. Kỵ Thần vượng+động -8 → DT bị tấn công.\n"
+                f"     VD Kỳ Môn: Cửa Khai Cát +6 → con đường mở. Cách Cục Hung -6 → bất lợi.\n"
+                f"B3: ĐỌC yếu tố từ CÁC PP PHỤ → tìm dữ kiện BỔ SUNG, XÁC NHẬN hoặc MÂU THUẪN.\n"
+                f"     Nếu PP chính CÁT + PP phụ CÁT → CHẮC CHẮN tốt.\n"
+                f"     Nếu PP chính CÁT + PP phụ HUNG → CẨN THẬN, có trở ngại nhưng vẫn được.\n"
+                f"     Nếu PP chính HUNG + PP phụ HUNG → CHẮC CHẮN xấu.\n"
+                f"B4: TỔNG HỢP → Viết câu trả lời TRỰC TIẾP ≤500 chữ, dẫn chứng yếu tố cụ thể.\n\n"
+                f"QUY TẮC CHỌN PP GỐC THEO CÂU HỎI:\n"
+                f"  CÓ/KHÔNG? → GỐC=Lục Hào (DT vượng/suy) + Kỳ Môn (Cung BT↔SV)\n"
+                f"  CÁI GÌ?   → GỐC=Vạn Vật + Mai Hoa (Bát Quái Tượng) + Thiết Bản\n"
+                f"  Ở ĐÂU?    → GỐC=Kỳ Môn (Cung + Phương) + Đại Lục Nhâm (Tam Truyền)\n"
+                f"  KHI NÀO?  → GỐC=Đại Lục Nhâm (Tam Truyền timeline) + Lục Hào (Ứng Kỳ)\n"
+                f"  TUỔI?     → GỐC=Thiết Bản + Lục Hào (số Bát Quái + Chi DT)\n"
+                f"  TỔNG QUÁT → GỐC=Thái Ất (xu hướng lớn) + tổng 5 verdicts\n\n"
                 f"CẤM: liệt kê từng PP riêng lẻ, bịa %, CÁT/HUNG khi không hỏi CÓ/KHÔNG.\n"
                 f"</reasoning_protocol>\n\n"
                 
                 f"<output_format>\n"
-                f"CÂU ĐẦU = TRẢ LỜI TRỰC TIẾP. Sau đó 2-4 dòng bằng chứng (gộp từ nhiều PP). Kết: lời khuyên.\n"
-                f"TỐI ĐA 500 CHỮ. CẤM bịa %. CẤM liệt kê từng PP riêng.\n"
+                f"CÂU ĐẦU = TRẢ LỜI TRỰC TIẾP (dựa trên PP GỐC).\n"
+                f"SAU ĐÓ: 3-5 dòng bằng chứng, mỗi dòng trích yếu tố CỤ THỂ từ data.\n"
+                f"VD: 'Lục Hào: DT Vượng (Nguyệt sinh +8, Nguyên Thần động +6), nhưng Kỳ Môn: Cửa Tử Hung -6'\n"
+                f"KẾT: 1-2 câu tổng kết + lời khuyên.\n"
+                f"TỐI ĐA 500 CHỮ. CẤM bịa %. PHẢI trích yếu tố cụ thể.\n"
                 f"</output_format>\n"
             )
 

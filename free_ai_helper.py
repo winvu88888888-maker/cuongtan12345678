@@ -1530,7 +1530,15 @@ class FreeAIHelper:
             elif any(kw in q_lower_online for kw in ['tuổi','bao nhiêu tuổi','mấy tuổi','năm tuổi','tuổi tác']):
                 question_type = 'AGE'
                 question_type_label = 'CÂU HỎI VỀ TUỔI TÁC'
-                question_type_instruction = "\n⚠️ PHẢI TRẢ LỜI CON SỐ TUỔI. Số Bát Quái: Khảm=1,Khôn=2,Chấn=3,Tốn=4,Trung=5,Càn=6,Đoài=7,Cấn=8,Ly=9. Tuổi=số đơn vị hoặc nhân 10.\n"
+                question_type_instruction = (
+                    "\n⚠️ ĐÂY LÀ CÂU HỎI VỀ TUỔI — PHẢI TRẢ LỜI CON SỐ TUỔI CỤ THỂ.\n"
+                    "PP GỐC: Thiết Bản (số Bát Quái map tuổi) + Mai Hoa (tượng quẻ).\n"
+                    "CẤM TUYỆT ĐỐI: phân tích CÁT/HUNG, liệt kê 5 PP, nói 'không thể xác định'.\n"
+                    "PHẢI: Đọc <answer_key> → lấy số TUỔI TRA SẴN → trả lời 'Khoảng X tuổi'.\n"
+                    "Nếu answer_key có nhiều PP: lấy trung bình. Nếu không có data: dùng số Bát Quái.\n"
+                    "Số Bát Quái: Khảm=1,Khôn=2,Chấn=3,Tốn=4,Trung=5,Càn=6,Đoài=7,Cấn=8,Ly=9.\n"
+                    "Tuổi = số Bát Quái × hệ số (1, 10, hoặc cộng thêm).\n"
+                )
             elif any(kw in q_lower_online for kw in ['bao nhiêu','mấy','số lượng']):
                 question_type = 'COUNT'
                 question_type_label = 'CÂU HỎI VỀ SỐ LƯỢNG'
@@ -1563,8 +1571,24 @@ class FreeAIHelper:
                 if od.get('v18_detective'):
                     ak.append(f"Thám Tử: {od['v18_detective'][:200]}")
             elif question_type in ('AGE', 'COUNT'):
-                if od.get('age_numbers'): ak.append(f"Tuổi: {od['age_numbers']}")
-                if od.get('count_numbers'): ak.append(f"Số: {od['count_numbers']}")
+                _age = od.get('age_numbers', [])
+                if _age and isinstance(_age, list) and len(_age) > 0:
+                    try:
+                        _nums = [n for _, n in _age if isinstance(n, (int, float))]
+                        _detail = ', '.join(f'{pp}={n}' for pp, n in _age)
+                        _avg = int(round(sum(_nums) / len(_nums))) if _nums else 0
+                        ak.append(f"⭐ TUỔI TRA SẴN: {_detail} → Trung bình ≈ {_avg} tuổi")
+                    except Exception:
+                        ak.append(f"Tuổi (raw): {_age}")
+                _cnt = od.get('count_numbers', [])
+                if _cnt and isinstance(_cnt, list) and len(_cnt) > 0:
+                    try:
+                        _nums_c = [n for _, n in _cnt if isinstance(n, (int, float))]
+                        _detail_c = ', '.join(f'{pp}={n}' for pp, n in _cnt)
+                        _avg_c = int(round(sum(_nums_c) / len(_nums_c))) if _nums_c else 0
+                        ak.append(f"⭐ SỐ TRA SẴN: {_detail_c} → Trung bình ≈ {_avg_c}")
+                    except Exception:
+                        ak.append(f"Số (raw): {_cnt}")
             elif question_type == 'WHEN':
                 if od.get('v15_timing'): ak.append(f"Ứng Kỳ: {od['v15_timing']}")
                 if od.get('v15_timeline'): ak.append(f"Timeline: {od['v15_timeline']}")

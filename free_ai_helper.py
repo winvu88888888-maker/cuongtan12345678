@@ -1381,17 +1381,25 @@ class FreeAIHelper:
         elif any(kw in q_lower for kw in ['cái gì','loại gì','là gì','vật gì']):
             primary_keys = [('v24_mh_factors','MH','Mai Hoa'), ('v24_tb_factors','TB','Thiết Bản')]
             q_label = 'CÁI GÌ'
+        elif any(kw in q_lower for kw in ['ai ','người nào','ai đó','là ai']):
+            primary_keys = [('v24_mh_factors','MH','Mai Hoa'), ('v24_ln_factors','LN','Đại Lục Nhâm')]
+            q_label = 'AI (NGƯỜI)'
         elif any(kw in q_lower for kw in ['ở đâu','nơi nào','phương nào','hướng nào']):
             primary_keys = [('v24_km_factors','KM','Kỳ Môn'), ('v24_ln_factors','LN','Đại Lục Nhâm')]
             q_label = 'Ở ĐÂU'
         elif any(kw in q_lower for kw in ['khi nào','bao giờ','lúc nào','thời điểm']):
             primary_keys = [('v24_ln_factors','LN','Đại Lục Nhâm'), ('v23_lh_factors','LH','Lục Hào')]
             q_label = 'KHI NÀO'
+        elif any(kw in q_lower for kw in ['tại sao','vì sao','nguyên nhân','do đâu']):
+            primary_keys = [('v23_lh_factors','LH','Lục Hào'), ('v24_km_factors','KM','Kỳ Môn')]
+            q_label = 'TẠI SAO'
+        elif any(kw in q_lower for kw in ['thế nào','như thế nào','ra sao','tình trạng']):
+            primary_keys = [('v23_lh_factors','LH','Lục Hào'), ('v24_km_factors','KM','Kỳ Môn')]
+            q_label = 'THẾ NÀO'
         elif any(kw in q_lower for kw in ['bao nhiêu','mấy','số lượng']):
             primary_keys = [('v24_tb_factors','TB','Thiết Bản'), ('v24_mh_factors','MH','Mai Hoa')]
             q_label = 'SỐ LƯỢNG'
         else:
-            # YES/NO hoặc tổng quát → LH + KM là GỐC
             primary_keys = [('v23_lh_factors','LH','Lục Hào'), ('v24_km_factors','KM','Kỳ Môn')]
             q_label = 'CÓ/KHÔNG'
         
@@ -1748,6 +1756,25 @@ class FreeAIHelper:
                 f"═══ SĐ12: XUẤT HÀNH ═══\n"
                 f"KM+LH: Khai/Hưu/Sinh Môn=NÊN ĐI | Tử/Kinh=KHÔNG\n"
                 f"  Dịch Mã=nhanh,thuận | KV cung đích=thất vọng | DT+Dịch Mã động=sẽ đi\n\n"
+                f"═══ SĐ13: AI (NGƯỜI NÀO) ═══\n"
+                f"MH+VV+KM: [Thể Quái]→Tượng người: Càn=bố/ông | Khôn=mẹ/bà | Chấn=con trai trưởng\n"
+                f"  Tốn=con gái trưởng | Khảm=con trai giữa | Ly=con gái giữa | Cấn=con trai út | Đoài=con gái út\n"
+                f"  [Lục Thân LH]→Phụ Mẫu=cha mẹ/sếp | Huynh Đệ=bạn bè/anh em | Thê Tài=vợ/người yêu\n"
+                f"  [Thiên Tướng LN]→Quý Nhân=quý nhân | Thanh Long=người tốt | Đằng Xà=kẻ gian\n"
+                f"  KL: kết hợp Quái tượng + Lục Thân + Thiên Tướng → mô tả NGƯỜI cụ thể\n\n"
+                f"═══ SĐ14: TẠI SAO (NGUYÊN NHÂN) ═══\n"
+                f"LH+KM: [Kỵ Thần]→hành gì KHẮC DT → đó là NGUYÊN NHÂN gây hại\n"
+                f"  Kỵ Thần=Quan Quỷ→áp lực/bệnh | =Thê Tài→tiền/vợ | =Huynh Đệ→bạn/cạnh tranh\n"
+                f"  =Phụ Mẫu→gia đình/giấy tờ | =Tử Tôn→con cái/phúc đức\n"
+                f"  [Hào Động]→hào nào ĐỘNG = yếu tố đang phát động → nguyên nhân trực tiếp\n"
+                f"  KM: [Cửa Hung]→loại trở ngại | [Thần Hung]→nguồn gốc vấn đề\n"
+                f"  KL: Kỵ Thần + Hào Động + Cửa/Thần → chỉ ra NGUYÊN NHÂN cụ thể\n\n"
+                f"═══ SĐ15: THẾ NÀO (CÁCH THỨC/TRẠNG THÁI) ═══\n"
+                f"LH+KM+MH: [DT Vượng/Suy]→trạng thái hiện tại: Vượng=tốt | Suy=kém | Mộ=bế tắc\n"
+                f"  [Nguyệt sinh/khắc DT]→xu hướng: sinh=đang lên | khắc=đang xuống\n"
+                f"  [Hào Động]→đang thay đổi | [DT Tĩnh]→ổn định ko đổi\n"
+                f"  MH: Thể↔Dụng→mối quan hệ hiện tại | KM: Cửa+Sao→cách giải quyết\n"
+                f"  KL: DT trạng thái + xu hướng + Cửa → mô tả CÁCH THỨC/TÌNH TRẠNG\n\n"
                 f"═══ SĐ0: TỔNG QUÁT (ko thuộc loại nào) ═══\n"
                 f"[5 Verdicts]→Đếm CÁT/HUNG: ≥4CÁT=ĐẠI CÁT|≥3=CÁT|2/2=LỠ CỠ|≥3HUNG=HUNG|≥4=ĐẠI HUNG\n\n"
                 f"CÁCH DÙNG: <question_type>→chọn SƠ ĐỒ→đọc factors→theo mũi tên→KẾT LUẬN ≤300 chữ\n"

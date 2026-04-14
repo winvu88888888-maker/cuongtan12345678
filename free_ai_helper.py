@@ -1371,20 +1371,55 @@ class FreeAIHelper:
         if od.get('v18_detective'):
             lines.append(f"V18: {od['v18_detective']}")
         
-        # 7) TẤT CẢ factors từng PP (KHÔNG CẮT — AI Online phải đọc ĐẦY ĐỦ)
-        for fkey, flabel, fname in [
-            ('v24_km_factors','KM','Kỳ Môn'),
-            ('v23_lh_factors','LH','Lục Hào'),
-            ('v24_mh_factors','MH','Mai Hoa'),
-            ('v24_tb_factors','TB','Thiết Bản'),
-            ('v24_ln_factors','LN','Đại Lục Nhâm'),
-            ('v24_ta_factors','TA','Thái Ất')
-        ]:
+        # 7) V29.5: SMART FACTOR INJECTION — CHỈ inject PP GỐC theo câu hỏi
+        q_lower = str(od.get('_question', '')).lower()
+        
+        # Xác định PP GỐC
+        if any(kw in q_lower for kw in ['tuổi','mấy tuổi','bao nhiêu tuổi']):
+            primary_keys = [('v24_tb_factors','TB','Thiết Bản'), ('v24_mh_factors','MH','Mai Hoa')]
+            q_label = 'TUỔI'
+        elif any(kw in q_lower for kw in ['cái gì','loại gì','là gì','vật gì']):
+            primary_keys = [('v24_mh_factors','MH','Mai Hoa'), ('v24_tb_factors','TB','Thiết Bản')]
+            q_label = 'CÁI GÌ'
+        elif any(kw in q_lower for kw in ['ở đâu','nơi nào','phương nào','hướng nào']):
+            primary_keys = [('v24_km_factors','KM','Kỳ Môn'), ('v24_ln_factors','LN','Đại Lục Nhâm')]
+            q_label = 'Ở ĐÂU'
+        elif any(kw in q_lower for kw in ['khi nào','bao giờ','lúc nào','thời điểm']):
+            primary_keys = [('v24_ln_factors','LN','Đại Lục Nhâm'), ('v23_lh_factors','LH','Lục Hào')]
+            q_label = 'KHI NÀO'
+        elif any(kw in q_lower for kw in ['bao nhiêu','mấy','số lượng']):
+            primary_keys = [('v24_tb_factors','TB','Thiết Bản'), ('v24_mh_factors','MH','Mai Hoa')]
+            q_label = 'SỐ LƯỢNG'
+        else:
+            # YES/NO hoặc tổng quát → LH + KM là GỐC
+            primary_keys = [('v23_lh_factors','LH','Lục Hào'), ('v24_km_factors','KM','Kỳ Môn')]
+            q_label = 'CÓ/KHÔNG'
+        
+        # Inject FULL factors cho PP GỐC
+        primary_labels = [pk[1] for pk in primary_keys]
+        lines.append(f"\n🎯 PP GỐC cho câu hỏi [{q_label}]: {', '.join(pk[2] for pk in primary_keys)}")
+        
+        for fkey, flabel, fname in primary_keys:
             fdata = od.get(fkey, [])
             if fdata and isinstance(fdata, list) and len(fdata) > 0:
-                lines.append(f"\n--- {fname} ({len(fdata)} yếu tố) ---")
+                lines.append(f"\n--- ★ {fname} ({len(fdata)} yếu tố) [PP GỐC] ---")
                 for f in fdata:
                     lines.append(f"  • {f}")
+        
+        # PP PHỤ: chỉ hiện verdict tóm tắt (KHÔNG liệt kê factors)
+        ALL_METHODS = [
+            ('v24_km_factors','KM','Kỳ Môn'), ('v23_lh_factors','LH','Lục Hào'),
+            ('v24_mh_factors','MH','Mai Hoa'), ('v24_tb_factors','TB','Thiết Bản'),
+            ('v24_ln_factors','LN','Đại Lục Nhâm'), ('v24_ta_factors','TA','Thái Ất')
+        ]
+        secondary = [m for m in ALL_METHODS if m[1] not in primary_labels]
+        sec_parts = []
+        for fkey, flabel, fname in secondary:
+            fdata = od.get(fkey, [])
+            count = len(fdata) if fdata and isinstance(fdata, list) else 0
+            sec_parts.append(f"{fname}({count} yếu tố)")
+        if sec_parts:
+            lines.append(f"\n--- PP Phụ (chỉ tham khảo): {', '.join(sec_parts)} ---")
         
         lines.append("=== [HET V27 COMPACT] ===\n")
         return "\n".join(lines)
@@ -1431,6 +1466,7 @@ class FreeAIHelper:
 
             if offline_analysis_data:
                 od = offline_analysis_data
+                od['_question'] = question or ''  # V29.5: để compact block biết câu hỏi
                 
                 # V27.0: VERDICT COMPACT BLOCK
                 offline_ctx += self._build_verdict_compact_block(od)

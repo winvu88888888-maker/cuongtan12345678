@@ -1365,18 +1365,18 @@ class FreeAIHelper:
         
         # 5) V17 Method Routing compact (chi 200 ky tu)
         if od.get('v17_routing'):
-            lines.append(f"V17: {od['v17_routing'][:200]}")
+            lines.append(f"V17: {od['v17_routing'][:400]}")
         
         # 6) V18 Detective compact (chi 200 ky tu)
         if od.get('v18_detective'):
-            lines.append(f"V18: {od['v18_detective'][:200]}")
+            lines.append(f"V18: {od['v18_detective'][:500]}")
         
         # 7) Top factors (tat ca phuong phap, chi lay top 3 moi loai)
         factor_parts = []
         for fkey, flabel in [('v23_lh_factors','LH'),('v24_km_factors','KM'),('v24_mh_factors','MH'),('v24_ln_factors','LN'),('v24_ta_factors','TA')]:
             fdata = od.get(fkey, [])
             if fdata and isinstance(fdata, list) and len(fdata) > 0:
-                factor_parts.append(f"{flabel}:[{';'.join(str(f) for f in fdata[:3])}]")
+                factor_parts.append(f"{flabel}:[{';'.join(str(f) for f in fdata[:10])}]")
         if factor_parts:
             lines.append(f"Factors: {' | '.join(factor_parts)}")
         
@@ -1434,11 +1434,25 @@ class FreeAIHelper:
                     f"DT: {od.get('dung_than', '?')} | Cat: {od.get('category_label', '?')}\n"
                     f"KM={od.get('ky_mon_verdict','?')} LH={od.get('luc_hao_verdict','?')} MH={od.get('mai_hoa_verdict','?')} LN={od.get('luc_nham_verdict','?')} TA={od.get('thai_at_verdict','?')}\n"
                 )
+                # Verdicts chi tiết với reasons
+                offline_ctx += (
+                    f"\n--- VERDICTS CHI TIẾT ---\n"
+                    f"Kỳ Môn: {od.get('ky_mon_verdict','?')} — {od.get('ky_mon_reason','')}\n"
+                    f"Lục Hào: {od.get('luc_hao_verdict','?')} — {od.get('luc_hao_reason','')}\n"
+                    f"Mai Hoa: {od.get('mai_hoa_verdict','?')} — {od.get('mai_hoa_reason','')}\n"
+                    f"Đại Lục Nhâm: {od.get('luc_nham_verdict','?')} — {od.get('luc_nham_reason','')}\n"
+                    f"Thái Ất: {od.get('thai_at_verdict','?')} — {od.get('thai_at_reason','')}\n"
+                )
                 
+                # ALL impact evidence (hào động, sinh khắc DT, Nguyên/Kỵ Thần...)
                 if od.get('impact_evidence'):
-                    offline_ctx += f"\n--- BẰNG CHỨNG ---\n"
-                    for e in od['impact_evidence'][:15]:
+                    offline_ctx += f"\n--- YẾU TỐ TÁC ĐỘNG VÀO DỤNG THẦN ---\n"
+                    for e in od['impact_evidence']:
                         offline_ctx += f"• {e}\n"
+                
+                # Unified narrative (kết luận tổng hợp offline)
+                if od.get('unified_narrative'):
+                    offline_ctx += f"\n--- KẾT LUẬN OFFLINE ---\n{od['unified_narrative']}\n"
                 
                 if od.get('full_offline_report'):
                     offline_ctx += f"\n--- BÁO CÁO OFFLINE ---\n{od['full_offline_report']}\n"

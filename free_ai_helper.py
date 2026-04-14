@@ -1595,17 +1595,50 @@ class FreeAIHelper:
                 f"DT: tiền=Thê Tài | sếp/bệnh=Quan Quỷ | con/phúc=Tử Tôn | nhà/cha mẹ=Phụ Mẫu | bạn=Huynh Đệ\n"
                 f"</ngu_hanh_rules>\n\n"
                 
+                f"<method_strengths>\n"
+                f"=== THẾ MẠNH TỪNG PHƯƠNG PHÁP (dùng để cross-reference) ===\n"
+                f"① LỤC HÀO: MẠNH NHẤT cho phân tích DỤNG THẦN vượng/suy.\n"
+                f"   Yếu tố: Nguyệt lệnh sinh/khắc DT ±8 | Nhật thần sinh/khắc ±6 | Nguyên Thần (sinh DT) vượng/suy ±6 | Kỵ Thần (khắc DT) vượng+động -8 | Tuần Không (DT lâm Không=chưa thành) | Nguyệt Phá | Hào động biến hóa (Tiến Thần/Thoái Thần) | Lục Thú (Thanh Long=vui, Bạch Hổ=tang, Đằng Xà=lo) | Phản/Phục Ngâm | Phục Thần\n"
+                f"   → Dùng khi hỏi: CÓ/KHÔNG, tình trạng, mạnh/yếu\n\n"
+                
+                f"② KỲ MÔN ĐỘN GIÁP: MẠNH NHẤT cho PHƯƠNG HƯỚNG + CHIẾN LƯỢC.\n"
+                f"   Yếu tố: Cung Bản Thân (Can ngày) | Cung Sự Việc (Can giờ) | Cửu Tinh (Sao: Bồng/Nhậm=Cát, Nhuế/Cầm=Hung) | Bát Môn (Cửa: Khai/Hưu/Sinh=Cát, Tử/Kinh/Cảnh=Hung) | Bát Thần (Trực Phù/Thái Âm=Cát, Đằng Xà/Bạch Hổ=Hung) | Cách Cục (81 cách) | Ngũ Hành Cung khắc/sinh | Không Vong\n"
+                f"   → Dùng khi hỏi: Ở ĐÂU, hướng nào, chiến lược, nên/không\n\n"
+                
+                f"③ MAI HOA DỊCH SỐ: MẠNH NHẤT cho MỐI QUAN HỆ THỂ/DỤNG.\n"
+                f"   Yếu tố: Thể Quái (mình) vs Dụng Quái (đối phương) → Sinh/Khắc/Tỷ | Hỗ Quái (diễn biến giữa chừng) | Biến Quái (kết quả cuối) | Dụng sinh Thể=ĐẠI CÁT | Thể sinh Dụng=MẤT MÁT | Dụng khắc Thể=HUNG\n"
+                f"   → Dùng khi hỏi: kết quả, được/mất, quan hệ 2 bên\n\n"
+                
+                f"④ THIẾT BẢN THẦN SỐ: MẠNH cho XÁC ĐỊNH VẬT THỂ + SỐ.\n"
+                f"   Yếu tố: Số quẻ → Bát Quái → Vạn Vật Loại Tượng | 12 Trường Sinh (Trường Sinh→Đế Vượng=tốt, Tử→Tuyệt=xấu) | Ngũ Hành quẻ\n"
+                f"   → Dùng khi hỏi: CÁI GÌ, bao nhiêu, tuổi, đặc điểm\n\n"
+                
+                f"⑤ VẠN VẬT LOẠI TƯỢNG: MẠNH cho MÔ TẢ VẬT THỂ/CON NGƯỜI.\n"
+                f"   Yếu tố: Bát Quái Tượng (Càn=trời/vàng/bố | Khảm=nước/máu/tai | Cấn=núi/bất động sản | Chấn=sấm/âm thanh | Tốn=gió/công nghệ | Ly=lửa/IT/mắt | Khôn=đất/mẹ/vải | Đoài=ao/kim loại/miệng) | Ngũ Hành Vật Chất (Kim=kim loại,tròn | Mộc=gỗ,dài | Thủy=lỏng | Hỏa=nóng,nhựa | Thổ=đất,vuông)\n"
+                f"   → Dùng khi hỏi: SẢN XUẤT GÌ, hình dạng, màu sắc, người nào\n\n"
+                
+                f"⑥ ĐẠI LỤC NHÂM: MẠNH NHẤT cho DIỄN BIẾN THỜI GIAN.\n"
+                f"   Yếu tố: Sơ Truyền=QUÁ KHỨ | Trung Truyền=HIỆN TẠI | Mạt Truyền=TƯƠNG LAI | 12 Thiên Tướng (Quý Nhân, Đằng Xà, Chu Tước...) | Khóa Thể\n"
+                f"   → Dùng khi hỏi: KHI NÀO, diễn biến, quá trình\n\n"
+                
+                f"⑦ THÁI ẤT THẦN SỐ: MẠNH cho BỨC TRANH LỚN.\n"
+                f"   Yếu tố: Thái Ất Cung | Chủ/Khách Đại Tướng → ai thắng | Cách Cục (Thái Ất, Văn Xương, Thiên Ất...) | Vận khí năm/tháng\n"
+                f"   → Dùng khi hỏi: xu hướng lớn, vận mệnh, tổng thể\n"
+                f"</method_strengths>\n\n"
+                
                 f"<reasoning_protocol>\n"
-                f"B0: Xem <question_type> → Hỏi gì trả lời đó.\n"
-                f"B1: Đọc <answer_key> → Dữ liệu ĐÃ TRA SẴN.\n"
-                f"B2: Trích 2-3 dữ kiện từ <data> làm bằng chứng.\n"
-                f"B3: Viết KẾT LUẬN ≤500 chữ.\n"
-                f"CẤM: liệt kê 5 PP riêng lẻ, bịa %, CÁT/HUNG khi không hỏi CÓ/KHÔNG, từ mơ hồ.\n"
+                f"CÁCH LẬP LUẬN:\n"
+                f"B0: Xem <question_type> → xác định câu hỏi thuộc loại gì.\n"
+                f"B1: Đọc <method_strengths> → chọn PP PHÙ HỢP NHẤT cho loại câu hỏi này làm PP CHÍNH.\n"
+                f"B2: Đọc <answer_key> + <data> → trích dữ kiện THEN CHỐT từ PP chính.\n"
+                f"B3: Đối chiếu với 2-3 PP phụ → tìm DỮ KIỆN BỔ SUNG hoặc XÁC NHẬN.\n"
+                f"B4: TỔNG HỢP → Viết câu trả lời TRỰC TIẾP ≤500 chữ.\n\n"
+                f"CẤM: liệt kê từng PP riêng lẻ, bịa %, CÁT/HUNG khi không hỏi CÓ/KHÔNG.\n"
                 f"</reasoning_protocol>\n\n"
                 
                 f"<output_format>\n"
-                f"CÂU ĐẦU = TRẢ LỜI TRỰC TIẾP. Sau đó 2-4 dòng bằng chứng. Kết: lời khuyên.\n"
-                f"TỐI ĐA 500 CHỮ. CẤM bịa %. CẤM liệt kê từng PP.\n"
+                f"CÂU ĐẦU = TRẢ LỜI TRỰC TIẾP. Sau đó 2-4 dòng bằng chứng (gộp từ nhiều PP). Kết: lời khuyên.\n"
+                f"TỐI ĐA 500 CHỮ. CẤM bịa %. CẤM liệt kê từng PP riêng.\n"
                 f"</output_format>\n"
             )
 

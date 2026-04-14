@@ -6372,13 +6372,13 @@ class FreeAIHelper:
         )
         
         if online_result:
-            # AI Online thành công → Hiện Online TRƯỚC, Offline ẩn sau
+            # V30.2: AI Online → CHỈ hiện sơ đồ + yếu tố + câu trả lời
             final_parts = []
-            final_parts.append(f"## 🌐 AI ONLINE — KẾT LUẬN CUỐI CÙNG (Gemini)")
+            final_parts.append(f"## 🌐 AI ONLINE — KẾT QUẢ")
             final_parts.append(online_result)
             final_parts.append("")
             final_parts.append("\n<details>")
-            final_parts.append("<summary><b>📦 Xem Chi Tiết AI Offline — THIÊN CƠ ĐẠI SƯ V26.2 (nhấn để mở)</b></summary>\n")
+            final_parts.append("<summary><b>📦 Xem Chi Tiết AI Offline (nhấn để mở)</b></summary>\n")
             final_parts.append(offline_full_output)
             final_parts.append("\n</details>")
             return "\n".join(final_parts)

@@ -1636,7 +1636,11 @@ class FreeAIHelper:
                 _cc = sum(1 for v in _vd if v and 'CÁT' in str(v).upper())
                 _hc = sum(1 for v in _vd if v and 'HUNG' in str(v).upper())
                 ak.append(f"Đếm: {_cc}/5 CÁT, {_hc}/5 HUNG | DT {tier_cap}")
-                if od.get('v15_timing'): ak.append(f"Ứng Kỳ: {od['v15_timing']}")
+            
+            # V29.9b: CHỈ inject timing khi hỏi về thời gian
+            if question_type == 'WHEN':
+                if od.get('v15_timing'): ak.append(f"⏰ Ứng Kỳ: {od['v15_timing']}")
+                if od.get('v15_timeline'): ak.append(f"📊 Timeline: {od['v15_timeline']}")
             
             answer_key_block = "\n".join(ak)
             
@@ -1757,15 +1761,10 @@ class FreeAIHelper:
                 f"⚡ YẾU TỐ TÁC ĐỘNG:\n"
                 f"• [yếu tố 1 từ data] → [tác động gì] → [kết quả]\n"
                 f"• [yếu tố 2 từ data] → [tác động gì] → [kết quả]\n"
-                f"• [yếu tố 3...]\n"
-                f"(CHỈ liệt kê yếu tố CÓ TRONG <data>, KHÔNG bịa)\n\n"
+                f"• [yếu tố 3...]\n\n"
                 f"🎯 CÂU TRẢ LỜI: [trả lời TRỰC TIẾP câu hỏi, 1-2 câu]\n\n"
-                f"TUYỆT ĐỐI CẤM:\n"
-                f"- Viết thêm BẤT CỨ GÌ ngoài 3 phần trên\n"
-                f"- Liệt kê từng PP (🎴☯️🌸🏯🌟)\n"
-                f"- Phân tích chi tiết, hướng dẫn hành động, thời vận\n"
-                f"- Bịa %, emoji format cũ, TỔNG KẾT CHUYÊN SÂU\n"
-                f"- Viết quá 150 chữ\n"
+                f"(NẾU câu hỏi về THỜI GIAN → thêm phần ⏰ THỜI GIAN: giờ/ngày/tháng/năm dựa trên Ứng Kỳ trong data)\n\n"
+                f"TUYỆT ĐỐI CẤM: viết thêm gì ngoài 4 phần trên. Tối đa 200 chữ.\n"
                 f"</output_format>\n"
             )
 

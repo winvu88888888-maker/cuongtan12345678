@@ -1460,8 +1460,8 @@ class FreeAIHelper:
                 if od.get('unified_narrative'):
                     offline_ctx += f"\n--- KẾT LUẬN OFFLINE ---\n{od['unified_narrative']}\n"
                 
-                if od.get('full_offline_report'):
-                    offline_ctx += f"\n--- BÁO CÁO OFFLINE ---\n{od['full_offline_report']}\n"
+                # V29.2: BỎ full_offline_report — chứa format cũ emoji 🎴☯️ khiến Gemini COPY
+                # Data đã có đầy đủ trong verdict_compact + factors + answer_key
                 
                 if od.get('v15_bt_score') or od.get('v15_dt_score'):
                     offline_ctx += f"\n--- V15 XÂU DƯỢC ---\n"

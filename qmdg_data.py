@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from datetime import datetime
+import datetime
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -17,6 +17,7 @@ def resource_path(relative_path):
 CUSTOM_DATA_FILE = resource_path('custom_data.json')
 EXCEL_DATA_FILE = resource_path('qmdg_excel_full.json')
 ADVANCED_DATA_FILE = resource_path('qmdg_advanced_knowledge.json')
+THIET_BAN_FILE = resource_path('thiet_ban_than_toan.json')
 
 def load_excel_data():
     """Tải dữ liệu đã trích xuất từ Excel và trộn vào KY_MON_DATA."""
@@ -56,6 +57,16 @@ def load_advanced_knowledge():
     if os.path.exists(ADVANCED_DATA_FILE):
         try:
             with open(ADVANCED_DATA_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return {}
+    return {}
+
+def load_thiet_ban_data():
+    """Tải dữ liệu Thiết Bản Thần Toán."""
+    if os.path.exists(THIET_BAN_FILE):
+        try:
+            with open(THIET_BAN_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except (json.JSONDecodeError, IOError):
             return {}
@@ -105,7 +116,7 @@ BAT_MON_CO_DINH_DISPLAY = {
 
 # Vị trí Bát Môn Cố Định theo Cung (không dùng cung 5)
 BAT_MON_CO_DINH_CUNG = {
-    1: "Hưu", 2: "Tử", 3: "Thương", 4: "Đỗ", 6: "Kinh", 7: "Khai", 8: "Sinh", 9: "Cảnh"
+    1: "Hưu", 2: "Tử", 3: "Thương", 4: "Đỗ", 6: "Khai", 7: "Kinh", 8: "Sinh", 9: "Cảnh"
 }
 
 # Địa Chi Giờ
@@ -115,6 +126,8 @@ CAN_CHI_Gio = ["Tý", "Sửu", "Dần", "Mão", "Thìn", "Tị", "Ngọ", "Mùi"
 KY_MON_DATA = {
     # Dữ liệu từ Excel sẽ được trộn vào đây nếu có
     "ENRICHED_DATA": load_excel_data(),
+    # Dữ liệu Thiết Bản Thần Toán (60 Hoa Giáp, 12 Trường Sinh, Thần Sát...)
+    "THIET_BAN_THAN_TOAN": load_thiet_ban_data(),
     "DU_LIEU_DUNG_THAN_PHU_TRO": {
         "CUU_TINH": {
             "Thiên Bồng": {"Hành": "Thủy", "Tính_Chất": "Tướng quân, thích hợp trộm cướp, binh đao."},
@@ -475,7 +488,46 @@ KY_MON_DATA = {
         "Thần thánh": {"Dụng_Thần": ["Trực Phù", "Cửu Thiên", "Thái Âm"], "Luận_Giải_Gợi_Ý": "Xem có được thần linh, gia tiên phù hộ hay không. Trực Phù = Thần tối cao. Cửu Thiên = Thần linh. Thái Âm = Quý nhân âm"},
         "Dự Đoán Tỉ Số Bóng Đá": {"Dụng_Thần": ["Cảnh Môn", "Thiên Anh", "Can Ngày", "Can Giờ"], "Luận_Giải_Gợi_Ý": "Cảnh Môn = Bàn thắng. Thiên Anh = Sự hào hứng/Kết quả nổi bật. Can Ngày = Đội chủ nhà. Can Giờ = Đội khách. Cung Khắc/Sinh giữa Cảnh Môn và Can để đoán tỉ số."},
         "Trận Đấu Thể Thao (Thắng/Thua)": {"Dụng_Thần": ["Can Ngày", "Can Giờ", "Trực Phù", "Cửu Thiên"], "Luận_Giải_Gợi_Ý": "Can Ngày = Đội nhà/Mình cổ vũ. Can Giờ = Đội khách/Đối thủ. Trực Phù = Trọng tài/Lực lượng điều hành. Cửu Thiên = Ưu thế tấn công."},
-        "Dự Đoán Kết Quả Trận Đấu": {"Dụng_Thần": ["Can Ngày (Chủ)", "Can Giờ (Khách)", "Khai Môn", "Cảnh Môn"], "Luận_Giải_Gợi_Ý": "Khai Môn = Sự khởi đầu/Trận đấu chính thức. Cảnh Môn = Tỉ số/Danh tiếng đạt được. Xem sự tương tác giữa 2 cung Can Ngày/Giờ."}
+        "Dự Đoán Kết Quả Trận Đấu": {"Dụng_Thần": ["Can Ngày (Chủ)", "Can Giờ (Khách)", "Khai Môn", "Cảnh Môn"], "Luận_Giải_Gợi_Ý": "Khai Môn = Sự khởi đầu/Trận đấu chính thức. Cảnh Môn = Tỉ số/Danh tiếng đạt được. Xem sự tương tác giữa 2 cung Can Ngày/Giờ."},
+        # ====================================================================
+        # CHỦ ĐỀ MỚI BỔ SUNG (30 CHỦ ĐỀ)
+        # ====================================================================
+        # --- GIA ĐÌNH ---
+        "Nuôi Con Nhỏ": {"Dụng_Thần": ["Sinh Môn", "Thiên Nhuế", "Can Giờ"], "Luận_Giải_Gợi_Ý": "Xem việc nuôi con nhỏ có thuận lợi không. Sinh Môn = Sự trưởng thành. Thiên Nhuế = Sức khỏe bé. Can Giờ = Đứa trẻ"},
+        "Giáo Dục Con Cái": {"Dụng_Thần": ["Thiên Phụ", "Cảnh Môn", "Can Giờ"], "Luận_Giải_Gợi_Ý": "Xem con cái học hành có tiến bộ không. Thiên Phụ = Thầy cô. Cảnh Môn = Kết quả học. Can Giờ = Con cái"},
+        "Quan Hệ Anh Chị Em": {"Dụng_Thần": ["Lục Hợp", "Can Tháng", "Can Ngày"], "Luận_Giải_Gợi_Ý": "Xem quan hệ anh chị em có hòa thuận không. Lục Hợp = Sự gắn kết. Can Tháng = Anh chị em"},
+        "Chăm Sóc Cha Mẹ Già": {"Dụng_Thần": ["Can Năm", "Thiên Nhuế", "Hưu Môn"], "Luận_Giải_Gợi_Ý": "Xem sức khỏe cha mẹ và cách chăm sóc tốt nhất. Can Năm = Cha mẹ. Thiên Nhuế = Sức khỏe. Hưu Môn = An dưỡng"},
+        # --- TÂM LINH ---
+        "Xem Số Mệnh": {"Dụng_Thần": ["Can Ngày", "Trực Phù", "Cửu Thiên"], "Luận_Giải_Gợi_Ý": "Xem tổng quan vận mệnh đời người. Can Ngày = Bản mệnh. Trực Phù = Quý nhân hộ mệnh. Cửu Thiên = Vận trời"},
+        "Phong Thủy Văn Phòng": {"Dụng_Thần": ["Sinh Môn", "Khai Môn", "Cung vị"], "Luận_Giải_Gợi_Ý": "Xem bố trí văn phòng có vượng tài không. Sinh Môn = Khí tài lộc. Khai Môn = Hướng bàn làm việc"},
+        "Chọn Ngày Tốt": {"Dụng_Thần": ["Can Ngày", "Can Giờ", "Trực Phù"], "Luận_Giải_Gợi_Ý": "Xem ngày giờ này có đại cát để khởi sự không. Can Ngày = Ngày chọn. Can Giờ = Giờ chọn. Trực Phù = Quý nhân"},
+        "Xin Xăm Giải Quẻ": {"Dụng_Thần": ["Cảnh Môn", "Đằng Xà", "Trực Phù"], "Luận_Giải_Gợi_Ý": "Xem lá xăm/quẻ này điềm báo gì. Cảnh Môn = Nội dung quẻ. Đằng Xà = Điềm bí ẩn. Trực Phù = Thần linh"},
+        # --- SỨC KHỎE ---
+        "Giảm Cân Ăn Kiêng": {"Dụng_Thần": ["Thiên Nhuế", "Sinh Môn", "Can Ngày"], "Luận_Giải_Gợi_Ý": "Xem chế độ ăn kiêng có hiệu quả không. Thiên Nhuế = Thể trạng. Sinh Môn = Sức khỏe phục hồi"},
+        "Tập Thể Dục Thể Thao": {"Dụng_Thần": ["Thiên Xung", "Cửu Thiên", "Can Ngày"], "Luận_Giải_Gợi_Ý": "Xem tập luyện có tốt cho sức khỏe không. Thiên Xung = Năng lượng vận động. Cửu Thiên = Sức mạnh thể chất"},
+        "Nghiện Rượu Thuốc Lá": {"Dụng_Thần": ["Thiên Nhuế", "Đằng Xà", "Tử Môn"], "Luận_Giải_Gợi_Ý": "Xem có cai được nghiện không. Thiên Nhuế = Bệnh nghiện. Đằng Xà = Sự ràng buộc. Tử Môn = Nguy hiểm"},
+        "Bệnh Mắt Tai": {"Dụng_Thần": ["Thiên Nhuế", "Cung 9", "Cung 7"], "Luận_Giải_Gợi_Ý": "Xem bệnh về mắt hoặc tai. Cung 9 (Ly) tượng cho mắt. Cung 7 (Đoài) tượng cho miệng và tai"},
+        # --- TÀI CHÍNH ---
+        "Tiết Kiệm Tích Lũy": {"Dụng_Thần": ["Mậu", "Cửu Địa", "Can Ngày"], "Luận_Giải_Gợi_Ý": "Xem tiết kiệm có tích góp được không. Mậu = Tiền tích lũy. Cửu Địa = Sự bền vững lâu dài"},
+        "Mua Bảo Hiểm": {"Dụng_Thần": ["Trực Phù", "Sinh Môn", "Mậu"], "Luận_Giải_Gợi_Ý": "Xem mua bảo hiểm có lợi không. Trực Phù = Công ty bảo hiểm. Sinh Môn = Quyền lợi. Mậu = Phí đóng"},
+        "Hưu Trí An Nhàn": {"Dụng_Thần": ["Hưu Môn", "Mậu", "Cửu Địa"], "Luận_Giải_Gợi_Ý": "Xem tuổi già có an nhàn đầy đủ không. Hưu Môn = Nghỉ ngơi. Mậu = Tài sản tích lũy. Cửu Địa = Sự ổn định"},
+        "Trúng Số Đề": {"Dụng_Thần": ["Thiên Bồng", "Mậu", "Huyền Vũ"], "Luận_Giải_Gợi_Ý": "Xem có vận may trúng số không. Thiên Bồng = May rủi cờ bạc. Mậu = Tiền thưởng. Huyền Vũ = Sự may mắn bất ngờ"},
+        # --- CÔNG NGHỆ ---
+        "Khởi Nghiệp Startup": {"Dụng_Thần": ["Khai Môn", "Sinh Môn", "Cửu Thiên"], "Luận_Giải_Gợi_Ý": "Xem startup có thành công gọi vốn không. Khai Môn = Khởi nghiệp. Sinh Môn = Lợi nhuận. Cửu Thiên = Tầm nhìn xa"},
+        "Phát Triển Ứng Dụng": {"Dụng_Thần": ["Cảnh Môn", "Thiên Phụ", "Khai Môn"], "Luận_Giải_Gợi_Ý": "Xem phát triển app có nhiều người dùng không. Cảnh Môn = Giao diện. Thiên Phụ = Công nghệ. Khai Môn = Ra mắt"},
+        "Bán Hàng TikTok Livestream": {"Dụng_Thần": ["Cảnh Môn", "Thiên Anh", "Sinh Môn"], "Luận_Giải_Gợi_Ý": "Xem bán hàng trên TikTok/Livestream có đắt khách không. Cảnh Môn = Nội dung. Thiên Anh = Sự nổi bật. Sinh Môn = Doanh thu"},
+        "Marketing Quảng Cáo": {"Dụng_Thần": ["Cảnh Môn", "Thiên Anh", "Mậu"], "Luận_Giải_Gợi_Ý": "Xem chiến dịch quảng cáo có hiệu quả không. Cảnh Môn = Ấn phẩm truyền thông. Thiên Anh = Sự lan tỏa. Mậu = Ngân sách"},
+        # --- XÃ HỘI ---
+        "Tình Bạn Tri Kỷ": {"Dụng_Thần": ["Lục Hợp", "Hưu Môn", "Can Ngày"], "Luận_Giải_Gợi_Ý": "Xem tình bạn có bền vững chân thành không. Lục Hợp = Tình bạn. Hưu Môn = Sự vui vẻ gắn kết"},
+        "Xin Lỗi Hòa Giải": {"Dụng_Thần": ["Lục Hợp", "Hưu Môn", "Can Giờ"], "Luận_Giải_Gợi_Ý": "Xem xin lỗi có được tha thứ không. Lục Hợp = Sự hòa giải. Hưu Môn = Tha thứ. Can Giờ = Người cần xin lỗi"},
+        "Di Cư Nhập Cảnh": {"Dụng_Thần": ["Mã Tinh", "Trực Phù", "Cảnh Môn"], "Luận_Giải_Gợi_Ý": "Xem thủ tục di cư có suôn sẻ không. Mã Tinh = Di chuyển. Trực Phù = Cơ quan nhập cảnh. Cảnh Môn = Giấy tờ"},
+        # --- CUỘC SỐNG ---
+        "Chọn Tên Cho Con": {"Dụng_Thần": ["Cảnh Môn", "Đinh", "Sinh Môn"], "Luận_Giải_Gợi_Ý": "Xem tên này có hợp mệnh và mang lại may mắn không. Cảnh Môn = Tên gọi. Đinh = Ý nghĩa. Sinh Môn = Phát triển"},
+        "Nuôi Thú Cưng Mới": {"Dụng_Thần": ["Sinh Môn", "Thiên Nhuế", "Lục Hợp"], "Luận_Giải_Gợi_Ý": "Xem nuôi thú cưng này có hợp và khỏe mạnh không. Sinh Môn = Sự phát triển. Thiên Nhuế = Sức khỏe vật nuôi. Lục Hợp = Sự gắn bó"},
+        "Mua Xe Máy": {"Dụng_Thần": ["Mã Tinh", "Canh", "Can Ngày"], "Luận_Giải_Gợi_Ý": "Xem mua xe máy có bền và an toàn không. Mã Tinh = Phương tiện. Canh = Kim loại/Máy móc. Can Ngày = Mình"},
+        "Đổi Nghề Nghiệp": {"Dụng_Thần": ["Khai Môn", "Mã Tinh", "Can Ngày"], "Luận_Giải_Gợi_Ý": "Xem chuyển ngành có phát triển tốt hơn không. Khai Môn = Nghề mới. Mã Tinh = Sự thay đổi. Can Ngày = Mình"},
+        "Xem Tuổi Xung Khắc": {"Dụng_Thần": ["Can Năm (Mình)", "Can Năm (Đối phương)", "Lục Hợp"], "Luận_Giải_Gợi_Ý": "Xem hai người có xung khắc tuổi không. Can Năm = Mệnh tuổi mỗi người. Lục Hợp = Sự tương hợp"},
+        "Chọn Màu Sắc May Mắn": {"Dụng_Thần": ["Can Ngày", "Ngũ Hành bản mệnh"], "Luận_Giải_Gợi_Ý": "Xem màu sắc nào hợp mệnh và mang lại may mắn. Ngũ Hành quyết định: Kim=Trắng, Mộc=Xanh, Thủy=Đen, Hỏa=Đỏ, Thổ=Vàng"}
     }
 }
 # ======================================================================

@@ -1,5 +1,5 @@
 """
-Free AI Helper V27.0 — THIÊN CƠ ĐẠI SƯ (LỤC THUẬT HỢP NHẤT + LƯỢNG HÓA SUY VƯỢNG TOÀN DIỆN)
+Free AI Helper V32.2 — THIÊN CƠ ĐẠI SƯ (Unified Index + Offline Engine + Vạn Vật 2226+)
 Kết hợp Python rule-based + Gemini Online Deep Reasoning.
 Sử dụng dữ liệu Kỳ Môn + Mai Hoa + Lục Hào + Thiết Bản + Đại Lục Nhâm + Thái Ất Thần Số.
 V26.2: Tích hợp _calc_unified_strength_tier() — 3 tầng LH+TS+NK → Unified %.
@@ -107,6 +107,42 @@ except ImportError:
     def tra_cuu_can(c): return {}
     def xac_dinh_huong_khoang_cach(c): return {}
     def kha_nang_tim_duoc(m): return ""
+
+# V31.0: Interaction Diagrams — Sơ đồ tương tác thời gian thực
+try:
+    from interaction_diagrams import (
+        DIAGRAM_MASTER, DIAGRAMS as INTERACTION_DIAGRAMS, 
+        match_question_to_diagram, CUNG_PHUONG, QUAI_NGUOI, KY_THAN_NGUYEN_NHAN,
+        split_compound_question, format_parsed_questions, clean_question,
+    )
+except ImportError:
+    DIAGRAM_MASTER = None
+    INTERACTION_DIAGRAMS = {}
+    def match_question_to_diagram(q): return 'SD0', {}
+    CUNG_PHUONG = {}
+    QUAI_NGUOI = {}
+    KY_THAN_NGUYEN_NHAN = {}
+    def split_compound_question(q): return []
+    def format_parsed_questions(lst): return ""
+    def clean_question(q): return q.strip() if q else ""
+
+# V32.0: Vạn Vật Lazy-Load Package — AI chỉ load hành cần thiết
+try:
+    from van_vat import get_van_vat_chi_tiet, format_van_vat_for_ai, get_tham_tu_mo_ta
+except ImportError:
+    try:
+        from van_vat_tong_hop import (
+            get_van_vat_chi_tiet, format_van_vat_for_ai, get_tham_tu_mo_ta,
+        )
+    except ImportError:
+        try:
+            from van_vat_chi_tiet import (
+                get_van_vat_chi_tiet, format_van_vat_for_ai, get_tham_tu_mo_ta,
+            )
+        except ImportError:
+            def get_van_vat_chi_tiet(h, ts): return {}
+            def format_van_vat_for_ai(h, ts): return ""
+            def get_tham_tu_mo_ta(h, ts, q=""): return ""
 
 # === NGŨ HÀNH ENGINE ===
 SINH = {'Mộc': 'Hỏa', 'Hỏa': 'Thổ', 'Thổ': 'Kim', 'Kim': 'Thủy', 'Thủy': 'Mộc'}
@@ -1257,7 +1293,7 @@ class FreeAIHelper:
     Kế thừa V9.0: Phản/Phục Ngâm, Tam Kỳ, Tam Tài, Không Vong.
     """
     def __init__(self, api_key=None):
-        self.name = "Thiên Cơ Đại Sư (V27.0 Unified + Deep Integration)"
+        self.name = "Thiên Cơ Đại Sư (V32.2 Unified Index + Offline Engine)"
         self.version = "V26.2-Unified-Strength"
         self.model_name = "offline-rule-engine-v22.0"
         self.logs = []
@@ -1281,6 +1317,424 @@ class FreeAIHelper:
     def _process_response(self, text):
         return text if text else "Không có phản hồi."
 
+    # ═══════════════════════════════════════════════════════════════
+    # V31.0: SƠ ĐỒ TƯƠNG TÁC THỜI GIAN THỰC
+    # ═══════════════════════════════════════════════════════════════
+    
+    def _fill_master_diagram(self, question, category_label, dung_than, hanh_dt,
+                              unified_v22, v23_lh_factors, chart_data, luc_hao_data):
+        """V31.0: Điền yếu tố THỜI GIAN THỰC vào SĐ_MASTER.
+        
+        SĐ_MASTER = Sơ đồ QUAN TRỌNG NHẤT:
+        DT → Suy/Vượng (3 tầng: LH + 12TS + Ngũ Khí) → Vạn Vật Loại Tượng → Chi tiết
+        """
+        if not DIAGRAM_MASTER:
+            return "", {}
+        
+        # === Extract data ===
+        v22 = unified_v22 or {}
+        lh_raw = v22.get('lh_pct', 50)
+        ts_stage = v22.get('ts_stage', 'N/A')
+        ts_power = TRUONG_SINH_POWER.get(ts_stage, {}).get('power', 50) if ts_stage else 50
+        ts_icon = TRUONG_SINH_POWER.get(ts_stage, {}).get('cap', '?') if ts_stage else '?'
+        ts_mota = TRUONG_SINH_GIAI_THICH.get(ts_stage, '') if ts_stage else ''
+        ngu_khi = v22.get('ngu_khi', '?')
+        nk_power = NGU_KHI_POWER.get(ngu_khi, {}).get('power', 50) if ngu_khi else 50
+        unified_pct = v22.get('unified_pct', 50)
+        tier_cap = v22.get('tier_cap', '?')
+        
+        # Ngũ Hành vật chất
+        hanh_vat = v22.get('hanh_vat', NGU_HANH_VAT_CHAT.get(hanh_dt, {}))
+        vv_cu_the = v22.get('van_vat_cu_the', {})
+        vv_mapping = v22.get('tier_data', {})
+        
+        # Chi reference cho 12 Trường Sinh
+        chi_ref = ''
+        if luc_hao_data:
+            if isinstance(luc_hao_data, dict):
+                chi_ref = luc_hao_data.get('chi_ngay', '')
+            elif hasattr(luc_hao_data, 'chi_ngay'):
+                chi_ref = getattr(luc_hao_data, 'chi_ngay', '')
+        if not chi_ref and chart_data:
+            chi_ref = chart_data.get('chi_ngay', '')
+        
+        # Cung hành
+        cung_hanh = ''
+        if chart_data:
+            can_ngay = chart_data.get('can_ngay', '')
+            can_thien_ban = chart_data.get('can_thien_ban', {})
+            for c_num, c_can in can_thien_ban.items():
+                if c_can == can_ngay:
+                    cung_hanh = CUNG_NGU_HANH.get(int(c_num), '?') if c_num else '?'
+                    break
+        
+        # LH factors -> extract NT, KT, Nguyệt, Nhật
+        nguyet_lenh = ''
+        nhat_than = ''
+        nguyen_than = ''
+        ky_than = ''
+        nt_state = ''
+        kt_state = ''
+        nguyet_tac_dong = ''
+        nhat_tac_dong = ''
+        dac_biet = []
+        lh_raw_score = 0
+        
+        if v23_lh_factors:
+            for f in v23_lh_factors:
+                if 'Nguyệt' in f and 'DT' in f:
+                    nguyet_tac_dong = 'sinh' if '+' in f else 'khắc' if '-' in f else ''
+                    # Extract Nguyệt value  
+                    nguyet_lenh = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                elif 'Nhật' in f and 'DT' in f:
+                    nhat_tac_dong = 'sinh' if '+' in f else 'khắc' if '-' in f else ''
+                    nhat_than = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                elif 'NT(' in f or 'Nguyên Thần' in f:
+                    nguyen_than = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                    nt_state = 'Vượng' if '+' in f else 'Suy'
+                elif 'KT(' in f or 'Kỵ Thần' in f:
+                    ky_than = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                    kt_state = 'Vượng+Động' if '-8' in f else 'Suy' if '-' in f else '?'
+                elif 'THAM SINH' in f.upper():
+                    dac_biet.append('⚡ THAM SINH VONG KHẮC')
+                elif 'PHẢN NGÂM' in f.upper():
+                    dac_biet.append('🔄 Phản Ngâm')
+                elif 'PHỤC NGÂM' in f.upper():
+                    dac_biet.append('🔄 Phục Ngâm')
+                elif 'Tuần Không' in f:
+                    dac_biet.append('⭕ Tuần Không')
+                elif 'Nguyệt Phá' in f:
+                    dac_biet.append('💥 Nguyệt Phá')
+            
+            # LH raw score 
+            for f in v23_lh_factors:
+                try:
+                    parts = f.split()
+                    for p in parts:
+                        if p.startswith('+') or p.startswith('-'):
+                            lh_raw_score += int(p)
+                            break
+                except:
+                    pass
+        
+        dac_biet_str = ', '.join(dac_biet) if dac_biet else 'Không có'
+        
+        # Build short question
+        q_short = question[:40] + '...' if len(question) > 40 else question
+        
+        # === Fill template ===
+        slots = {
+            'question_short': q_short,
+            'category_label': category_label,
+            'dung_than': dung_than,
+            'hanh_dt': hanh_dt,
+            'nguyet_lenh': nguyet_lenh or '?',
+            'nguyet_tac_dong': nguyet_tac_dong or '?',
+            'nhat_than': nhat_than or '?',
+            'nhat_tac_dong': nhat_tac_dong or '?',
+            'nguyen_than': nguyen_than or '?',
+            'nt_state': nt_state or '?',
+            'ky_than': ky_than or '?',
+            'kt_state': kt_state or '?',
+            'dac_biet': dac_biet_str,
+            'lh_raw_score': lh_raw_score,
+            'lh_pct': lh_raw,
+            'chi_reference': chi_ref or '?',
+            'ts_stage': ts_stage or 'N/A',
+            'ts_icon': ts_icon,
+            'ts_power': ts_power,
+            'ts_mota': ts_mota or '',
+            'cung_hanh': cung_hanh or '?',
+            'ngu_khi': ngu_khi or '?',
+            'nk_power': nk_power,
+            'unified_pct': unified_pct,
+            'tier_cap': tier_cap,
+            # Vạn Vật Vật Chất
+            'hinh_dang': hanh_vat.get('hinh', '?'),
+            'chat_lieu': hanh_vat.get('chat_lieu', '?'),
+            'mau_sac': hanh_vat.get('mau', '?'),
+            'huong': hanh_vat.get('huong', '?'),
+            # Vạn Vật Mapping
+            'kich_thuoc': vv_mapping.get('kich_thuoc', '?'),
+            'tinh_trang': vv_mapping.get('tinh_trang', '?'),
+            'so_luong': vv_mapping.get('so_luong', '?'),
+            'chat_luong': vv_mapping.get('chat_luong', '?'),
+            'con_nguoi': vv_mapping.get('con_nguoi', '?'),
+            'suc_khoe': hanh_vat.get('co_the', '?'),
+            # Vạn Vật Cụ Thể (Ngũ Hành × Tầng)
+            'do_vat': vv_cu_the.get('do_vat', '?'),
+            'nha_cua': vv_cu_the.get('nha_cua', '?'),
+            'nguoi_lien_quan': vv_cu_the.get('nguoi', '?'),
+            'benh_tat': vv_cu_the.get('benh', '?'),
+        }
+        
+        # Fill template
+        try:
+            template = DIAGRAM_MASTER.get('template', '')
+            filled = template
+            for k, v in slots.items():
+                filled = filled.replace('{' + k + '}', str(v))
+            # Xử lý {lh_raw_score:+d} format specifier
+            filled = filled.replace('{lh_raw_score:+d}', f'{lh_raw_score:+d}')
+        except Exception:
+            filled = f"[SĐ_MASTER Error] Không thể điền sơ đồ"
+        
+        # === Conclusion from formula ===
+        conclusion = ''
+        rules = DIAGRAM_MASTER.get('conclusion_rules', {})
+        for _, (lo, hi, desc) in rules.items():
+            if lo <= unified_pct <= hi:
+                conclusion = desc
+                break
+        if not conclusion:
+            conclusion = f"Unified = {unified_pct}%"
+        
+        formula_detail = (
+            f"LH({lh_raw}%)×50% + TS({ts_power}%)×30% + NK({nk_power}%)×20% "
+            f"= {unified_pct}%"
+        )
+        
+        return filled, {
+            'conclusion': conclusion,
+            'formula_detail': formula_detail,
+            'unified_pct': unified_pct,
+            'tier_cap': tier_cap,
+            'slots': slots,
+        }
+    
+    def _fill_question_diagram(self, diagram_id, question, dung_than, hanh_dt,
+                                unified_v22, v23_lh_factors, v24_km_factors,
+                                v24_mh_factors, chart_data, luc_hao_data, mai_hoa_data,
+                                verdicts_dict=None):
+        """V31.0: Điền yếu tố thời gian thực vào sơ đồ câu hỏi (SĐ0-SĐ16).
+        
+        Trả về: (filled_template, info_dict)
+        """
+        if not INTERACTION_DIAGRAMS or diagram_id not in INTERACTION_DIAGRAMS:
+            return "", {}
+        
+        diagram = INTERACTION_DIAGRAMS[diagram_id]
+        v22 = unified_v22 or {}
+        vd = verdicts_dict or {}
+        
+        # === Common slots ===
+        common = {
+            'dung_than': dung_than,
+            'hanh_dt': hanh_dt,
+            'unified_pct': v22.get('unified_pct', 50),
+            'tier_cap': v22.get('tier_cap', '?'),
+        }
+        
+        # Extract common LH data
+        dt_state = v22.get('tier_cap', '?')
+        
+        # Verdicts
+        km_v = vd.get('km', '?')
+        lh_v = vd.get('lh', '?')
+        mh_v = vd.get('mh', '?')
+        ln_v = vd.get('ln', '?')
+        ta_v = vd.get('ta', '?')
+        
+        # Count
+        _vl = [km_v, lh_v, mh_v, ln_v, ta_v]
+        cat_c = sum(1 for v in _vl if v and 'CÁT' in str(v).upper())
+        hung_c = sum(1 for v in _vl if v and 'HUNG' in str(v).upper())
+        
+        # === Diagram-specific slots ===
+        slots = dict(common)
+        
+        # ——— SĐ0: TỔNG QUÁT ———
+        if diagram_id == 'SD0':
+            if cat_c >= 4: concl = 'ĐẠI CÁT'
+            elif cat_c >= 3: concl = 'CÁT'
+            elif hung_c >= 4: concl = 'ĐẠI HUNG'
+            elif hung_c >= 3: concl = 'HUNG'
+            else: concl = 'LỠ CỠ'
+            
+            slots.update({
+                'km_verdict': km_v, 'lh_verdict': lh_v, 'mh_verdict': mh_v,
+                'ln_verdict': ln_v, 'ta_verdict': ta_v,
+                'cat_count': cat_c, 'hung_count': hung_c,
+                'conclusion': concl,
+            })
+        
+        # ——— SĐ1: CÓ/KHÔNG ———
+        elif diagram_id == 'SD1':
+            # Extract from factors
+            nguyet = nhat = nt = kt = cuu = ''
+            m_rel = n_rel = nt_st = kt_st = cuu_st = ''
+            the_st = ung_st = tsvk = tk = npha = ''
+            cung_bt = cung_sv = bt_sv = ''
+            score_parts = []
+            total = 0
+            
+            for f in (v23_lh_factors or []):
+                if 'Nguyệt' in f and ('sinh' in f.lower() or 'khắc' in f.lower()):
+                    nguyet = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                    m_rel = 'sinh' if '+' in f else 'khắc'
+                elif 'Nhật' in f and ('sinh' in f.lower() or 'khắc' in f.lower()):
+                    nhat = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                    n_rel = 'sinh' if '+' in f else 'khắc'
+                elif 'NT(' in f:
+                    nt = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                    nt_st = 'Vượng' if '+' in f else 'Suy'
+                elif 'KT(' in f:
+                    kt = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                    kt_st = 'Vượng' if '-8' in f else 'Có'
+                elif 'Cừu' in f:
+                    cuu = f.split('(')[1].split(')')[0] if '(' in f else '?'
+                    cuu_st = '⚠️ Tiếp sức KT' if '-' in f else 'Yếu'
+                elif 'Thế' in f and 'Ứng' in f:
+                    the_st = 'Vượng' if 'khắc Ứng' in f else 'Suy'
+                    ung_st = 'Suy' if 'khắc Ứng' in f else 'Vượng'
+                elif 'THAM SINH' in f.upper():
+                    tsvk = '⚡ CÓ → CÁT'
+                elif 'Tuần Không' in f:
+                    tk = 'CÓ ⭕ (chưa thành)'
+                elif 'Nguyệt Phá' in f:
+                    npha = 'CÓ 💥'
+                
+                # Extract score
+                try:
+                    for p in f.split():
+                        if (p.startswith('+') or p.startswith('-')) and p[1:].isdigit():
+                            val = int(p)
+                            total += val
+                            score_parts.append(p)
+                            break
+                except: pass
+            
+            # KM BT/SV
+            for f in (v24_km_factors or []):
+                if 'BT' in f and ('sinh' in f.lower() or 'khắc' in f.lower()):
+                    bt_sv = 'BT thắng SV' if ('khắc' in f.lower() and '+' in f) else 'SV thắng'
+            
+            concl = 'CÓ ✅' if total > 10 else 'KHÔNG ❌' if total < -10 else 'LỠ CỠ 🟡'
+            
+            slots.update({
+                'nguyet_lenh': nguyet or '?', 'nhat_than': nhat or '?',
+                'm_rel': m_rel or '?', 'n_rel': n_rel or '?',
+                'dt_state': dt_state,
+                'nguyen_than': nt or '?', 'nt_state': nt_st or '?',
+                'ky_than': kt or '?', 'kt_state': kt_st or '?',
+                'cuu_than': cuu or '?', 'cuu_state': cuu_st or '?',
+                'tuan_khong': tk or 'Không',
+                'nguyet_pha': npha or 'Không',
+                'the_state': the_st or '?', 'ung_state': ung_st or '?',
+                'tham_sinh_vong_khac': tsvk or 'Không có',
+                'cung_bt': cung_bt or '?', 'cung_sv': cung_sv or '?',
+                'bt_sv_rel': bt_sv or '?',
+                'score_detail': ' '.join(score_parts[:6]) if score_parts else '?',
+                'total_score': total,
+                'conclusion': concl,
+            })
+        
+        # ——— SĐ2-SĐ16: Fill based on available data ———
+        else:
+            # Generic fill — use dt_state and vạn vật
+            hanh_vat = v22.get('hanh_vat', NGU_HANH_VAT_CHAT.get(hanh_dt, {}))
+            vv_cu_the = v22.get('van_vat_cu_the', {})
+            
+            generic_slots = {
+                'dt_state': dt_state,
+                'hinh_dang': hanh_vat.get('hinh', '?'),
+                'chat_lieu': hanh_vat.get('chat_lieu', '?'),
+                'mau_sac': hanh_vat.get('mau', '?'),
+                'huong': hanh_vat.get('huong', '?'),
+                'co_the': hanh_vat.get('co_the', '?'),
+                'do_vat': vv_cu_the.get('do_vat', '?'),
+                'nguoi_lien_quan': vv_cu_the.get('nguoi', '?'),
+                # Verdicts
+                'km_verdict': km_v, 'lh_verdict': lh_v, 'mh_verdict': mh_v,
+                'ln_verdict': ln_v, 'ta_verdict': ta_v,
+                'cat_count': cat_c, 'hung_count': hung_c,
+            }
+            
+            # MH data
+            if mai_hoa_data and isinstance(mai_hoa_data, dict):
+                generic_slots['the_quai'] = mai_hoa_data.get('the_quai', {}).get('ten', '?') if isinstance(mai_hoa_data.get('the_quai'), dict) else str(mai_hoa_data.get('the_quai', '?'))
+                generic_slots['dung_quai'] = mai_hoa_data.get('dung_quai', {}).get('ten', '?') if isinstance(mai_hoa_data.get('dung_quai'), dict) else str(mai_hoa_data.get('dung_quai', '?'))
+                generic_slots['ho_quai'] = str(mai_hoa_data.get('ho_quai', '?'))
+                generic_slots['bien_quai'] = str(mai_hoa_data.get('bien_quai', '?'))
+                the_h = mai_hoa_data.get('the_quai', {}).get('hanh', '?') if isinstance(mai_hoa_data.get('the_quai'), dict) else '?'
+                dung_h = mai_hoa_data.get('dung_quai', {}).get('hanh', '?') if isinstance(mai_hoa_data.get('dung_quai'), dict) else '?'
+                generic_slots['the_quai_hanh'] = the_h  
+                generic_slots['dung_quai_hanh'] = dung_h
+                if the_h != '?' and dung_h != '?':
+                    generic_slots['the_dung_rel'] = _ngu_hanh_relation(the_h, dung_h).split('(')[0] if the_h and dung_h else '?'
+                else:
+                    generic_slots['the_dung_rel'] = '?'
+            
+            # KM data
+            if chart_data and isinstance(chart_data, dict):
+                generic_slots['cung_bt'] = '?'
+                generic_slots['cung_sv'] = '?'
+                generic_slots['cung_dt'] = '?'
+                generic_slots['phuong_km'] = '?'
+                
+                can_ngay = chart_data.get('can_ngay', '')
+                can_thien_ban = chart_data.get('can_thien_ban', {})
+                nhan_ban = chart_data.get('nhan_ban', {})
+                thien_ban = chart_data.get('thien_ban', {})
+                
+                for c_num, c_can in can_thien_ban.items():
+                    if c_can == can_ngay:
+                        generic_slots['cung_bt'] = str(c_num)
+                    elif c_can == chart_data.get('can_gio', ''):
+                        generic_slots['cung_sv'] = str(c_num)
+                        generic_slots['cung_dt'] = str(c_num)
+                        generic_slots['phuong_km'] = CUNG_PHUONG.get(int(c_num), '?') if c_num else '?'
+                
+                # Cửa at DT cung
+                dt_cung = generic_slots.get('cung_dt', '')
+                if dt_cung and dt_cung.isdigit():
+                    cua_val = nhan_ban.get(int(dt_cung), nhan_ban.get(dt_cung, '?'))
+                    generic_slots['cua_dt'] = str(cua_val)
+                    cua_key = str(cua_val) if 'Môn' in str(cua_val) else str(cua_val) + ' Môn'
+                    cua_info = CUA_GIAI_THICH.get(cua_key, {})
+                    generic_slots['cua_y_nghia'] = cua_info.get('y_nghia', '?')
+                    
+                    sao_val = thien_ban.get(int(dt_cung), thien_ban.get(dt_cung, '?'))
+                    generic_slots['sao_dt'] = str(sao_val)
+                else:
+                    generic_slots['cua_dt'] = '?'
+                    generic_slots['sao_dt'] = '?'
+                    generic_slots['cua_y_nghia'] = '?'
+                
+                generic_slots['bt_sv_rel'] = '?'
+                for f in (v24_km_factors or []):
+                    if 'BT' in f and ('sinh' in f or 'khắc' in f):
+                        generic_slots['bt_sv_rel'] = f.split('(')[0].strip() if '(' in f else f[:30]
+            
+            # Auto-conclusion based on cat/hung
+            if cat_c >= 3:
+                generic_slots['conclusion'] = 'THUẬN LỢI ✅'
+            elif hung_c >= 3:
+                generic_slots['conclusion'] = 'BẤT LỢI ❌'
+            else:
+                generic_slots['conclusion'] = f'CẦN CÂN NHẮC 🟡 ({cat_c}/{cat_c+hung_c} CÁT)'
+            
+            slots.update(generic_slots)
+        
+        # === Fill template ===
+        try:
+            template = diagram.get('template', '')
+            filled = template
+            for k, v in slots.items():
+                filled = filled.replace('{' + k + '}', str(v))
+            # Handle format specifiers
+            filled = filled.replace('{total_score:+d}', f'{slots.get("total_score", 0):+d}')
+        except Exception as e:
+            filled = f"[{diagram_id} Error] {str(e)[:50]}"
+        
+        formula = diagram.get('formula', '')
+        
+        return filled, {
+            'diagram_name': diagram.get('name', diagram_id),
+            'formula': formula,
+            'conclusion': slots.get('conclusion', '?'),
+            'pp_goc': diagram.get('pp_goc', []),
+        }
 
 
     # V27.0: ENHANCED DETECTIVE - Tich hop qmdg_advanced_rules + qmdg_inference_rules
@@ -5478,7 +5932,13 @@ class FreeAIHelper:
         q_words = question.lower().split()
         if len(q_words) < 5 and any(k in q_words or k == question.lower().strip() for k in social):
             lc = len(_load_learned_topics())
-            return f"Chào bạn, tôi là THIÊN CƠ ĐẠI SƯ (V27.0 Unified + Deep Integration). 6 phương pháp (KM+LH+MH+TB+LN+TA) → 1 câu trả lời! Tích hợp 3 tầng LH+TS+NK. Đã học {lc} câu hỏi mới."
+            return f"Chào bạn, tôi là THIÊN CƠ ĐẠI SƯ (V32.2 Unified Index + Offline Engine). 6 phương pháp (KM+LH+MH+TB+LN+TA) → 1 câu trả lời! Vạn Vật 2226+ items. Đã học {lc} câu hỏi mới."
+        
+        # V31.2: LÀM SẠCH CÂU HỎI — loại bỏ từ thừa, dấu thừa, noise
+        original_question = question
+        question = clean_question(question)
+        if len(question) < 2:
+            question = original_question.strip()
         
         # ====== V8.2: SMART CATEGORY DETECTION ======
         # Phân loại câu hỏi theo 6 nhóm lớn thay vì match 220+ topics cụ thể
@@ -5633,8 +6093,44 @@ class FreeAIHelper:
             matched_topic, topic_data = None, None
         
         sections = []
-        sections.append(f"## 🔮 THIÊN CƠ ĐẠI SƯ — V27.0 Unified + Deep Integration\n")
+        sections.append(f"## 🔮 THIÊN CƠ ĐẠI SƯ — V31.1 Unified + Dynamic Diagrams\n")
         sections.append(f"**Câu hỏi:** {question}\n")
+        
+        # ═══════════════════════════════════════════════════
+        # V31.1: PHÂN TÁCH CÂU HỎI PHỨC HỢP
+        # ═══════════════════════════════════════════════════
+        v31_parsed_questions = []
+        v31_primary = None  # Câu hỏi chính (dùng để xác định DT)
+        category_label = cat_data['label']
+        
+        try:
+            v31_parsed_questions = split_compound_question(question)
+            if v31_parsed_questions and len(v31_parsed_questions) >= 1:
+                v31_primary = v31_parsed_questions[0]
+                
+                # Override DT từ parser nếu phát hiện hỏi cho người khác
+                # VD: "bố tôi bệnh" → DT = Phụ Mẫu (parser detect "bố")
+                if v31_primary.get('person') and v31_primary.get('dung_than'):
+                    parser_dt = v31_primary['dung_than']
+                    if parser_dt != 'Bản Thân':
+                        dung_than = parser_dt
+                        self.log_step("V31.1 Parser", "DT_OVERRIDE", 
+                                      f"Hỏi cho {v31_primary['person']} → DT={parser_dt}")
+                
+                # Hiển thị bảng phân tách nếu > 1 câu hỏi
+                if len(v31_parsed_questions) > 1:
+                    parsed_table = format_parsed_questions(v31_parsed_questions)
+                    if parsed_table:
+                        sections.append(parsed_table)
+                        sections.append("")
+                elif len(v31_parsed_questions) == 1:
+                    # 1 câu hỏi → vẫn hiển thị phân tích
+                    pq = v31_parsed_questions[0]
+                    person_info = f" | Hỏi cho: **{pq['person']}**" if pq.get('person') else ""
+                    sections.append(f"📋 **Phân loại:** {pq['qtype_label']} — {pq['topic_label']}{person_info} — Sơ đồ: {pq['diagram_id']}")
+                    sections.append("")
+        except Exception as e:
+            self.log_step("V31.1 Parser", "ERROR", str(e)[:80])
         
         # BƯỚC 1: DỤNG THẦN & CHỦ ĐỀ
         sections.append(f"### BƯỚC 1 — DỤNG THẦN & CHỦ ĐỀ")
@@ -6361,6 +6857,75 @@ class FreeAIHelper:
             'full_offline_report': offline_full_output[:4000] if offline_full_output else '',
         }
         
+        # ═══════════════════════════════════════════════════════════
+        # V31.0: TẠO SƠ ĐỒ TƯƠNG TÁC THỜI GIAN THỰC
+        # ═══════════════════════════════════════════════════════════
+        v31_master_diagram = ""
+        v31_master_info = {}
+        v31_question_diagram = ""
+        v31_question_info = {}
+        v31_diagram_id = 'SD0'
+        
+        try:
+            # 1. SĐ_MASTER: DT → Suy/Vượng → Vạn Vật (LUÔN hiển thị)
+            v31_v22_data = {
+                'lh_pct': unified_v22['lh_pct'] if unified_v22 else 50,
+                'ts_stage': ts_stage or 'N/A',
+                'ts_power': TRUONG_SINH_POWER.get(ts_stage, {}).get('power', 50) if ts_stage else 50,
+                'ngu_khi': ngu_khi_state_v22,
+                'nk_power': NGU_KHI_POWER.get(ngu_khi_state_v22, {}).get('power', 50) if ngu_khi_state_v22 else 50,
+                'unified_pct': unified_v22['unified_pct'] if unified_v22 else 50,
+                'tier_cap': unified_v22['tier_data']['cap'] if unified_v22 else '?',
+                'tier_data': unified_v22.get('tier_data', {}) if unified_v22 else {},
+                'hanh_vat': unified_v22.get('hanh_vat', {}) if unified_v22 else {},
+                'van_vat_cu_the': _get_van_vat_cu_the(hanh_dt_v22, unified_v22.get('tier_key', 'TRUNG_BÌNH')) if unified_v22 else {},
+            }
+            
+            v31_master_diagram, v31_master_info = self._fill_master_diagram(
+                question=question,
+                category_label=category_label,
+                dung_than=dung_than,
+                hanh_dt=hanh_dt_v22,
+                unified_v22=v31_v22_data,
+                v23_lh_factors=v23_lh_factors,
+                chart_data=chart_data,
+                luc_hao_data=luc_hao_data,
+            )
+            
+            # 2. Sơ đồ theo loại câu hỏi (SĐ1-SĐ16)
+            v31_diagram_id, v31_diagram_info = match_question_to_diagram(question)
+            
+            v31_verdicts = {
+                'km': ky_mon_verdict, 'lh': luc_hao_verdict,
+                'mh': mai_hoa_verdict, 'ln': luc_nham_verdict,
+                'ta': thai_at_verdict,
+            }
+            
+            v31_question_diagram, v31_question_info = self._fill_question_diagram(
+                diagram_id=v31_diagram_id,
+                question=question,
+                dung_than=dung_than,
+                hanh_dt=hanh_dt_v22,
+                unified_v22=v31_v22_data,
+                v23_lh_factors=v23_lh_factors,
+                v24_km_factors=v24_km_factors,
+                v24_mh_factors=v24_mh_factors,
+                chart_data=chart_data,
+                luc_hao_data=luc_hao_data,
+                mai_hoa_data=mai_hoa_data,
+                verdicts_dict=v31_verdicts,
+            )
+            
+            # Inject vào offline_analysis_data cho Gemini
+            offline_analysis_data['v31_master_diagram'] = v31_master_diagram
+            offline_analysis_data['v31_question_diagram'] = v31_question_diagram
+            offline_analysis_data['v31_diagram_id'] = v31_diagram_id
+            offline_analysis_data['v31_master_conclusion'] = v31_master_info.get('conclusion', '')
+            offline_analysis_data['v31_formula'] = v31_master_info.get('formula_detail', '')
+            
+        except Exception as e:
+            self.log_step("V31 Diagrams", "ERROR", str(e)[:80])
+        
         # Gọi AI Online (Gemini) — phân tích sâu
         online_result = self._try_online_ai(
             question=question,
@@ -6372,11 +6937,35 @@ class FreeAIHelper:
         )
         
         if online_result:
-            # V30.2: AI Online → CHỈ hiện sơ đồ + yếu tố + câu trả lời
+            # V31.0: AI Online + Sơ Đồ Tương Tác
             final_parts = []
             final_parts.append(f"## 🌐 AI ONLINE — KẾT QUẢ")
             final_parts.append(online_result)
             final_parts.append("")
+            
+            # V31.0: Chú Giải — Sơ Đồ Tương Tác
+            if v31_question_diagram:
+                final_parts.append("\n<details>")
+                final_parts.append(f"<summary><b>📐 CHÚ GIẢI: {v31_question_info.get('diagram_name', 'Sơ Đồ')} (nhấn để mở)</b></summary>\n")
+                final_parts.append(f"```")
+                final_parts.append(v31_question_diagram)
+                final_parts.append(f"```")
+                final_parts.append(f"\n**📊 CÔNG THỨC:** {v31_question_info.get('formula', '?')}")
+                final_parts.append(f"\n**🎯 KẾT LUẬN CÔNG THỨC:** {v31_question_info.get('conclusion', '?')}")
+                final_parts.append("\n</details>")
+            
+            # V31.0: SĐ MASTER — DT → Vạn Vật
+            if v31_master_diagram:
+                final_parts.append("\n<details>")
+                final_parts.append(f"<summary><b>🏆 SĐ MASTER: DỤNG THẦN → SUY VƯỢNG → VẠN VẬT (nhấn để mở)</b></summary>\n")
+                final_parts.append(f"```")
+                final_parts.append(v31_master_diagram)
+                final_parts.append(f"```")
+                final_parts.append(f"\n**📊 CÔNG THỨC:** {v31_master_info.get('formula_detail', '?')}")
+                final_parts.append(f"\n**🎯 KẾT LUẬN:** {v31_master_info.get('conclusion', '?')}")
+                final_parts.append("\n</details>")
+            
+            # Chi tiết AI Offline
             final_parts.append("\n<details>")
             final_parts.append("<summary><b>📦 Xem Chi Tiết AI Offline (nhấn để mở)</b></summary>\n")
             final_parts.append(offline_full_output)
@@ -6419,7 +7008,7 @@ class FreeAIHelper:
                 v_icon = '🟡'
             
             final_parts = []
-            final_parts.append(f"## 🖥️ AI OFFLINE — THIÊN CƠ ĐẠI SƯ V28.1")
+            final_parts.append(f"## 🖥️ AI OFFLINE — THIÊN CƠ ĐẠI SƯ V32.2")
             final_parts.append(f"*⚠️ AI Online không khả dụng: {error_msg}*")
             final_parts.append("")
             final_parts.append(f"## {v_icon} KẾT LUẬN: {overall_short} ({_cat_count}/5 PP CÁT)")
@@ -6434,6 +7023,30 @@ class FreeAIHelper:
                 final_parts.append(f"- 🏠 **Nhà cửa:** {vv_cu_the_kl.get('nha_cua', '?')}")
                 final_parts.append(f"- 🧑 **Người:** {vv_cu_the_kl.get('nguoi', '?')}")
                 final_parts.append(f"- 🏥 **Bệnh:** {vv_cu_the_kl.get('benh', '?')}")
+            
+            # ═══════════════════════════════════════════════════════
+            # V31.0: HIỂN THỊ SƠ ĐỒ TƯƠNG TÁC TRỰC TIẾP (AI Offline)
+            # ═══════════════════════════════════════════════════════
+            
+            # SĐ MASTER — Luôn hiển thị trực tiếp (không ẩn)
+            if v31_master_diagram:
+                final_parts.append(f"\n### 🏆 SĐ MASTER: DỤNG THẦN → SUY VƯỢNG → VẠN VẬT")
+                final_parts.append(f"```")
+                final_parts.append(v31_master_diagram)
+                final_parts.append(f"```")
+                final_parts.append(f"**📊 CÔNG THỨC:** {v31_master_info.get('formula_detail', '?')}")
+                final_parts.append(f"**🎯 KẾT LUẬN MASTER:** {v31_master_info.get('conclusion', '?')}")
+            
+            # Sơ đồ theo câu hỏi — trong Chú Giải
+            if v31_question_diagram and v31_diagram_id != 'SD0':
+                final_parts.append(f"\n<details>")
+                final_parts.append(f"<summary><b>📐 CHÚ GIẢI: {v31_question_info.get('diagram_name', 'Sơ Đồ')} (nhấn để mở)</b></summary>\n")
+                final_parts.append(f"```")
+                final_parts.append(v31_question_diagram)
+                final_parts.append(f"```")
+                final_parts.append(f"\n**📊 CÔNG THỨC:** {v31_question_info.get('formula', '?')}")
+                final_parts.append(f"\n**🎯 KẾT LUẬN:** {v31_question_info.get('conclusion', '?')}")
+                final_parts.append(f"\n</details>")
             
             # ═══════════════════════════════════════════════════════
             # V21.0: TRẢ LỜI TRỰC TIẾP — THÔNG MINH THEO LOẠI CÂU HỎI
@@ -6695,8 +7308,136 @@ class FreeAIHelper:
             final_parts.append(f"🔢 **Số lượng:** {vv_data_f['so_luong']} | 💎 **Chất lượng:** {vv_data_f['chat_luong']}")
             final_parts.append(f"🔢 **Con số:** {vv_data_f['so']}")
             
-            # Lời khuyên cuối
-            final_parts.append(f"\n### 💡 LỜI KHUYÊN HÀNH ĐỘNG")
+            # ═══════════════════════════════════════════════════
+            # V31.3: VẠN VẬT SIÊU CHI TIẾT + THÁM TỬ LẮP GHÉP
+            # ═══════════════════════════════════════════════════
+            try:
+                v33_hanh = hanh_dt_v22 if hanh_dt_v22 else 'Thổ'
+                v33_ts = ts_stage if ts_stage else 'Lâm Quan'
+                
+                v33_detail = format_van_vat_for_ai(v33_hanh, v33_ts)
+                v33_tham_tu = get_tham_tu_mo_ta(v33_hanh, v33_ts, question)
+                
+                if v33_detail:
+                    final_parts.append(f"\n<details>")
+                    final_parts.append(f"<summary><b>🔬 Vạn Vật SIÊU CHI TIẾT: {v33_hanh} × {v33_ts} (nhấn mở)</b></summary>\n")
+                    final_parts.append(v33_detail)
+                    final_parts.append(f"\n</details>")
+                
+                if v33_tham_tu:
+                    final_parts.append(f"\n{v33_tham_tu}")
+            except Exception as e:
+                self.log_step("V31.3 VanVat", "ERROR", str(e)[:80])
+            
+            # ═══════════════════════════════════════════════════════
+            # V32.2: KẾT LUẬN TỔNG HỢP OFFLINE — CHẤT LƯỢNG NHƯ AI ONLINE
+            # ═══════════════════════════════════════════════════════
+            final_parts.append(f"\n### 🏆 KẾT LUẬN TỔNG HỢP (AI OFFLINE)")
+            
+            # --- Xác định verdict text tự nhiên ---
+            if _cat_count >= 4:
+                verdict_text = "RẤT THUẬN LỢI"
+                verdict_detail = "Tất cả phương pháp đều cho kết quả tích cực"
+            elif _cat_count >= 3:
+                verdict_text = "THUẬN LỢI"
+                verdict_detail = "Đa số phương pháp cho kết quả tốt"
+            elif _cat_count >= 2:
+                verdict_text = "CÒN PHẢI XEM"
+                verdict_detail = "Kết quả trộn lẫn, không rõ ràng"
+            elif _hung_count >= 4:
+                verdict_text = "RẤT BẤT LỢI"
+                verdict_detail = "Hầu hết phương pháp đều cho kết quả tiêu cực"
+            else:
+                verdict_text = "KHÔNG THUẬN LỢI"
+                verdict_detail = "Nhiều yếu tố cản trở"
+            
+            # --- Tổng kết ngắn gọn ---
+            final_parts.append(f"**{v_icon} {verdict_text}** — {verdict_detail}.")
+            final_parts.append(f"")
+            
+            # --- Chain of Reasoning (chuỗi lý luận) ---
+            final_parts.append(f"**📊 Chuỗi lý luận:**")
+            reasoning_steps = []
+            
+            # Bước 1: Dụng Thần
+            dt_state = unified_v22['tier_data']['cap'] if unified_v22 else 'Chưa rõ'
+            reasoning_steps.append(f"1. Dụng Thần **{dung_than}** (hành {hanh_dt_v22 or '?'}) → Trạng thái: **{dt_state}**")
+            
+            # Bước 2: 12 Trường Sinh
+            if ts_stage:
+                ts_p = TRUONG_SINH_POWER.get(ts_stage, {})
+                reasoning_steps.append(f"2. 12 Trường Sinh → **{ts_stage}** (power {ts_p.get('power', 50)}%) → {ts_p.get('con_nguoi', '?')}")
+            
+            # Bước 3: 6 PP
+            cat_pp = [pp for pp, _, v in pp_ranking if v in ['CÁT', 'ĐẠI CÁT', 'TRUNG CÁT']]
+            hung_pp = [pp for pp, _, v in pp_ranking if v in ['HUNG', 'ĐẠI HUNG']]
+            reasoning_steps.append(f"3. 6 Phương Pháp → **{_cat_count} CÁT** ({', '.join(cat_pp) or 'không có'}) vs **{_hung_count} HUNG** ({', '.join(hung_pp) or 'không có'})")
+            
+            # Bước 4: Ngũ Khí
+            reasoning_steps.append(f"4. Ngũ Khí → **{ngu_khi_state_v22}** | Unified Score: **{pct_short}%**")
+            
+            for step in reasoning_steps:
+                final_parts.append(f"   {step}")
+            
+            final_parts.append(f"")
+            
+            # --- TRẢ LỜI CỤ THỂ theo loại câu hỏi ---
+            final_parts.append(f"**🎯 Câu trả lời trực tiếp:**")
+            
+            if is_yesno:
+                if _cat_count >= 3:
+                    final_parts.append(f"→ **CÓ** (xác suất {pct_short}%). Dụng Thần {dung_than} vượng, điều kiện thuận lợi để thực hiện. Hành {hanh_dt_v22} ở {ts_stage or 'Lâm Quan'} cho thấy sự việc đang trong giai đoạn {dt_state.lower()}.")
+                elif _cat_count >= 2:
+                    final_parts.append(f"→ **CHƯA CHẮC** (xác suất {pct_short}%). Cần thêm thời gian hoặc yếu tố hỗ trợ. Nên chờ 1-2 tuần rồi xem xét lại.")
+                else:
+                    final_parts.append(f"→ **KHÔNG NÊN** (xác suất thành công {pct_short}%). {dung_than} suy yếu, quá nhiều trở ngại. Nên hoãn lại hoặc tìm hướng khác.")
+            
+            elif is_health_critical:
+                if _cat_count >= 3:
+                    final_parts.append(f"→ Tình trạng **KHẢ QUAN**. {dung_than} còn sức ({dt_state}), có khả năng hồi phục. Tiếp tục điều trị tích cực.")
+                else:
+                    final_parts.append(f"→ Tình trạng **NGUY HIỂM**. {dung_than} suy ({dt_state}), cần can thiệp y tế khẩn cấp. Tìm bác sĩ giỏi nhất.")
+            
+            elif is_when:
+                if _cat_count >= 3:
+                    final_parts.append(f"→ Dự kiến trong **1-7 ngày** tới. {dung_than} vượng ({ts_stage or '?'}), sự việc sẽ diễn ra nhanh.")
+                elif _cat_count >= 2:
+                    final_parts.append(f"→ Dự kiến **1-3 tháng**. {dung_than} trung bình, cần kiên nhẫn chờ thêm.")
+                else:
+                    final_parts.append(f"→ Dự kiến **3-6 tháng** hoặc lâu hơn. {dung_than} suy ({ts_stage or '?'}), sự việc bị đình trệ.")
+            
+            elif is_find:
+                _hanh_vat_f = NGU_HANH_VAT_CHAT.get(hanh_dt_v22, {})
+                final_parts.append(f"→ Hướng: **{_hanh_vat_f.get('huong', '?')}**. Vật có hình dạng {_hanh_vat_f.get('hinh', '?')}, chất liệu {_hanh_vat_f.get('chat_lieu', '?')}, màu {_hanh_vat_f.get('mau', '?')}.")
+                if _cat_count >= 3:
+                    final_parts.append(f"→ Khả năng tìm thấy: **CAO** ({pct_short}%)")
+                else:
+                    final_parts.append(f"→ Khả năng tìm thấy: **THẤP** ({pct_short}%)")
+            
+            elif is_what:
+                _hanh_vat_w = NGU_HANH_VAT_CHAT.get(hanh_dt_v22, {})
+                final_parts.append(f"→ Thuộc hành **{hanh_dt_v22}** ({ts_stage or '?'}): Hình dạng {_hanh_vat_w.get('hinh', '?')}, chất liệu {_hanh_vat_w.get('chat_lieu', '?')}, màu {_hanh_vat_w.get('mau', '?')}.")
+                _vv_kl = _get_van_vat_cu_the(hanh_dt_v22, unified_v22.get('tier_key', 'TRUNG_BÌNH') if unified_v22 else 'TRUNG_BÌNH') 
+                if _vv_kl:
+                    final_parts.append(f"→ Đồ vật có thể là: {_vv_kl.get('do_vat', '?')}")
+            
+            elif is_emotion:
+                if _cat_count >= 3:
+                    final_parts.append(f"→ Đối phương **THẬT LÒNG**. {dung_than} vượng ({pct_short}%), tình cảm chân thành.")
+                else:
+                    final_parts.append(f"→ Đối phương **KHÔNG thật lòng**. {dung_than} suy ({pct_short}%), có dấu hiệu giả dối hoặc phai nhạt.")
+            
+            else:
+                if _cat_count >= 3:
+                    final_parts.append(f"→ Tình hình **THUẬN LỢI** ({pct_short}%). {dung_than} vượng ở {ts_stage or '?'}, nên tận dụng cơ hội ngay.")
+                elif _cat_count >= 2:
+                    final_parts.append(f"→ Tình hình **BÌNH THƯỜNG** ({pct_short}%). Giữ nguyên hiện trạng, quan sát thêm.")
+                else:
+                    final_parts.append(f"→ Tình hình **KHÓ KHĂN** ({pct_short}%). Kiên nhẫn chờ, tìm quý nhân hỗ trợ.")
+            
+            # --- Lời khuyên cuối ---
+            final_parts.append(f"")
+            final_parts.append(f"### 💡 LỜI KHUYÊN HÀNH ĐỘNG")
             if pct_short >= 65:
                 final_parts.append("- ✅ Hành động sớm, tận dụng thời cơ. Mọi điều kiện đang có lợi cho bạn.")
             elif pct_short >= 50:
@@ -6707,6 +7448,101 @@ class FreeAIHelper:
                 final_parts.append("- 🛑 Dừng lại, không hành động. Chờ chu kỳ mới, mọi thứ sẽ chuyển biến.")
             
             final_parts.append("")
+            
+            # ═══════════════════════════════════════════════════════
+            # V31.1: TRẢ LỜI TỪNG CÂU HỎI CON (COMPOUND)
+            # ═══════════════════════════════════════════════════════
+            if v31_parsed_questions and len(v31_parsed_questions) > 1:
+                final_parts.append(f"\n### 📝 TRẢ LỜI TỪNG CÂU HỎI ({len(v31_parsed_questions)} câu)")
+                
+                for pq in v31_parsed_questions:
+                    sub_q = pq['text']
+                    sub_person = pq.get('person', 'Bản thân') or 'Bản thân'
+                    sub_dt = pq.get('dung_than', dung_than)
+                    sub_topic = pq.get('topic', 'CHUNG')
+                    sub_qtype = pq.get('qtype', 'CHUNG')
+                    sub_diagram_id = pq.get('diagram_id', 'SD0')
+                    
+                    final_parts.append(f"\n---")
+                    final_parts.append(f"**Câu {pq['index']}:** {sub_q}")
+                    final_parts.append(f"*Hỏi cho: {sub_person} | DT: {sub_dt} | {pq.get('qtype_label', '?')} | {pq.get('topic_label', '?')}*")
+                    
+                    # Tạo câu trả lời dựa trên qtype
+                    if sub_qtype == 'CÓ/KHÔNG':
+                        if _cat_count >= 3:
+                            final_parts.append(f"→ ✅ **CÓ** — {sub_dt} vượng ({_cat_count}/5 CÁT)")
+                        elif _hung_count >= 3:
+                            final_parts.append(f"→ ❌ **KHÔNG** — {sub_dt} suy ({_hung_count}/5 HUNG)")
+                        else:
+                            final_parts.append(f"→ 🟡 **LỠ CỠ** — Chưa rõ ràng ({_cat_count}/{_cat_count+_hung_count} CÁT)")
+                    
+                    elif sub_qtype == 'KHI NÀO':
+                        if _cat_count >= 3:
+                            final_parts.append(f"→ ⏰ **NHANH** — 1-7 ngày tới ({sub_dt} vượng)")
+                        elif _cat_count >= 2:
+                            final_parts.append(f"→ ⏰ **TRUNG BÌNH** — 1-3 tháng ({sub_dt} trung bình)")
+                        else:
+                            final_parts.append(f"→ ⏰ **CHẬM** — 3-6 tháng+ ({sub_dt} suy)")
+                        if ts_stage:
+                            final_parts.append(f"→ 12 Trường Sinh: {ts_stage}")
+                    
+                    elif sub_qtype == 'Ở ĐÂU':
+                        if chart_data and isinstance(chart_data, dict):
+                            final_parts.append(f"→ 📍 Xem sơ đồ KM: Cung DT → Phương hướng")
+                        else:
+                            final_parts.append(f"→ 📍 Cần dữ liệu KM để xác định hướng")
+                    
+                    elif sub_qtype in ['SỨC KHỎE']:
+                        if _cat_count >= 3:
+                            final_parts.append(f"→ 🟢 {sub_person} sức khỏe **KHẢ QUAN** ({_cat_count}/5 CÁT)")
+                        elif _cat_count >= 2:
+                            final_parts.append(f"→ 🟡 {sub_person} cần **THEO DÕI SÁT** ({_cat_count}/5 CÁT)")
+                        else:
+                            final_parts.append(f"→ 🔴 {sub_person} tình trạng **NGHIÊM TRỌNG** ({_hung_count}/5 HUNG)")
+                    
+                    elif sub_qtype in ['TÀI LỘC']:
+                        if _cat_count >= 3:
+                            final_parts.append(f"→ 💰 Tài lộc **THUẬN LỢI** ({_cat_count}/5 CÁT)")
+                        else:
+                            final_parts.append(f"→ 💰 Tài lộc **KHÓ KHĂN** ({_hung_count}/5 HUNG)")
+                    
+                    else:
+                        # Default
+                        if _cat_count >= 3:
+                            final_parts.append(f"→ ✅ **THUẬN LỢI** ({_cat_count}/5 CÁT)")
+                        elif _hung_count >= 3:
+                            final_parts.append(f"→ ❌ **BẤT LỢI** ({_hung_count}/5 HUNG)")
+                        else:
+                            final_parts.append(f"→ 🟡 **BÌNH** ({_cat_count}/{_cat_count+_hung_count} CÁT)")
+                    
+                    # Hiển thị sơ đồ nhỏ cho từng sub-question
+                    if sub_diagram_id and sub_diagram_id != 'SD0':
+                        try:
+                            sub_d_filled, sub_d_info = self._fill_question_diagram(
+                                diagram_id=sub_diagram_id,
+                                question=sub_q,
+                                dung_than=sub_dt,
+                                hanh_dt=hanh_dt_v22,
+                                unified_v22=v31_v22_data,
+                                v23_lh_factors=v23_lh_factors,
+                                v24_km_factors=v24_km_factors,
+                                v24_mh_factors=v24_mh_factors,
+                                chart_data=chart_data,
+                                luc_hao_data=luc_hao_data,
+                                mai_hoa_data=mai_hoa_data,
+                                verdicts_dict=v31_verdicts,
+                            )
+                            if sub_d_filled:
+                                final_parts.append(f"\n<details>")
+                                final_parts.append(f"<summary>📐 Sơ đồ {sub_d_info.get('diagram_name', sub_diagram_id)} (nhấn mở)</summary>\n")
+                                final_parts.append(f"```")
+                                final_parts.append(sub_d_filled)
+                                final_parts.append(f"```")
+                                final_parts.append(f"</details>")
+                        except:
+                            pass
+                
+                final_parts.append("\n---")
             
             # MỌI THỨ chi tiết ẩn sau 1 nút bấm duy nhất
             final_parts.append("\n<details>")

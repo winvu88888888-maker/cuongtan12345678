@@ -1,9 +1,12 @@
 import streamlit as st
 
-# VERSION: 2026-04-15-V32.2-UNIFIED-INDEX-OFFLINE
+# ═══ PHIÊN BẢN — CHỈ SỬA Ở ĐÂY, TỰ ĐỘNG CẬP NHẬT TOÀN BỘ APP ═══
+APP_VERSION = "V42.9.2"
+APP_VERSION_FULL = f"{APP_VERSION} — THIÊN CƠ ĐẠI SƯ (Siêu Premium UI + Answer-First + 28 Handlers + Vạn Vật 3378+ + 12 Trường Sinh + KV/DM Chuẩn QMDG)"
+# ═══════════════════════════════════════════════════════════════════════
 try:
     st.set_page_config(
-        page_title="🔮 Kỳ Môn AI V32.2",
+        page_title=f"🔮 Kỳ Môn AI {APP_VERSION}",
     page_icon="☯️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -66,6 +69,149 @@ st.session_state.zoom_level = zoom
 # Dynamic CSS for Zoom
 st.markdown(f"""
 <style>
+    /* V40.9: EXACT FIX — ẩn text "keyboard_arrow_right" bên trong summary */
+    /* Element nằm sâu: summary > span > span > span — cần catch ALL */
+    [data-testid="stExpander"] summary span {{
+        font-size: 0 !important;
+        color: transparent !important;
+        overflow: hidden !important;
+    }}
+    /* Giữ lại text label của expander — chỉ span chứa title */
+    [data-testid="stExpander"] summary p,
+    [data-testid="stExpander"] summary p span {{
+        font-size: inherit !important;
+        color: inherit !important;
+    }}
+    /* Thay icon bằng Unicode arrow */
+    [data-testid="stExpander"] summary > span:first-child {{
+        width: 20px !important;
+        height: 20px !important;
+        display: inline-block !important;
+        position: relative !important;
+    }}
+    [data-testid="stExpander"] summary > span:first-child::before {{
+        content: "▸" !important;
+        font-size: 16px !important;
+        color: #94a3b8 !important;
+    }}
+    [data-testid="stExpander"] details[open] summary > span:first-child::before,
+    details[open] > summary > span:first-child::before {{
+        content: "▾" !important;
+    }}
+    
+    /* Sidebar collapse/expand button */  
+    [data-testid="stSidebarCollapseButton"] span,
+    [data-testid="collapsedControl"] span {{
+        font-size: 0 !important;
+        color: transparent !important;
+        width: 0 !important;
+    }}
+    
+    /* Fullscreen buttons on charts/textareas */
+    [data-testid="StyledFullScreenButton"] span {{
+        font-size: 0 !important;
+        color: transparent !important;
+    }}
+    [data-testid="StyledFullScreenButton"]::before {{
+        content: "⛶" !important;
+        font-size: 14px !important;
+        color: #94a3b8 !important;
+    }}
+    
+    /* TextArea/TextInput clear/action buttons */
+    [data-testid="stTextArea"] button span,
+    [data-testid="stTextInput"] button span,
+    [data-testid="stChatInput"] button span,
+    [data-testid="stNumberInput"] button span {{
+        font-size: 0 !important;
+        color: transparent !important;
+    }}
+    
+    /* V40.9: FIX OVERLAP — Selectbox input hint text */
+    [data-baseweb="select"] input {{
+        opacity: 0 !important;
+        position: absolute !important;
+        width: 0 !important;
+        height: 0 !important;
+        pointer-events: none !important;
+    }}
+    
+    /* V40.9: FIX Material Symbols — force proper font rendering */
+    .material-symbols-outlined,
+    [data-testid="stSidebarCollapseButton"] span,
+    [data-testid="collapsedControl"] span,
+    button[kind="headerNoPadding"] span {{
+        font-family: 'Material Symbols Outlined' !important;
+        font-size: 24px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 24px !important;
+        height: 24px !important;
+        overflow: hidden !important;
+        -webkit-font-feature-settings: 'liga' !important;
+        font-feature-settings: 'liga' !important;
+    }}
+    
+    /* V40.9: NUCLEAR — nếu font vẫn không load, ẩn text thô hoàn toàn */
+    @supports not (font-family: 'Material Symbols Outlined') {{
+        .material-symbols-outlined,
+        [data-testid="stSidebarCollapseButton"] span,
+        [data-testid="collapsedControl"] span {{
+            font-size: 0 !important;
+            color: transparent !important;
+        }}
+    }}
+    
+    /* V40.9: FIX Expander toggle icon text */
+    [data-testid="stExpander"] summary > span:first-child {{
+        overflow: hidden !important;
+        max-width: 24px !important;
+        display: inline-flex !important;
+    }}
+    
+    /* V40.9: FIX Sidebar toggle button */
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="collapsedControl"] {{
+        overflow: hidden !important;
+    }}
+    [data-testid="stSidebarCollapseButton"] button,
+    [data-testid="collapsedControl"] button {{
+        overflow: hidden !important;
+        width: 32px !important;
+        height: 32px !important;
+    }}
+    
+    /* V40.9: NUCLEAR FIX — ẩn MỌI broken Material Symbols text */
+    /* TextArea expand/fullscreen button */
+    [data-testid="stTextArea"] button span,
+    [data-testid="stTextInput"] button span,
+    [data-testid="stChatInput"] button span,
+    [data-testid="stNumberInput"] button span,
+    textarea + div span,
+    [data-testid="StyledFullScreenButton"] span,
+    button[data-testid="StyledFullScreenButton"] span {{
+        font-family: 'Material Symbols Outlined', sans-serif !important;
+        font-size: 18px !important;
+        width: 20px !important;
+        height: 20px !important;
+        overflow: hidden !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        -webkit-font-feature-settings: 'liga' !important;
+    }}
+    
+    /* V40.9: Fullscreen overlay button on ALL containers */
+    [data-testid="StyledFullScreenButton"] {{
+        overflow: hidden !important;
+    }}
+    [data-testid="StyledFullScreenButton"] span {{
+        font-family: 'Material Symbols Outlined' !important;
+        -webkit-font-feature-settings: 'liga' !important;
+        font-feature-settings: 'liga' !important;
+    }}
+
     html {{
         font-size: {zoom}% !important;
         transition: font-size 0.2s ease-in-out;
@@ -117,14 +263,20 @@ except Exception: pass
 
 # --- AI MODEL BADGE ---
 st.sidebar.markdown("---")
-st.sidebar.markdown("""
-<div style='text-align: center; margin-bottom: 20px;'>
-    <h3 style='color: #4CAF50; margin-bottom: 5px;'>Trí Tuệ Nhân Tạo</h3>
-    <div style='background-color: #2E3B4E; padding: 5px 10px; border-radius: 15px; display: inline-block;'>
-        <code style='color: #4CAF50; background: none;'>🚀 MODEL: GEMINI-2.5-PRO</code>
-    </div>
-    <div style='margin-top: 10px; font-size: 0.8em; color: #a0aec0;'>
-        Trạng thái: <b>THIÊN CƠ ĐẠI SƯ V32.2</b> —<br>Unified Index + Offline Engine (6 Môn + Vạn Vật 2226+)
+st.sidebar.markdown(f"""
+<div style='text-align:center;margin:15px 0;'>
+    <div style='background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);padding:24px 16px;border-radius:20px;border:1px solid rgba(255,215,0,0.3);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1);position:relative;overflow:hidden;'>
+        <div style='position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(255,215,0,0.05),transparent 40%);animation:spin 8s linear infinite;'></div>
+        <div style='position:relative;z-index:1;'>
+            <div style='font-size:2em;margin-bottom:8px;filter:drop-shadow(0 0 10px rgba(255,215,0,0.5));'>☯️</div>
+            <div style='font-size:1.1em;font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none;'>THIÊN CƠ ĐẠI SƯ</div>
+            <div style='font-size:0.75em;color:#a78bfa;font-weight:600;margin:6px 0;letter-spacing:1px;'>{APP_VERSION}</div>
+            <div style='display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.15);padding:6px 14px;border-radius:20px;border:1px solid rgba(34,197,94,0.3);margin:8px 0;'>
+                <span style='width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;box-shadow:0 0 8px #22c55e;'></span>
+                <span style='color:#86efac;font-size:0.8em;font-weight:700;'>HOẠT ĐỘNG TỐT</span>
+            </div>
+            <div style='font-size:0.7em;color:#94a3b8;margin-top:8px;line-height:1.5;'>🤖 Gemini AI | 6 Phương Pháp<br>📦 Vạn Vật 2226+ | 12 Trường Sinh<br>🎯 Answer-First Protocol</div>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -360,10 +512,19 @@ CUA_8 = list(BAT_MON_CO_DINH_DISPLAY.keys())
 # ======================================================================
 st.markdown("""
 <style>
-    /* Imperial Silk & High-Contrast Theme */
+    /* === V40.8 SIÊU PREMIUM THEME === */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+    
+    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; }
+    
+    @keyframes spin { from {transform:rotate(0deg)} to {transform:rotate(360deg)} }
+    @keyframes pulse-glow { 0%,100% {box-shadow:0 0 5px rgba(34,197,94,0.3)} 50% {box-shadow:0 0 20px rgba(34,197,94,0.6)} }
+    @keyframes shimmer { 0% {background-position:-200% 0} 100% {background-position:200% 0} }
+    @keyframes fadeInUp { from {opacity:0;transform:translateY(20px)} to {opacity:1;transform:translateY(0)} }
+    
     .stApp {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        color: #1e293b;
+        background: linear-gradient(160deg, #0f0c29 0%, #1a1145 30%, #0c1222 60%, #0a0a1a 100%) !important;
+        color: #e2e8f0;
     }
     
     /* SPECIFIC HIGH-CONTRAST FOR EXPLANATIONS (TABLES & INFO) */
@@ -836,6 +997,333 @@ st.markdown("""
         position: absolute;
         left: 0;
     }
+
+    /* ═══════════════════════════════════════════════════════ */
+    /* V40.8 SIÊU PREMIUM — DARK LUXE THEME                 */
+    /* ═══════════════════════════════════════════════════════ */
+    
+    /* SIDEBAR — Glassmorphism Dark */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0f0c29 0%, #1a1145 50%, #0c1222 100%) !important;
+        border-right: 1px solid rgba(255,215,0,0.15) !important;
+    }
+    [data-testid="stSidebar"] * {
+        color: #cbd5e1 !important;
+    }
+    [data-testid="stSidebar"] .stSelectbox label,
+    [data-testid="stSidebar"] .stTextInput label,
+    [data-testid="stSidebar"] .stTextArea label {
+        color: #a78bfa !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    /* HEADER — Premium gradient */
+    [data-testid="stHeader"] {
+        background: linear-gradient(90deg, #0f0c29, #302b63, #24243e) !important;
+        border-bottom: 1px solid rgba(255,215,0,0.2) !important;
+    }
+    
+    /* MARKDOWN — Dark premium typography */
+    [data-testid="stMarkdown"] { animation: fadeInUp 0.3s ease-out; }
+    [data-testid="stMarkdown"] p,
+    [data-testid="stMarkdown"] li {
+        color: #e2e8f0 !important;
+        line-height: 1.7 !important;
+    }
+    [data-testid="stMarkdown"] h1,
+    [data-testid="stMarkdown"] h2,
+    [data-testid="stMarkdown"] h3 {
+        background: linear-gradient(90deg, #ffd700, #ff8c00) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        font-weight: 900 !important;
+    }
+    [data-testid="stMarkdown"] strong,
+    [data-testid="stMarkdown"] b {
+        color: #fbbf24 !important;
+        font-weight: 800 !important;
+    }
+    [data-testid="stMarkdown"] code {
+        background: rgba(139,92,246,0.15) !important;
+        color: #c4b5fd !important;
+        padding: 2px 8px !important;
+        border-radius: 6px !important;
+    }
+    [data-testid="stMarkdown"] pre {
+        background: rgba(15,23,42,0.8) !important;
+        border: 1px solid rgba(100,116,139,0.3) !important;
+        border-radius: 12px !important;
+        color: #e2e8f0 !important;
+    }
+    
+    /* DETAILS — Glassmorphism */
+    details {
+        background: rgba(15,23,42,0.6) !important;
+        border: 1px solid rgba(148,163,184,0.2) !important;
+        border-radius: 14px !important;
+        padding: 4px 16px !important;
+        margin: 12px 0 !important;
+        backdrop-filter: blur(10px) !important;
+    }
+    details summary {
+        cursor: pointer !important;
+        padding: 12px 8px !important;
+        color: #a78bfa !important;
+        font-weight: 700 !important;
+    }
+    details summary:hover { color: #c4b5fd !important; }
+    details[open] summary {
+        border-bottom: 1px solid rgba(167,139,250,0.2) !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* TABLE — Dark premium */
+    [data-testid="stTable"] {
+        background-color: rgba(15,23,42,0.7) !important;
+        border: 1px solid rgba(148,163,184,0.2) !important;
+        border-radius: 12px !important;
+    }
+    [data-testid="stTable"] th {
+        background: linear-gradient(135deg,#312e81,#1e1b4b) !important;
+        color: #c4b5fd !important;
+        font-weight: 800 !important;
+    }
+    [data-testid="stTable"] td {
+        color: #e2e8f0 !important;
+        font-weight: 600 !important;
+    }
+    
+    /* BUTTON — Premium glow */
+    .stButton>button {
+        background: linear-gradient(135deg, #7c3aed, #6d28d9, #5b21b6) !important;
+        color: #f5f3ff !important;
+        border: none !important;
+        padding: 14px 28px !important;
+        border-radius: 16px !important;
+        font-weight: 800 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        box-shadow: 0 8px 24px rgba(124,58,237,0.4) !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    }
+    .stButton>button:hover {
+        transform: translateY(-3px) scale(1.02) !important;
+        box-shadow: 0 12px 32px rgba(124,58,237,0.6), 0 0 20px rgba(139,92,246,0.3) !important;
+    }
+    
+    /* ALERT — Dark */
+    .stAlert {
+        background: rgba(30,41,59,0.8) !important;
+        border-radius: 12px !important;
+    }
+    .stAlert p { color: #e2e8f0 !important; }
+    
+    /* INPUT — Dark luxury */
+    [data-testid="stTextInput"] input,
+    [data-testid="stTextArea"] textarea {
+        background: rgba(15,23,42,0.8) !important;
+        border: 1px solid rgba(139,92,246,0.3) !important;
+        border-radius: 12px !important;
+        color: #e2e8f0 !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stTextInput"] input:focus,
+    [data-testid="stTextArea"] textarea:focus {
+        border-color: #8b5cf6 !important;
+        box-shadow: 0 0 12px rgba(139,92,246,0.3) !important;
+    }
+    
+    /* DIVIDER — Gradient glow */
+    [data-testid="stMarkdown"] hr {
+        border: none !important;
+        height: 1px !important;
+        background: linear-gradient(90deg, transparent, rgba(167,139,250,0.4), transparent) !important;
+    }
+    
+    /* SCROLLBAR — Premium */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0f0c29; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#7c3aed,#4c1d95); border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+    /* ═══ V40.8 FIX: DARK BACKGROUND TOÀN BỘ ═══ */
+    
+    /* MAIN APP BACKGROUND — use config.toml dark colors */
+    .stApp {
+        background: #1a1a2e !important;
+    }
+    
+    /* ALL CONTAINERS — transparent */
+    [data-testid="stVerticalBlock"],
+    [data-testid="stHorizontalBlock"],
+    [data-testid="column"] {
+        background: transparent !important;
+    }
+    
+    /* FIX: SELECTBOX — dark + fix overlap */
+    [data-testid="stSelectbox"] > div > div {
+        background: #2c3e50 !important;
+        border: 1px solid rgba(139,92,246,0.3) !important;
+        border-radius: 10px !important;
+        min-height: 42px !important;
+    }
+    [data-testid="stSelectbox"] svg { fill: #a78bfa !important; }
+    
+    /* FIX: Hide arrow key hint text that causes overlap */
+    [data-testid="stSelectbox"] [data-baseweb="select"] input {
+        color: transparent !important;
+        caret-color: transparent !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        position: absolute !important;
+    }
+    
+    /* FIX: DROPDOWN options — dark */
+    [data-baseweb="popover"], [data-baseweb="menu"],
+    [data-baseweb="select"] [role="listbox"] {
+        background: #34495e !important;
+        border: 1px solid rgba(139,92,246,0.3) !important;
+    }
+    [data-baseweb="menu"] li { color: #ecf0f1 !important; }
+    [data-baseweb="menu"] li:hover { background: rgba(139,92,246,0.2) !important; }
+    
+    /* FIX: EXPANDER — dark */
+    [data-testid="stExpander"] {
+        background: rgba(44,62,80,0.7) !important;
+        border: 1px solid rgba(148,163,184,0.2) !important;
+        border-radius: 12px !important;
+    }
+    
+    /* FIX: RADIO + CHECKBOX */
+    [data-testid="stRadio"] label,
+    [data-testid="stCheckbox"] label {
+        color: #ecf0f1 !important;
+    }
+
+    /* ═══ V40.9 FIX: FORCE DARK cho MỌI Streamlit component ═══ */
+    
+    /* Alert boxes (st.info, st.success, st.warning, st.error) */
+    [data-testid="stAlert"],
+    [data-testid="stNotification"],
+    .stAlert, .element-container .stAlert {
+        background: rgba(30,41,59,0.9) !important;
+        color: #e2e8f0 !important;
+        border-radius: 10px !important;
+    }
+    [data-testid="stAlert"] p,
+    [data-testid="stAlert"] span,
+    [data-testid="stAlert"] div {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Chat message */
+    [data-testid="stChatMessage"] {
+        background: rgba(30,41,59,0.7) !important;
+        border: 1px solid rgba(100,116,139,0.3) !important;
+    }
+    
+    /* Forms */
+    [data-testid="stForm"] {
+        background: rgba(30,41,59,0.5) !important;
+        border: 1px solid rgba(100,116,139,0.2) !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Code blocks */
+    [data-testid="stCode"], code, pre {
+        background: #1e293b !important;
+        color: #e2e8f0 !important;
+    }
+    
+    /* DataFrames & Tables */
+    [data-testid="stDataFrame"],
+    [data-testid="stTable"],
+    .stDataFrame, .stTable {
+        background: rgba(30,41,59,0.7) !important;
+    }
+    [data-testid="stDataFrame"] th,
+    [data-testid="stTable"] th {
+        background: #1e293b !important;
+        color: #fbbf24 !important;
+    }
+    [data-testid="stDataFrame"] td,
+    [data-testid="stTable"] td {
+        background: rgba(15,23,42,0.5) !important;
+        color: #e2e8f0 !important;
+    }
+    
+    /* Status containers (st.status) */
+    [data-testid="stStatusWidget"] {
+        background: rgba(30,41,59,0.8) !important;
+    }
+    
+    /* Toast messages */
+    [data-testid="stToast"] {
+        background: #1e293b !important;
+        color: #e2e8f0 !important;
+    }
+    
+    /* Caption text */
+    [data-testid="stCaptionContainer"] {
+        color: #94a3b8 !important;
+    }
+    
+    /* NUCLEAR FIX: Any remaining light backgrounds */
+    .element-container > div[style*="background-color: rgb(255"],
+    .element-container > div[style*="background-color: rgb(252"],
+    .element-container > div[style*="background-color: rgb(250"],
+    .element-container > div[style*="background-color: rgb(248"],
+    .element-container > div[style*="background-color: rgb(245"],
+    .element-container > div[style*="background-color: rgb(240"],
+    .element-container > div[style*="background-color: rgb(235"] {
+        background-color: rgba(30,41,59,0.9) !important;
+        color: #e2e8f0 !important;
+    }
+    
+    /* Streamlit info/success/warning/error specific selectors */
+    div[data-testid="stAlert"] > div {
+        background: transparent !important;
+    }
+    
+    /* Bottom toolbar / footer */
+    [data-testid="stBottomBlockContainer"],
+    [data-testid="stToolbar"] {
+        background: #0f172a !important;
+    }
+    footer { background: #0f172a !important; color: #64748b !important; }
+
+    /* V40.9: Tượng Quẻ box — dark */
+    .tuong-que-box {
+        background: rgba(22,33,62,0.9) !important;
+        border: 1px solid rgba(139,92,246,0.3);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin: 8px 0;
+        color: #ecf0f1;
+    }
+    .tuong-que-box strong { color: #fbbf24; }
+
+    /* V40.9: interpret-box — dark */
+    .interpret-box {
+        background: rgba(22,33,62,0.9) !important;
+        border-top: 5px solid #7c3aed !important;
+        border-radius: 12px;
+        padding: 16px;
+        color: #ecf0f1 !important;
+    }
+    .interpret-box * { color: #ecf0f1 !important; }
+    .interpret-box strong, .interpret-box b { color: #fbbf24 !important; }
+    .interpret-box h1, .interpret-box h2, .interpret-box h3 { color: #a78bfa !important; }
+
+    /* V40.9: Fix Material Icons showing as raw text */
+    [data-testid="stExpander"] span.material-symbols-outlined,
+    span[class*="material"] {
+        font-size: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 # Zoom level already initialized in session state
@@ -1004,7 +1492,7 @@ with col_header3:
 
 st.markdown("---")
 # DEPLOYMENT VERIFICATION BANNER
-st.success("✅ SYSTEM ONLINE: V32.2 — THIÊN CƠ ĐẠI SƯ (Unified Index + Offline Engine + Vạn Vật 2226+ items)")
+st.success(f"✅ SYSTEM ONLINE: {APP_VERSION_FULL}")
 
 # ======================================================================
 # SIDEBAR - CONTROLS
@@ -1015,7 +1503,7 @@ with st.sidebar:
     # View selection
     view_option = st.radio(
         "Chọn Phương Pháp:",
-        ["🔮 Kỳ Môn Độn Giáp", "🏭 Nhà Máy AI", "🌟 40 Chuyên Gia AI", "📖 Mai Hoa 64 Quẻ", "☯️ Lục Hào Kinh Dịch", "📜 Thiết Bản Thần Toán", "📊 Vạn Vật Loại Tượng", "🌊 Đại Lục Nhâm", "⭐ Thái Ất Thần Số", "🤖 Hỏi Gemini AI"],
+        ["🔮 Kỳ Môn Độn Giáp", "🏭 Nhà Máy AI", "🌟 40 Chuyên Gia AI", "📖 Mai Hoa 64 Quẻ", "☯️ Lục Hào Kinh Dịch", "📜 Thiết Bản Thần Toán", "📊 Vạn Vật Loại Tượng", "🌊 Đại Lục Nhâm", "⭐ Thái Ất Thần Số", "📅 Xem Ngày Đẹp", "🔯 Tử Vi Đẩu Số", "🤖 Hỏi Gemini AI"],
         index=0
     )
     
@@ -1037,6 +1525,10 @@ with st.sidebar:
         st.session_state.current_view = "dai_luc_nham"
     elif view_option == "⭐ Thái Ất Thần Số":
         st.session_state.current_view = "thai_at"
+    elif view_option == "📅 Xem Ngày Đẹp":
+        st.session_state.current_view = "xem_ngay"
+    elif view_option == "🔯 Tử Vi Đẩu Số":
+        st.session_state.current_view = "tu_vi"
     else:  # 🤖 Hỏi Gemini AI
         st.session_state.current_view = "gemini_ai"
 
@@ -1167,64 +1659,17 @@ except ImportError:
 # V19.0: DISPLAY AI RESULT — Beautiful answer layout
 # ════════════════════════════════════════════════════
 def display_ai_result(text, key_prefix="ai"):
-    """V20.5: Trình bày kết quả AI giống hệt nút 'Bắt đầu Phân Tích Tổng Hợp' - dễ đọc, rõ ràng."""
+    """V40.9: Render AI result — verdict box đã được tạo sẵn trong text, chỉ cần render."""
     if not text:
         st.warning("❌ Không có kết quả")
         return
     
-    import re
     text = str(text).strip()
     
-    # ═══ PHÁT HIỆN KẾT LUẬN CHÍNH (CÁT/HUNG/BÌNH) ═══
-    conclusion = ""
-    verdict_badge = ""
-    for line in text.split('\n'):
-        stripped = line.strip()
-        if not stripped:
-            continue
-        if re.search(r'(?:KẾT LUẬN|PHÁN QUYẾT|TỔNG KẾT|VERDICT)', stripped, re.IGNORECASE):
-            conclusion = stripped
-        elif re.search(r'^\*\*.*(?:CÁT|ĐẠI CÁT|HUNG|ĐẠI HUNG|THUẬN LỢI|KHÓ KHĂN).*\*\*', stripped, re.IGNORECASE):
-            conclusion = stripped
-        if conclusion:
-            if re.search(r'CÁT|ĐẠI CÁT|THUẬN LỢI|TỐT|THÀNH CÔNG', conclusion, re.IGNORECASE):
-                verdict_badge = "cat"
-            elif re.search(r'HUNG|ĐẠI HUNG|KHÓ|XẤU|THẤT BẠI', conclusion, re.IGNORECASE):
-                verdict_badge = "hung"
-            else:
-                verdict_badge = "binh"
-            break
-    
-    # ═══ 1. VERDICT BOX (nổi bật) ═══
-    if conclusion:
-        if verdict_badge == "cat":
-            gradient = "linear-gradient(135deg, #065f46, #047857)"
-            border_color = "#10b981"
-            v_icon = "✅"; label = "THUẬN LỢI"
-        elif verdict_badge == "hung":
-            gradient = "linear-gradient(135deg, #7f1d1d, #b91c1c)"
-            border_color = "#ef4444"
-            v_icon = "⚠️"; label = "KHÓ KHĂN"
-        else:
-            gradient = "linear-gradient(135deg, #78350f, #b45309)"
-            border_color = "#f59e0b"
-            v_icon = "⚖️"; label = "CÂN NHẮC"
-        
-        clean_conclusion = conclusion.replace('**', '').replace('##', '').replace('#', '').strip()
-        st.markdown(f"""
-        <div style="background:{gradient}; border-radius:16px; padding:24px 28px; margin:16px 0; box-shadow:0 8px 32px rgba(0,0,0,0.15); border-left:6px solid {border_color};">
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                <span style="font-size:28px;">{v_icon}</span>
-                <span style="background:{border_color}; color:white; padding:4px 16px; border-radius:20px; font-weight:800; font-size:13px; letter-spacing:1px;">{label}</span>
-            </div>
-            <div style="color:white; font-size:1.3rem; font-weight:700; line-height:1.6; text-shadow:0 1px 3px rgba(0,0,0,0.3);">{clean_conclusion}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # ═══ 2. NỘI DUNG CHÍNH — RENDER GIỐNG HỆT "Bắt đầu Phân Tích Tổng Hợp" (dòng 2370) ═══
-    # Y HỆT: st.markdown(f'<div class="interpret-box">{text}</div>', unsafe_allow_html=True)
+    # V40.9: KHÔNG tạo thêm verdict box — đã có sẵn trong text (NÂU + XANH LÁ)
+    # Chỉ render text trực tiếp
     st.markdown(f"""
-    <div class="interpret-box" style="background: white; border-top: 5px solid #1e3a8a;">
+    <div class="interpret-box" style="background: rgba(22,33,62,0.9); border-top: 5px solid #7c3aed; color: #ecf0f1;">
         {text}
     </div>
     """, unsafe_allow_html=True)
@@ -1250,7 +1695,7 @@ class PhoenixOrchestrator:
 if 'gemini_helper' not in st.session_state:
     if st.session_state.ai_preference == "offline":
         if FREE_AI_AVAILABLE:
-            st.session_state.gemini_helper = FreeAIHelper()
+            st.session_state.gemini_helper = FreeAIHelper(api_key=st.session_state.get('_resolved_api_key'))
             st.session_state.ai_type = "Free AI (Manual Offline)"
             st.session_state.api_status_ok = True
             st.session_state.api_status_msg = "Offline Mode"
@@ -1275,10 +1720,10 @@ if 'gemini_helper' not in st.session_state:
                 st.session_state.api_status_ok = False
                 st.session_state.api_status_msg = f"Lỗi Gemini: {e}"
                 if FREE_AI_AVAILABLE:
-                    st.session_state.gemini_helper = FreeAIHelper()
+                    st.session_state.gemini_helper = FreeAIHelper(api_key=st.session_state.get('_resolved_api_key'))
                     st.session_state.ai_type = "Free AI (Fallback từ Lỗi)"
         elif FREE_AI_AVAILABLE:
-            st.session_state.gemini_helper = FreeAIHelper()
+            st.session_state.gemini_helper = FreeAIHelper(api_key=st.session_state.get('_resolved_api_key'))
             st.session_state.ai_type = "Free AI (Offline Mode)"
             st.session_state.api_status_ok = True
             st.session_state.api_status_msg = "Offline Mode"
@@ -1335,7 +1780,7 @@ if 'gemini_helper' not in st.session_state and st.session_state.get('_resolved_a
         st.session_state.api_status_ok = False
         st.session_state.api_status_msg = str(e)
         if FREE_AI_AVAILABLE:
-            st.session_state.gemini_helper = FreeAIHelper()
+            st.session_state.gemini_helper = FreeAIHelper(api_key=st.session_state.get('_resolved_api_key'))
 
 # UNIFIED SETTINGS (One place for everything)
 is_connected = st.session_state.get("api_status_ok", False) is True
@@ -1364,7 +1809,7 @@ with st.expander(expander_title, expanded=not is_connected):
     # 2. UNIFIED KEY INPUT — 1 Ô Duy Nhất
     st.markdown("👉 [Lấy Gemini API Key miễn phí](https://aistudio.google.com/app/apikey)")
     
-    user_api_input = st.text_area("📋 Dán API Key vào đây:", height=80, key="input_api_key_smart_unified", placeholder="AIzaSy... (hỗ trợ dán nhiều key cùng lúc)")
+    user_api_input = st.text_area("📋 Dán API Key vào đây:", height=80, key="input_api_key_smart_unified", placeholder="AIzaSy... hoặc AQ.Ab8... (hỗ trợ dán nhiều key cùng lúc)")
     
     # --- 2 NÚT HÀNH ĐỘNG ---
     btn_col1, btn_col2 = st.columns(2)
@@ -1421,7 +1866,7 @@ with st.expander(expander_title, expanded=not is_connected):
                     # Bước 1: Kích hoạt ngay trong session
                     temp_helper = GeminiQMDGHelper(user_api_input)
                     if not temp_helper.api_keys:
-                        st.error("❌ Không tìm thấy API Key hợp lệ (AIza...) trong văn bản.")
+                        st.error("❌ Không tìm thấy API Key hợp lệ. Key phải dài ít nhất 20 ký tự.")
                     else:
                         success, msg = temp_helper.test_connection()
                         st.session_state.gemini_helper = temp_helper
@@ -1610,8 +2055,9 @@ try:
     import qmdg_calc
     params = qmdg_calc.calculate_qmdg_params(selected_datetime)
     
-    # Calculate Lunar Date for display
-    lday, lmonth, lyear, is_leap = qmdg_calc.solar_to_lunar(selected_datetime)
+    # Calculate Lunar Date for display — V42.8 FIX: Use Hồ Ngọc Đức algorithm (accurate)
+    from xem_ngay_dep import solar2lunar as _s2l_sidebar
+    lday, lmonth, lyear, is_leap = _s2l_sidebar(selected_datetime.day, selected_datetime.month, selected_datetime.year)
     l_year_can, l_year_chi = qmdg_calc.get_can_chi_year(lyear)
     l_year_name = f"{l_year_can} {l_year_chi}"
     
@@ -1646,13 +2092,17 @@ hub_entries = []
 try:
     from ai_modules.shard_manager import search_index
     hub_entries = search_index() # Returns list of dicts with 'title' and 'category'
-except Exception: pass
+except Exception as _hub_err:
+    # V35.8-FIX: Show warning instead of silent fail
+    try:
+        st.warning(f"⚠️ Dữ liệu hub đang được sửa chữa tự động. Chi tiết: {str(_hub_err)[:100]}")
+    except: pass
 
 # Store full entry list for filtering
 st.session_state.hub_entries = hub_entries
 
-# Filter topics logic simplified for selectbox
-all_titles = sorted(list(set(core_topics + [e['title'] for e in hub_entries])))
+# Filter topics logic simplified for selectbox — safe access with fallback
+all_titles = sorted(list(set(core_topics + [e.get('title', '') for e in hub_entries if isinstance(e, dict) and e.get('title')])))
 st.session_state.all_topics_full = all_titles
 
 
@@ -1776,9 +2226,10 @@ if st.session_state.current_view == "ky_mon":
                 can_gio, params['chi_gio'], params['is_duong_don']
             )
             
-            # Calculate special palaces
-            khong_vong = tinh_khong_vong(can_gio, params['chi_gio'])
-            dich_ma = tinh_dich_ma(params['chi_gio'])
+            # V42.2 FIX: Tuần Không & Dịch Mã tính theo Can+Chi NGÀY (chuẩn QMDG)
+            # KV theo Chi Giờ là sai — phải dùng Chi Ngày làm cơ sở tra bảng
+            khong_vong = tinh_khong_vong(params['can_ngay'], params['chi_ngay'])
+            dich_ma = tinh_dich_ma(params['chi_ngay'])
             
             # Store in session state
             if 'chart_data' not in st.session_state:
@@ -2335,7 +2786,7 @@ if st.session_state.current_view == "ky_mon":
                 
                 if st.session_state.get('final_ai_report'):
                     st.markdown(f"""
-                    <div class="interpret-box" style="background: white; border-top: 5px solid #1e3a8a;">
+                    <div class="interpret-box" style="background: rgba(22,33,62,0.9); border-top: 5px solid #7c3aed; color: #ecf0f1;">
                         {st.session_state.final_ai_report}
                     </div>
                     """, unsafe_allow_html=True)
@@ -2505,11 +2956,15 @@ if st.session_state.current_view == "ky_mon":
                                     _chart = st.session_state.get('chart_data', {})
                                     can_ngay_val = _chart.get('can_ngay', 'Giáp') if _chart else 'Giáp'
                                     chi_ngay_val = _chart.get('chi_ngay', 'Tý') if _chart else 'Tý'
+                                    can_thang_val = _chart.get('can_thang', 'Giáp') if _chart else 'Giáp'
+                                    chi_thang_val = _chart.get('chi_thang', 'Tý') if _chart else 'Tý'
                                     luc_hao_for_offline = lap_qua_luc_hao(
                                         dt_now.year, dt_now.month, dt_now.day, dt_now.hour,
                                         topic=selected_topic,
                                         can_ngay=can_ngay_val,
-                                        chi_ngay=chi_ngay_val
+                                        chi_ngay=chi_ngay_val,
+                                        can_thang=can_thang_val,
+                                        chi_thang=chi_thang_val
                                     )
                                     st.session_state.luc_hao_result = luc_hao_for_offline
                                 except Exception:
@@ -2705,10 +3160,398 @@ PHÂN TÍCH LIÊN MẠCH:
             # 4. AI Q&A SECTION — V8.2 UNIFIED (Offline + Online kết hợp)
             st.markdown("---")
             st.markdown("### ❓ HỎI AI — KHÔNG GIỚI HẠN CHỦ ĐỀ")
+            
+            # ═══ V42.7: INLINE INPUT — Tử Vi + Xem Ngày NGAY TẠI ĐÂY ═══
+            _tv_la_so = st.session_state.get('tv_la_so')
+            _xn_result = st.session_state.get('xn_result')
+            
+            col_toggle1, col_toggle2 = st.columns(2)
+            with col_toggle1:
+                use_tu_vi = st.toggle(
+                    "🔯 Kết hợp TỬ VI",
+                    value=st.session_state.get('qa_use_tu_vi', False),
+                    key="qa_toggle_tuvi",
+                    help="Bật để nhập ngày sinh → tự lập lá số Tử Vi ngay tại đây"
+                )
+                st.session_state['qa_use_tu_vi'] = use_tu_vi
+                        
+            with col_toggle2:
+                use_xem_ngay = st.toggle(
+                    "📅 Kết hợp XEM NGÀY ĐẸP",
+                    value=st.session_state.get('qa_use_xem_ngay', False),
+                    key="qa_toggle_xemngay",
+                    help="Bật để chọn ngày → tự đánh giá tốt/xấu ngay tại đây"
+                )
+                st.session_state['qa_use_xem_ngay'] = use_xem_ngay
+            
+            # ════════ INLINE TỬ VI ════════
+            if use_tu_vi:
+                st.markdown("""
+                <div style='background:linear-gradient(145deg,#1e1b4b,#312e81);padding:16px 20px;border-radius:14px;
+                    border:1px solid rgba(167,139,250,0.4);margin:8px 0;'>
+                    <span style='color:#c4b5fd;font-weight:800;font-size:1.1rem;'>🔯 NHẬP NGÀY SINH — Tự lập lá số Tử Vi</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                try:
+                    from tu_vi import lap_la_so, format_la_so_text, CAN, CHI
+                    from xem_ngay_dep import solar2lunar
+                    import datetime as _dt_tv
+                    
+                    _c_mode, _c_gt = st.columns([3, 1])
+                    with _c_mode:
+                        qa_tv_mode = st.radio("📅 Cách nhập:", ["🌞 Dương lịch", "🌙 Âm lịch"], key="qa_tv_mode", horizontal=True)
+                    with _c_gt:
+                        qa_tv_gt = st.radio("⚧:", ["Nam","Nữ"], key="qa_tv_gt", horizontal=True)
+                    
+                    if qa_tv_mode.startswith("🌞"):
+                        _c_tv1, _c_tv2 = st.columns([2, 1])
+                        with _c_tv1:
+                            qa_tv_ngay = st.date_input("📆 Ngày sinh dương lịch:", value=_dt_tv.date(1990, 1, 15), key="qa_tv_ngay_sinh")
+                        with _c_tv2:
+                            _gio_labels = [f"{CHI[i]} ({i*2}h-{i*2+2}h)" for i in range(12)]
+                            qa_tv_gio = st.selectbox("🕐 Giờ sinh:", range(12), format_func=lambda i: _gio_labels[i], key="qa_tv_gio")
+                        
+                        # Auto-convert + compute
+                        try:
+                            _d, _m, _y, _leap = solar2lunar(qa_tv_ngay.day, qa_tv_ngay.month, qa_tv_ngay.year)
+                            _gt = 'nam' if qa_tv_gt == 'Nam' else 'nu'
+                            # V42.8 FIX: Dùng năm ÂL (_y) cho lap_la_so + Can Chi
+                            _la_so = lap_la_so(_y, _m, _d, qa_tv_gio, _gt)
+                            st.session_state['tv_la_so'] = _la_so
+                            _tv_la_so = _la_so
+                            
+                            _can_i = (_y - 4) % 10
+                            _chi_i = (_y - 4) % 12
+                            _leap_t = " (Nhuận)" if _leap else ""
+                            st.markdown(f"""
+                            <div style='background:linear-gradient(135deg,#312e81,#4c1d95);padding:14px 20px;border-radius:12px;
+                                border:1px solid #7c3aed;margin:6px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;'>
+                                <span style='color:#fbbf24;font-weight:800;font-size:1.05rem;'>
+                                    📆 ÂL: {_d}/{_m}/{_y}{_leap_t} | Năm {CAN[_can_i]} {CHI[_chi_i]}
+                                </span>
+                                <span style='color:#6ee7b7;font-weight:700;font-size:1.05rem;'>
+                                    ✅ Mệnh: {_la_so.get('menh_cung',{}).get('chi','?') if isinstance(_la_so.get('menh_cung'), dict) else _la_so.get('menh_cung','?')} | Cục: {_la_so.get('cuc_ten', _la_so.get('cuc','?'))} | {_la_so.get('nap_am','?')}
+                                </span>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        except Exception as e:
+                            st.error(f"⚠️ Lỗi lập lá số: {e}")
+                    else:
+                        # ═══ ÂM LỊCH ═══
+                        _c_al1, _c_al2, _c_al3, _c_al4 = st.columns(4)
+                        with _c_al1:
+                            qa_tv_nam = st.number_input("Năm ÂL:", 1920, 2026, 1990, key="qa_tv_nam_al")
+                        with _c_al2:
+                            qa_tv_thang = st.number_input("Tháng ÂL:", 1, 12, 1, key="qa_tv_thang_al")
+                        with _c_al3:
+                            qa_tv_ngay_al = st.number_input("Ngày ÂL:", 1, 30, 15, key="qa_tv_ngay_al")
+                        with _c_al4:
+                            _gio_labels = [f"{CHI[i]} ({i*2}h-{i*2+2}h)" for i in range(12)]
+                            qa_tv_gio = st.selectbox("🕐 Giờ sinh:", range(12), format_func=lambda i: _gio_labels[i], key="qa_tv_gio_al")
+                        
+                        try:
+                            _gt = 'nam' if qa_tv_gt == 'Nam' else 'nu'
+                            _la_so = lap_la_so(qa_tv_nam, qa_tv_thang, qa_tv_ngay_al, qa_tv_gio, _gt)
+                            st.session_state['tv_la_so'] = _la_so
+                            _tv_la_so = _la_so
+                            
+                            _can_i = (qa_tv_nam - 4) % 10
+                            _chi_i = (qa_tv_nam - 4) % 12
+                            st.markdown(f"""
+                            <div style='background:linear-gradient(135deg,#312e81,#4c1d95);padding:14px 20px;border-radius:12px;
+                                border:1px solid #7c3aed;margin:6px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;'>
+                                <span style='color:#fbbf24;font-weight:800;font-size:1.05rem;'>
+                                    📆 ÂL: {qa_tv_ngay_al}/{qa_tv_thang}/{qa_tv_nam} | Năm {CAN[_can_i]} {CHI[_chi_i]}
+                                </span>
+                                <span style='color:#6ee7b7;font-weight:700;font-size:1.05rem;'>
+                                    ✅ Mệnh: {_la_so.get('menh_cung',{}).get('chi','?') if isinstance(_la_so.get('menh_cung'), dict) else _la_so.get('menh_cung','?')} | Cục: {_la_so.get('cuc_ten', _la_so.get('cuc','?'))} | {_la_so.get('nap_am','?')}
+                                </span>
+                            </div>
+                            """, unsafe_allow_html=True)
+                        except Exception as e:
+                            st.error(f"⚠️ Lỗi lập lá số: {e}")
+                except Exception as e:
+                    st.error(f"⚠️ Module tu_vi chưa sẵn sàng: {e}")
+            
+            # ════════ INLINE XEM NGÀY ════════
+            if use_xem_ngay:
+                st.markdown("""
+                <div style='background:linear-gradient(145deg,#1a1a2e,#16213e);padding:16px 20px;border-radius:14px;
+                    border:1px solid rgba(251,191,36,0.4);margin:8px 0;'>
+                    <span style='color:#fbbf24;font-weight:800;font-size:1.1rem;'>📅 CHỌN NGÀY — Tự đánh giá tốt/xấu</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                try:
+                    from xem_ngay_dep import danh_gia_ngay, solar2lunar, VIEC_XEM_NGAY, CAN_10, CHI_12
+                    import datetime as _dt_xn
+                    
+                    _c_xn1, _c_xn2 = st.columns(2)
+                    with _c_xn1:
+                        qa_xn_ngay = st.date_input("📆 Chọn ngày:", value=_dt_xn.date.today(), key="qa_xn_ngay")
+                    with _c_xn2:
+                        _vk = list(VIEC_XEM_NGAY.keys())
+                        _vl = [VIEC_XEM_NGAY[k]["ten"] for k in _vk]
+                        _vi = st.selectbox("🎯 Loại việc:", range(len(_vl)), format_func=lambda i: _vl[i], key="qa_xn_viec")
+                        _loai_viec = _vk[_vi]
+                    
+                    # Ô nhập tự do
+                    qa_xn_custom = st.text_input("✍️ Hoặc tự nhập:", placeholder="VD: Ký hợp đồng / Nhận xe mới...", key="qa_xn_custom")
+                    
+                    # Auto-compute
+                    try:
+                        _d2, _m2, _y2, _ = solar2lunar(qa_xn_ngay.day, qa_xn_ngay.month, qa_xn_ngay.year)
+                        # V42.8f FIX: Dùng _jdn chuẩn từ xem_ngay_dep thay vì formula sai (lệch 11-13 ngày!)
+                        from xem_ngay_dep import _jdn as _jdn_accurate
+                        _cans = ['Giáp','Ất','Bính','Đinh','Mậu','Kỷ','Canh','Tân','Nhâm','Quý']
+                        _chis = ['Tý','Sửu','Dần','Mão','Thìn','Tị','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi']
+                        _jdn_val = _jdn_accurate(qa_xn_ngay.day, qa_xn_ngay.month, qa_xn_ngay.year)
+                        _cn = _cans[(_jdn_val + 9) % 10]
+                        _chi_n = _chis[(_jdn_val + 1) % 12]
+                        
+                        _xn_res = danh_gia_ngay(_m2, _d2, _cn, _chi_n, _loai_viec,
+                                                ngay_dl=(qa_xn_ngay.day, qa_xn_ngay.month, qa_xn_ngay.year))
+                        
+                        if qa_xn_custom and qa_xn_custom.strip():
+                            _xn_res['loai_viec'] = qa_xn_custom.strip()
+                            _xn_res['loai_viec_custom'] = qa_xn_custom.strip()
+                        
+                        st.session_state['xn_result'] = _xn_res
+                        _xn_result = _xn_res
+                        
+                        _diem = _xn_res.get('diem', 0)
+                        _verd = _xn_res.get('verdict', '?')
+                        _truc = _xn_res.get('truc', '?')
+                        _color = '#6ee7b7' if _diem >= 60 else '#fbbf24' if _diem >= 40 else '#f87171'
+                        _icon = '✅' if _diem >= 60 else '⚠️' if _diem >= 40 else '❌'
+                        
+                        st.markdown(f"""
+                        <div style='background:linear-gradient(135deg,#1a1a2e,#16213e);padding:14px 20px;border-radius:12px;
+                            border:1px solid {_color};margin:6px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;'>
+                            <span style='color:{_color};font-weight:800;font-size:1.05rem;'>
+                                {_icon} Điểm: {_diem}/100 | {_verd} | Trực: {_truc}
+                            </span>
+                            <span style='color:#94a3b8;font-size:0.9rem;'>
+                                ÂL: {_d2}/{_m2} | {_cn} {_chi_n}
+                            </span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"⚠️ Lỗi đánh giá ngày: {e}")
+                except Exception as e:
+                    st.error(f"⚠️ Module xem_ngay_dep chưa sẵn sàng: {e}")
+            
+            # Thông báo combo
+            if use_tu_vi and use_xem_ngay and _tv_la_so and _xn_result:
+                st.markdown("""
+                <div style='background:linear-gradient(135deg,#064e3b,#065f46);padding:12px 20px;border-radius:12px;
+                    border:1px solid #10b981;margin:10px 0;text-align:center;'>
+                    <span style='color:#6ee7b7;font-weight:900;font-size:1.1rem;'>
+                        🎯 COMBO ĐẦY ĐỦ: Tử Vi + Xem Ngày + Kỳ Môn → AI sẽ phân tích CHÍNH XÁC NHẤT
+                    </span>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # ════════ CHỌN LỤC THÂN (Đối tượng) ════════
+            st.markdown("""
+            <div style='background:linear-gradient(145deg,#1a1a2e,#0f172a);padding:14px 20px;border-radius:14px;
+                border:1px solid rgba(251,191,36,0.3);margin:8px 0;'>
+                <span style='color:#fbbf24;font-weight:800;font-size:1.05rem;'>🎯 XEM CHO AI? (Lục Thân → Dụng Thần)</span>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            _lt_options = [
+                "👤 Bản thân",
+                "👴👵 Bố mẹ / Ông bà / Thầy cô",
+                "💍 Vợ (nữ) / Tiền bạc",
+                "👔 Chồng (nam) / Cấp trên / Quan chức",
+                "👶 Con cái / Cháu / Thuốc men",
+                "👨‍👩‍👧 Anh chị em / Bạn bè / Đồng nghiệp",
+                "🤝 Người lạ / Đối phương / Đối thủ"
+            ]
+            _col_lt1, _col_lt2 = st.columns([2, 1])
+            with _col_lt1:
+                qa_luc_than = st.selectbox("Đang xem cho:", _lt_options, key="qa_luc_than", label_visibility="collapsed")
+            with _col_lt2:
+                # Map chuẩn theo Lục Hào: (Dụng Thần, Hào vị trí, Giải thích)
+                _LT_MAP = {
+                    "👤 Bản thân": ("Bản Thân", "Thế", "Hào Thế = chính mình"),
+                    "👴👵 Bố mẹ / Ông bà / Thầy cô": ("Phụ Mẫu", "Phụ Mẫu", "Hào Phụ Mẫu = bố mẹ, nhà cửa, giấy tờ"),
+                    "💍 Vợ (nữ) / Tiền bạc": ("Thê Tài", "Thê Tài", "Hào Thê Tài = vợ, tài lộc, tiền bạc"),
+                    "👔 Chồng (nam) / Cấp trên / Quan chức": ("Quan Quỷ", "Quan Quỷ", "Hào Quan Quỷ = chồng, sếp, bệnh tật"),
+                    "👶 Con cái / Cháu / Thuốc men": ("Tử Tôn", "Tử Tôn", "Hào Tử Tôn = con cái, thuốc, phúc đức"),
+                    "👨‍👩‍👧 Anh chị em / Bạn bè / Đồng nghiệp": ("Huynh Đệ", "Huynh Đệ", "Hào Huynh Đệ = anh em, bạn bè, cạnh tranh"),
+                    "🤝 Người lạ / Đối phương / Đối thủ": ("Quan Quỷ", "Ứng", "Hào Ứng = đối phương, người bên ngoài")
+                }
+                _dt_info = _LT_MAP.get(qa_luc_than, ("Bản Thân", "Thế", ""))
+                _dt_name = _dt_info[0]
+                _hao_vi = _dt_info[1]
+                _giai_thich = _dt_info[2]
+                _hao_color = '#6ee7b7' if _hao_vi == 'Thế' else '#f87171' if _hao_vi == 'Ứng' else '#fbbf24'
+                st.markdown(f"""
+                <div style='background:#312e81;padding:12px;border-radius:10px;margin-top:4px;text-align:center;'>
+                    <div style='color:#fbbf24;font-weight:800;font-size:1.05rem;'>DT: {_dt_name}</div>
+                    <div style='color:{_hao_color};font-weight:700;font-size:0.85rem;margin-top:4px;'>{_giai_thich}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Lưu vào session
+            st.session_state['selected_doi_tuong'] = qa_luc_than
+            
             user_question = st.text_area("💬 Đặt câu hỏi bất kỳ (tự do, không giới hạn chủ đề):", placeholder="Ví dụ: Năm nay có mua được nhà không? / Con mèo lạc tìm ở đâu? / Bao giờ tìm được việc?...", key="ai_q_input", height=80)
             if st.button("🔮 PHÂN TÍCH TỔNG HỢP AI", key="ai_ask_unified", type="primary", use_container_width=True):
                 if user_question:
                     try:
+                        # ═══ V42.8: NỐI DỮ LIỆU TỬ VI + XEM NGÀY + HƯỚNG DẪN LUẬN GIẢI CHUYÊN SÂU ═══
+                        enhanced_question = user_question
+                        _extra_context = []
+                        
+                        # ════ NỐI TỬ VI — ĐẦY ĐỦ DỮ LIỆU + PHƯƠNG PHÁP LUẬN GIẢI 7 BƯỚC ════
+                        if use_tu_vi and _tv_la_so:
+                            try:
+                                from tu_vi import format_la_so_text, CAN as _TV_CAN, CHI as _TV_CHI
+                                _tv_text = format_la_so_text(_tv_la_so)
+                                
+                                # V42.8d FIX: Trích xuất ĐÚNG key từ lap_la_so() return
+                                _tv_can = _tv_la_so.get('can_nam', '?')
+                                _tv_chi = _tv_la_so.get('chi_nam', '?')
+                                # menh_cung/than_cung là dict {"chi":"X","idx":N} — lấy chi
+                                _mc = _tv_la_so.get('menh_cung', {})
+                                _tv_menh = _mc.get('chi', str(_mc)) if isinstance(_mc, dict) else str(_mc)
+                                _tc = _tv_la_so.get('than_cung', {})
+                                _tv_than = _tc.get('chi', str(_tc)) if isinstance(_tc, dict) else str(_tc)
+                                # cuc là số (2-6) — dùng cuc_ten
+                                _tv_cuc = _tv_la_so.get('cuc_ten', _tv_la_so.get('cuc', '?'))
+                                _tv_nap_am = _tv_la_so.get('nap_am', '?')
+                                _tv_tu_hoa = _tv_la_so.get('tu_hoa', {})
+                                # 12 cung nằm trong key 'cung_map' (không phải 'cung')
+                                _tv_12cung = _tv_la_so.get('cung_map', _tv_la_so.get('cung', {}))
+                                
+                                # Build chi tiết 12 cung
+                                _cung_detail = ""
+                                if _tv_12cung:
+                                    for _cn, _cv in _tv_12cung.items():
+                                        _stars = ', '.join(_cv.get('chinh_tinh', [])) if _cv.get('chinh_tinh') else '—'
+                                        _phu = ', '.join(_cv.get('phu_tinh', [])[:8]) if _cv.get('phu_tinh') else ''
+                                        _chi_c = _cv.get('chi', '')
+                                        _cung_detail += f"  {_cn} ({_chi_c}): [{_stars}] {('+ ['+_phu+']') if _phu else ''}\n"
+                                
+                                # Tính Đại Hạn hiện tại từ danh sách đại hạn
+                                _dai_han_list = _tv_la_so.get('dai_han', [])
+                                _luu_nien = _tv_la_so.get('luu_nien', {})
+                                _tuoi_ht = _luu_nien.get('tuoi', 0) if isinstance(_luu_nien, dict) else 0
+                                _dh_hien_tai = "Chưa xác định"
+                                _dh_detail = ""
+                                for _dh in _dai_han_list:
+                                    if isinstance(_dh, dict) and _dh.get('tu', 0) <= _tuoi_ht <= _dh.get('den', 0):
+                                        _dh_hien_tai = f"Tuổi {_dh['tuoi_range']} — Cung {_dh.get('cung','?')} ({_dh.get('chi','?')})"
+                                        break
+                                # Lưu Niên text
+                                _ln_text = f"Năm {_luu_nien.get('nam','?')}, Tuổi {_luu_nien.get('tuoi','?')}, Cung {_luu_nien.get('cung','?')} ({_luu_nien.get('chi','?')})" if isinstance(_luu_nien, dict) else str(_luu_nien)
+                                
+                                # Đại Hạn full list
+                                _dh_full = ""
+                                for _dh in _dai_han_list[:12]:
+                                    if isinstance(_dh, dict):
+                                        _marker = " ◀ HIỆN TẠI" if _dh.get('tu', 0) <= _tuoi_ht <= _dh.get('den', 0) else ""
+                                        _dh_full += f"  {_dh.get('tuoi_range','?')}: {_dh.get('cung','?')} ({_dh.get('chi','?')}){_marker}\n"
+                                
+                                _extra_context.append(
+                                    f"\n\n{'='*60}\n"
+                                    f"🔯 DỮ LIỆU TỬ VI ĐẨU SỐ — PHÂN TÍCH VẬN MỆNH CÁ NHÂN\n"
+                                    f"{'='*60}\n"
+                                    f"▶ Năm sinh ÂL: {_tv_can} {_tv_chi} ({_tv_la_so.get('nam_sinh','?')}) | Giờ: {_tv_la_so.get('gio','?')} | GT: {_tv_la_so.get('gioi_tinh', '?')}\n"
+                                    f"▶ Nạp Âm: {_tv_nap_am}\n"
+                                    f"▶ Mệnh Cung: {_tv_menh} | Thân Cung: {_tv_than}\n"
+                                    f"▶ Cục: {_tv_cuc}\n"
+                                    f"▶ Tứ Hóa (Can {_tv_can}): Lộc={_tv_tu_hoa.get('Hóa Lộc','?')}, Quyền={_tv_tu_hoa.get('Hóa Quyền','?')}, Khoa={_tv_tu_hoa.get('Hóa Khoa','?')}, Kỵ={_tv_tu_hoa.get('Hóa Kỵ','?')}\n"
+                                    f"▶ ĐẠI HẠN hiện tại: {_dh_hien_tai}\n"
+                                    f"▶ LƯU NIÊN: {_ln_text}\n"
+                                    f"\n--- 12 CUNG CHI TIẾT ---\n{_cung_detail}\n"
+                                    f"--- ĐẠI HẠN 12 KỲ ---\n{_dh_full}\n"
+                                    f"--- LÁ SỐ ĐẦY ĐỦ ---\n{_tv_text}\n"
+                                    f"\n{'='*60}\n"
+                                    f"📋 HƯỚNG DẪN LUẬN GIẢI TỬ VI (BẮT BUỘC TUÂN THEO):\n"
+                                    f"{'='*60}\n"
+                                    f"BƯỚC 1 — ĐỊNH CỤC DIỆN: Xét Âm Dương thuận/nghịch, Mệnh-Cục tương sinh hay tương khắc.\n"
+                                    f"  → Cục sinh Mệnh = đời thuận; Mệnh khắc Cục = khó thành.\n"
+                                    f"BƯỚC 2 — MỆNH + THÂN: Phân tích chính tinh tại Mệnh ({_tv_menh}), Thân ({_tv_than}).\n"
+                                    f"  → Xét trạng thái Miếu/Vượng/Đắc/Hãm + phụ tinh hỗ trợ.\n"
+                                    f"BƯỚC 3 — TAM GIÁC VÀNG: Mệnh + Tài Bạch + Quan Lộc → tổng thể thành công.\n"
+                                    f"BƯỚC 4 — TỨ HÓA: Lộc={_tv_tu_hoa.get('Hóa Lộc','?')} (tài lộc), Quyền={_tv_tu_hoa.get('Hóa Quyền','?')} (quyền lực), "
+                                    f"Khoa={_tv_tu_hoa.get('Hóa Khoa','?')} (danh tiếng), Kỵ={_tv_tu_hoa.get('Hóa Kỵ','?')} (trở ngại).\n"
+                                    f"  → Hóa Kỵ vào cung nào = cung đó gặp trở ngại lớn nhất.\n"
+                                    f"BƯỚC 5 — ĐẠI HẠN + LƯU NIÊN: Đại Hạn = xu hướng 10 năm, Lưu Niên = chi tiết năm nay.\n"
+                                    f"  → ĐH tốt + LN xấu = bớt xấu; ĐH xấu + LN tốt = tạm vượt qua.\n"
+                                    f"BƯỚC 6 — KẾT HỢP KỲ MÔN: Phối Tử Vi (vận mệnh dài hạn) + Kỳ Môn (thời điểm hiện tại).\n"
+                                    f"BƯỚC 7 — KẾT LUẬN: Trả lời câu hỏi DỰA TRÊN cả Tử Vi lẫn Kỳ Môn.\n"
+                                    f"  → Đưa lời khuyên CỤ THỂ, HÀNH ĐỘNG ĐƯỢC.\n"
+                                )
+                            except Exception:
+                                pass
+                        
+                        # ════ V42.8c: NỐI XEM NGÀY ĐẸP — TOÀN BỘ DỮ LIỆU + QUY TẮC ════
+                        if use_xem_ngay and _xn_result:
+                            _xn_ly_do_tot = _xn_result.get('ly_do_tot', [])
+                            _xn_ly_do_xau = _xn_result.get('ly_do_xau', [])
+                            _xn_sao28 = ""
+                            _xn_sao28_detail = ""
+                            if _xn_result.get('sao_28_tu'):
+                                s28 = _xn_result['sao_28_tu']
+                                _xn_sao28 = f"{s28[0]} ({s28[1]}/{s28[2]})"
+                                _xn_sao28_detail = f"Tính chất: {s28[3]} | Ý nghĩa: {s28[5] if len(s28) > 5 else ''}" 
+                            
+                            # V42.8c FIX: Lấy đúng key từ danh_gia_ngay() return
+                            _xn_truc_info = _xn_result.get('truc_info', {})
+                            _xn_viec_list = _xn_truc_info.get('nen', [])   # Việc nên làm theo Trực
+                            _xn_viec_tranh = _xn_truc_info.get('ky', [])   # Việc kiêng theo Trực
+                            _xn_truc_mota = _xn_truc_info.get('mo_ta', '')
+                            _xn_truc_cat_hung = _xn_truc_info.get('cat_hung', '?')
+                            _xn_is_hac_dao = not _xn_result.get('is_hoang_dao', True)
+                            
+                            _extra_context.append(
+                                f"\n\n{'='*60}\n"
+                                f"📅 DỮ LIỆU XEM NGÀY ĐẸP — ĐÁNH GIÁ TOÀN DIỆN\n"
+                                f"{'='*60}\n"
+                                f"▶ LOẠI VIỆC ĐANG XEM: {_xn_result.get('loai_viec', '?')}\n"
+                                f"▶ NGÀY ÂM LỊCH: {_xn_result.get('ngay_am', '?')}/{_xn_result.get('thang_am', '?')}\n"
+                                f"▶ CAN CHI NGÀY: {_xn_result.get('can_ngay', '?')} {_xn_result.get('chi_ngay', '?')}\n"
+                                f"▶ ĐIỂM NGÀY: {_xn_result.get('diem', 0)}/100 | ĐÁNH GIÁ: {_xn_result.get('verdict', '?')}\n"
+                                f"▶ 12 Trực: {_xn_result.get('truc', '?')} ({_xn_truc_cat_hung}) — {_xn_truc_mota}\n"
+                                f"   Trực TỐT cho việc này: {'CÓ ✅' if _xn_result.get('truc_tot_cho_viec') else 'KHÔNG ❌'}\n"
+                                f"   Trực XẤU cho việc này: {'CÓ ⚠️' if _xn_result.get('truc_xau_cho_viec') else 'Không'}\n"
+                                f"▶ Hoàng Đạo/Hắc Đạo: {_xn_result.get('sao_hoang_dao', ['?','?','',''])[0]} ({_xn_result.get('sao_hoang_dao', ['?','?','',''])[1]}) — {_xn_result.get('sao_hoang_dao', ['?','?','',''])[3] if len(_xn_result.get('sao_hoang_dao', [])) > 3 else ''}\n"
+                                f"▶ Ngày Hắc Đạo: {'CÓ ⚠️ (bất lợi)' if _xn_is_hac_dao else 'Không (Hoàng Đạo ✅)'}\n"
+                                f"▶ 28 Tú: {_xn_sao28} — {_xn_sao28_detail}\n"
+                                f"▶ Tam Nương: {'CÓ ⚠️ (ngày {}, kiêng việc lớn)'.format(_xn_result.get('ngay_am','?')) if _xn_result.get('is_tam_nuong') else 'Không'}\n"
+                                f"▶ Nguyệt Phá: {'CÓ ⛔ (NGÀY CỰC XẤU — xung tháng, tuyệt đối tránh!)' if _xn_result.get('is_nguyet_pha') else 'Không'}\n"
+                                f"▶ Dương Công Kỵ: {'CÓ ⛔ (13 ngày ĐẠI KỴ trong năm!)' if _xn_result.get('is_duong_cong_ky') else 'Không'}\n"
+                                f"▶ Thiên Đức: {'CÓ ✅ (hóa giải hung, đại cát)' if _xn_result.get('has_thien_duc') else 'Không'}\n"
+                                f"▶ Nguyệt Đức: {'CÓ ✅ (may mắn, thuận lợi)' if _xn_result.get('has_nguyet_duc') else 'Không'}\n"
+                                f"\n--- LÝ DO TỐT ---\n" + ('\n'.join(f'  ✅ {r}' for r in _xn_ly_do_tot) if _xn_ly_do_tot else '  (không có)') + "\n"
+                                f"--- LÝ DO XẤU ---\n" + ('\n'.join(f'  ❌ {r}' for r in _xn_ly_do_xau) if _xn_ly_do_xau else '  (không có)') + "\n"
+                                f"--- VIỆC NÊN LÀM (theo Trực {_xn_result.get('truc','?')}) ---\n" + ('\n'.join(f'  👍 {v}' for v in _xn_viec_list) if _xn_viec_list else '  (không có)') + "\n"
+                                f"--- VIỆC NÊN TRÁNH (theo Trực {_xn_result.get('truc','?')}) ---\n" + ('\n'.join(f'  👎 {v}' for v in _xn_viec_tranh) if _xn_viec_tranh else '  (không có)') + "\n"
+                                f"\n{'='*60}\n"
+                                f"📋 HƯỚNG DẪN LUẬN GIẢI XEM NGÀY (BẮT BUỘC TUÂN THEO):\n"
+                                f"{'='*60}\n"
+                                f"1. ĐÁNH GIÁ TỔNG QUAN: Điểm ≥70 = TỐT, 50-69 = TRUNG BÌNH, <50 = XẤU.\n"
+                                f"2. NGUYỆT PHÁ: Nếu CÓ → CẢNH BÁO MẠNH, tuyệt đối tránh việc lớn.\n"
+                                f"3. DƯƠNG CÔNG KỴ: Nếu CÓ → 13 ngày đại kỵ, tránh mọi việc quan trọng.\n"
+                                f"4. TAM NƯƠNG: Nếu CÓ → Cảnh báo, không nên khởi sự việc mới.\n"
+                                f"5. 12 TRỰC: Phân tích Trực có phù hợp loại việc '{_xn_result.get('loai_viec', '?')}' không.\n"
+                                f"6. 28 TÚ: Sao CÁT = tốt cho việc lớn, HUNG = cần cẩn thận.\n"
+                                f"7. HOÀNG ĐẠO/HẮC ĐẠO: Hoàng Đạo = thuận lợi, Hắc Đạo = bất lợi.\n"
+                                f"8. THIÊN/NGUYỆT ĐỨC: Nếu CÓ → hóa giải bớt hung, tăng cát.\n"
+                                f"9. KẾT HỢP KỲ MÔN: Ngày tốt + Cửa tốt = TIẾN, Ngày xấu + Cửa xấu = TUYỆT ĐỐI TRÁNH.\n"
+                                f"10. GỢI Ý: Ngày xấu → đề xuất ngày tốt gần nhất. Ngày tốt → gợi ý GIỜ ĐẸP.\n"
+                            )
+                        
+                        # Nối context vào câu hỏi
+                        if _extra_context:
+                            enhanced_question = user_question + "\n".join(_extra_context)
+                        
                         # ====== BƯỚC 1: AI OFFLINE phân tích quẻ ======
                         with st.spinner("⚙️ Bước 1/2: AI Offline đang phân tích quẻ từ câu hỏi của bạn..."):
                             from free_ai_helper import FreeAIHelper
@@ -2741,17 +3584,20 @@ PHÂN TÍCH LIÊN MẠCH:
                                     _chart_q = st.session_state.get('chart_data', {})
                                     can_ngay_val = _chart_q.get('can_ngay', 'Giáp') if _chart_q else 'Giáp'
                                     chi_ngay_val = _chart_q.get('chi_ngay', 'Tý') if _chart_q else 'Tý'
+                                    can_thang_val = _chart_q.get('can_thang', 'Giáp') if _chart_q else 'Giáp'
+                                    chi_thang_val = _chart_q.get('chi_thang', 'Tý') if _chart_q else 'Tý'
                                     luc_hao_for_q = lap_qua_luc_hao(
                                         dt_now.year, dt_now.month, dt_now.day, dt_now.hour,
-                                        topic=selected_topic, can_ngay=can_ngay_val, chi_ngay=chi_ngay_val
+                                        topic=selected_topic, can_ngay=can_ngay_val, chi_ngay=chi_ngay_val,
+                                        can_thang=can_thang_val, chi_thang=chi_thang_val
                                     )
                                     st.session_state.luc_hao_result = luc_hao_for_q
                                 except Exception:
                                     pass
                             
-                            # V8.2: topic=None → AI tự phân tích câu hỏi thay vì dùng dropdown
+                            # V42.6: Gửi enhanced_question (có/không có data Tử Vi + Xem Ngày)
                             offline_result = offline_ai.answer_question(
-                                user_question,
+                                enhanced_question,
                                 chart_data=st.session_state.get('chart_data'),
                                 topic=None,
                                 selected_subject=st.session_state.get('selected_doi_tuong', 'Bản thân'),
@@ -2917,7 +3763,9 @@ elif st.session_state.current_view == "luc_hao":
             dt.year, dt.month, dt.day, dt.hour,
             topic=selected_topic,
             can_ngay=can_ngay,
-            chi_ngay=chi_ngay
+            chi_ngay=chi_ngay,
+            can_thang=can_thang,
+            chi_thang=chi_thang
         )
     except Exception as e:
         st.error(f"Lỗi lập quẻ Lục Hào: {e}")
@@ -2927,8 +3775,8 @@ elif st.session_state.current_view == "luc_hao":
         
         # ========== COMPACT HEADER (giống xinhdich.com) ==========
         st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #b45309; border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; font-size: 13px;">
-            <div style="text-align:center; font-weight:900; font-size:15px; color:#92400e; margin-bottom:6px;">
+        <div style="background: linear-gradient(135deg, rgba(30,27,75,0.9), rgba(22,33,62,0.9)); border: 2px solid #7c3aed; border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; font-size: 13px;">
+            <div style="text-align:center; font-weight:900; font-size:15px; color:#a78bfa; margin-bottom:6px;">
                 📜 PHẦN MỀM LẬP QUẺ DỊCH — Phương pháp: Mai Hoa
             </div>
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
@@ -3048,7 +3896,7 @@ elif st.session_state.current_view == "luc_hao":
         
         # ========== FOOTER INFO ==========
         st.markdown(f"""
-        <div style="background:#f1f5f9; border-radius:8px; padding:8px 12px; font-size:12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
+        <div style="background:rgba(22,33,62,0.8); border-radius:8px; padding:8px 12px; font-size:12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
             <span>💡 {res['the_ung']}</span>
             <span>📝 Dụng Thần: {res['ban']['details'][2]['luc_than']}</span>
             <span>🔄 Động hào: {', '.join([str(h) for h in moving_hao])}</span>
@@ -3059,7 +3907,7 @@ elif st.session_state.current_view == "luc_hao":
         phuc_than_data = res.get('phuc_than', [])
         if phuc_than_data:
             pt_html = """
-            <div style="background:#faf5ff; border:2px solid #7c3aed; border-radius:8px; padding:8px 12px; margin:8px 0;">
+            <div style="background:rgba(30,27,75,0.8); border:2px solid #7c3aed; border-radius:8px; padding:8px 12px; margin:8px 0;">
                 <div style="font-weight:700; color:#7c3aed; font-size:13px; margin-bottom:6px;">🔮 PHỤC THẦN (伏神) — Lục Thân Ẩn</div>
                 <table style="width:100%; font-size:12px; border-collapse:collapse;">
                 <tr style="background:#7c3aed; color:white;">
@@ -3171,9 +4019,9 @@ elif st.session_state.current_view == "ai_factory":
         col = rows[i // 3][i % 3]
         with col:
             st.markdown(f"""
-            <div style="background: white; padding: 15px; border-radius: 10px; border-left: 5px solid #1e3a8a; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <div style="font-weight: 800; color: #1e3a8a;">{status} {name}</div>
-                <div style="font-size: 13px; color: #666;">{desc}</div>
+            <div style="background: rgba(22,33,62,0.9); padding: 15px; border-radius: 10px; border-left: 5px solid #7c3aed; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                <div style="font-weight: 800; color: #a78bfa;">{status} {name}</div>
+                <div style="font-size: 13px; color: #94a3b8;">{desc}</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -3320,7 +4168,7 @@ elif st.session_state.current_view == "gemini_ai":
                 """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
-                <div style="background: #f0f2f6; padding: 10px 15px; border-radius: 10px; color: #1e293b; margin: 5px 0; margin-right: 20%; border-left: 4px solid #667eea;">
+                <div style="background: rgba(22,33,62,0.8); padding: 10px 15px; border-radius: 10px; color: #ecf0f1; margin: 5px 0; margin-right: 20%; border-left: 4px solid #667eea;">
                     <b>🤖 AI:</b> {msg['content'][:300]}{'...' if len(msg['content']) > 300 else ''}
                 </div>
                 """, unsafe_allow_html=True)
@@ -3539,7 +4387,7 @@ elif st.session_state.current_view == "gemini_ai":
                     # RENDER
                     st.markdown("""
                     <div style='text-align: center; color: gray; padding: 20px 0;'>
-                        --- <b>☯️ Kỳ Môn AI V32.2 — Unified Index + Offline Engine</b> ---<br>
+                        --- <b>☯️ Kỳ Môn AI {APP_VERSION} — Full Pipeline + Offline Engine</b> ---<br>
                         <i>© 2024-2026 Cuongtan888888. All rights reserved.</i>
                     </div>
                     """, unsafe_allow_html=True)
@@ -3685,6 +4533,807 @@ elif st.session_state.current_view == "thai_at":
         st.error(f"⚠️ Module thai_at_than_so.py chưa có: {e}")
     except Exception as e:
         st.error(f"⚠️ Lỗi Thái Ất Thần Số: {e}")
+
+# ======================================================================
+# XEM NGÀY ĐẸP VIEW (V42.4)
+# ======================================================================
+elif st.session_state.current_view == "xem_ngay":
+    st.markdown("""
+    <div style='text-align:center;margin-bottom:30px;'>
+        <div style='font-size:2.5rem;margin-bottom:10px;'>📅</div>
+        <h1 style='background:linear-gradient(90deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:2rem;margin:0;'>XEM NGÀY GIỜ ĐẸP</h1>
+        <p style='color:#94a3b8;font-size:0.9rem;margin-top:8px;'>Tổng hợp: Hiệp Kỷ Biện Phương Thư • Ngọc Hạp Thông Thư • Đổng Công Trạch Nhật • Thọ Mai Gia Lễ</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    try:
+        from xem_ngay_dep import (
+            danh_gia_ngay, danh_gia_ngay_duong_lich, tinh_trung_tang,
+            solar2lunar, tinh_28_tu, kiem_tra_duong_cong_ky,
+            VIEC_XEM_NGAY, CHI_12, CAN_10,
+            TRUC_TINH_CHAT, SAO_12, NHI_THAP_BAT_TU
+        )
+        from qmdg_calc import calculate_qmdg_params
+        import datetime
+
+        # ── TABS ──
+        tab_xn, tab_tt, tab_ref = st.tabs(["📅 Xem Ngày", "⚰️ Tra Trùng Tang", "📚 Bảng Tra Cứu"])
+
+        # ════════════════ TAB 1: XEM NGÀY ════════════════
+        with tab_xn:
+            # V42.6c: CSS input TO + ĐẸP cho Xem Ngày
+            st.markdown("""
+            <style>
+                .xn-input-label {
+                    color: #fbbf24;
+                    font-size: 1rem;
+                    font-weight: 700;
+                    margin-bottom: 6px;
+                }
+                .xn-person-card {
+                    background: linear-gradient(145deg, #1a1a2e, #16213e);
+                    padding: 20px 24px;
+                    border-radius: 16px;
+                    border: 1px solid rgba(167, 139, 250, 0.3);
+                    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.12);
+                    margin: 12px 0;
+                }
+                .xn-person-card h4 {
+                    color: #c4b5fd;
+                    margin: 0 0 14px 0;
+                    font-size: 1.15rem;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            col_input1, col_input2 = st.columns(2)
+            with col_input1:
+                st.markdown("<div class='xn-input-label'>📆 Chọn ngày dương lịch</div>", unsafe_allow_html=True)
+                ngay_xem = st.date_input("Chọn ngày:", value=datetime.date.today(), key="xn_date", label_visibility="collapsed")
+            with col_input2:
+                st.markdown("<div class='xn-input-label'>🎯 Chọn loại việc (hoặc tự nhập bên dưới)</div>", unsafe_allow_html=True)
+                viec_keys = list(VIEC_XEM_NGAY.keys())
+                viec_labels = [VIEC_XEM_NGAY[k]["ten"] for k in viec_keys]
+                viec_idx = st.selectbox("Loại việc:", range(len(viec_labels)), format_func=lambda i: viec_labels[i], key="xn_viec", label_visibility="collapsed")
+                loai_viec = viec_keys[viec_idx]
+            
+            # ── Ô nhập tự do ──
+            xn_custom_viec = st.text_input(
+                "✍️ Hoặc tự nhập loại việc theo ý bạn:",
+                placeholder="Ví dụ: Ký hợp đồng thuê nhà / Nhận xe mới / Khai trương quán ăn / Phẫu thuật...",
+                key="xn_custom_viec"
+            )
+            if xn_custom_viec and xn_custom_viec.strip():
+                # Ghi đè loại việc bằng input tự do
+                st.session_state['xn_custom_viec_text'] = xn_custom_viec.strip()
+                st.markdown(f"""
+                <div style='background:linear-gradient(135deg,#064e3b,#065f46);padding:10px 16px;border-radius:10px;
+                    border:1px solid #10b981;margin:4px 0;'>
+                    <span style='color:#6ee7b7;font-weight:700;'>✅ Sử dụng: "{xn_custom_viec.strip()}" (thay cho danh sách có sẵn)</span>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.session_state['xn_custom_viec_text'] = None
+
+            # ── THÔNG TIN NGƯỜI HỎI ──
+            st.markdown("""
+            <div class='xn-person-card'>
+                <h4>👤 Thông tin người hỏi (để xem tuổi hợp/xung)</h4>
+            </div>
+            """, unsafe_allow_html=True)
+
+            col_p1, col_p2, col_p3 = st.columns(3)
+            with col_p1:
+                st.markdown("<div class='xn-input-label'>📅 Năm sinh (DL)</div>", unsafe_allow_html=True)
+                nam_sinh = st.number_input("Năm sinh:", min_value=1920, max_value=2026, value=1990, key="xn_nam_sinh", label_visibility="collapsed")
+            with col_p2:
+                st.markdown("<div class='xn-input-label'>⚧ Giới tính</div>", unsafe_allow_html=True)
+                gioi_tinh_xn = st.radio("Giới tính:", ["Nam", "Nữ"], key="xn_gioi_tinh", horizontal=True, label_visibility="collapsed")
+            with col_p3:
+                # Tính Can Chi tuổi
+                can_tuoi_idx = (nam_sinh - 4) % 10
+                chi_tuoi_idx = (nam_sinh - 4) % 12
+                can_tuoi = CAN_10[can_tuoi_idx]
+                chi_tuoi = CHI_12[chi_tuoi_idx]
+                tuoi_am = datetime.date.today().year - nam_sinh + 1
+                st.markdown(f"""
+                <div style='background:linear-gradient(135deg,#312e81,#4c1d95);padding:16px;border-radius:14px;
+                    margin-top:8px;text-align:center;border:1px solid #7c3aed;
+                    box-shadow:0 4px 16px rgba(124,58,237,0.2);'>
+                    <div style='color:#fbbf24;font-weight:900;font-size:1.3rem;'>{can_tuoi} {chi_tuoi}</div>
+                    <div style='color:#c4b5fd;font-size:0.95rem;margin-top:4px;'>Tuổi âm: {tuoi_am}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # ── TÍNH KIM LÂU (cho cưới hỏi) ──
+            kim_lau = tuoi_am % 9
+            is_kim_lau = kim_lau in [1, 3, 6, 8]  # Kim Lâu: 1-Thân, 3-Thê, 6-Tử, 8-Mệnh
+            kim_lau_ten = {1: "Thân (bản thân)", 3: "Thê/Phu (vợ/chồng)", 6: "Tử (con cái)", 8: "Mệnh (sinh mệnh)"}
+
+            # ── KIỂM TRA TUỔI XUNG VỚI NGÀY ──
+            # Tính âm lịch
+            ngay_am, thang_am, nam_am, nhuan = solar2lunar(ngay_xem.day, ngay_xem.month, ngay_xem.year)
+            nhuan_str = " (Nhuận)" if nhuan else ""
+
+            # Tính Can-Chi ngày
+            dt_xem = datetime.datetime(ngay_xem.year, ngay_xem.month, ngay_xem.day, 12, 0)
+            try:
+                p = calculate_qmdg_params(dt_xem)
+                can_ngay = p.get('can_ngay', 'Giáp')
+                chi_ngay = p.get('chi_ngay', 'Tý')
+            except Exception:
+                can_ngay, chi_ngay = 'Giáp', 'Tý'
+
+            # Chi ngày xung Chi tuổi? (cách 6 vị trí)
+            chi_ngay_idx = CHI_12.index(chi_ngay) if chi_ngay in CHI_12 else 0
+            is_xung_tuoi = (chi_ngay_idx - chi_tuoi_idx) % 12 == 6
+
+            # Hiện thông tin âm lịch + tuổi
+            st.markdown(f"""
+            <div style='background:linear-gradient(135deg,#1a1a2e,#16213e);padding:15px 20px;border-radius:12px;
+                border-left:4px solid #fbbf24;margin:10px 0;'>
+                <span style='color:#fbbf24;font-weight:800;font-size:1.1rem;'>📅 Âm Lịch:</span>
+                <span style='color:white;font-size:1.1rem;'> Ngày {ngay_am} Tháng {thang_am}{nhuan_str} Năm {nam_am}</span>
+                <span style='color:#94a3b8;margin-left:15px;'>| {can_ngay} {chi_ngay}</span>
+                <span style='color:#c4b5fd;margin-left:15px;'>| 👤 {can_tuoi} {chi_tuoi} ({tuoi_am} tuổi)</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Cảnh báo tuổi
+            if is_xung_tuoi:
+                st.error(f"⛔ CHI NGÀY ({chi_ngay}) XUNG CHI TUỔI ({chi_tuoi}) — Ngày này KHÔNG hợp tuổi bạn!")
+            if is_kim_lau and loai_viec == "cuoi_hoi":
+                st.warning(f"⚠️ Tuổi {tuoi_am} phạm KIM LÂU — {kim_lau_ten.get(kim_lau, '')} — Cần cân nhắc kỹ cho cưới hỏi!")
+
+            # Lưu thông tin tuổi
+            st.session_state['xn_tuoi_info'] = {
+                'nam_sinh': nam_sinh, 'gioi_tinh': gioi_tinh_xn,
+                'can_tuoi': can_tuoi, 'chi_tuoi': chi_tuoi, 'tuoi_am': tuoi_am,
+                'is_xung_tuoi': is_xung_tuoi, 'is_kim_lau': is_kim_lau,
+                'kim_lau_loai': kim_lau_ten.get(kim_lau, '')
+            }
+
+            if st.button("🔍 XEM NGÀY", type="primary", key="btn_xem_ngay", use_container_width=True):
+                result = danh_gia_ngay(thang_am, ngay_am, can_ngay, chi_ngay, loai_viec, ngay_dl=(ngay_xem.day, ngay_xem.month, ngay_xem.year))
+                st.markdown(f"""
+                <div style='background:linear-gradient(135deg,#0f0c29,#302b63);padding:30px;border-radius:20px;
+                    border:2px solid {result['verdict_color']};text-align:center;margin:20px 0;
+                    box-shadow:0 10px 40px rgba(0,0,0,0.5);'>
+                    <div style='font-size:3rem;'>{result['verdict'].split()[0]}</div>
+                    <div style='font-size:1.8rem;font-weight:900;color:{result['verdict_color']};margin:10px 0;'>
+                        {result['verdict']}
+                    </div>
+                    <div style='font-size:1.2rem;color:#fbbf24;font-weight:700;'>Điểm: {result['diem']}/100</div>
+                    <div style='color:#94a3b8;margin-top:10px;font-size:0.95rem;'>
+                        📅 Ngày {can_ngay} {chi_ngay} — Tháng {thang_am} ÂL — Ngày {ngay_am} ÂL<br>
+                        🎯 Xem cho: {result['loai_viec']}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                col_d1, col_d2 = st.columns(2)
+                with col_d1:
+                    sao = result['sao_hoang_dao']
+                    hd_bg = '#064e3b' if result['is_hoang_dao'] else '#7f1d1d'
+                    st.markdown(f"""
+                    <div style='background:{hd_bg};padding:18px;border-radius:14px;margin:8px 0;'>
+                        <div style='font-size:1.3rem;font-weight:800;color:white;'>
+                            {sao[2]} {sao[0]} — {sao[1]}
+                        </div>
+                        <div style='color:#d1d5db;font-size:0.9rem;'>{sao[3]}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    truc = result['truc']
+                    ti = result['truc_info']
+                    truc_bg = '#064e3b' if result['truc_tot_cho_viec'] else ('#7f1d1d' if result['truc_xau_cho_viec'] else '#78350f')
+                    st.markdown(f"""
+                    <div style='background:{truc_bg};padding:18px;border-radius:14px;margin:8px 0;'>
+                        <div style='font-size:1.3rem;font-weight:800;color:white;'>
+                            {ti.get('icon','')} Trực {truc} — {ti.get('cat_hung','')}
+                        </div>
+                        <div style='color:#d1d5db;font-size:0.9rem;'>{ti.get('mo_ta','')}</div>
+                        <div style='color:#86efac;font-size:0.85rem;margin-top:5px;'>Nên: {', '.join(ti.get('nen',[]))}</div>
+                        <div style='color:#fca5a5;font-size:0.85rem;'>Kỵ: {', '.join(ti.get('ky',[]))}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    # 28 Tú (Ngọc Hạp Thông Thư)
+                    sao_28 = result.get('sao_28_tu')
+                    if sao_28:
+                        s28_bg = '#064e3b' if sao_28[3] == 'Cát' else '#7f1d1d'
+                        st.markdown(f"""
+                        <div style='background:{s28_bg};padding:15px;border-radius:14px;margin:8px 0;'>
+                            <div style='font-size:1.1rem;font-weight:800;color:white;'>
+                                ⭐ Sao {sao_28[0]} ({sao_28[1]}/{sao_28[2]}) — {sao_28[3]}
+                            </div>
+                            <div style='color:#d1d5db;font-size:0.85rem;'>{sao_28[5]}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                with col_d2:
+                    if result['ly_do_tot']:
+                        for r in result['ly_do_tot']:
+                            st.success(r)
+                    if result['ly_do_xau']:
+                        for r in result['ly_do_xau']:
+                            st.error(r)
+                    if result['is_tam_nuong']:
+                        st.warning(f"⚠️ NGÀY TAM NƯƠNG (ngày {ngay_am} ÂL) — Kiêng việc lớn!")
+                    if result['is_nguyet_pha']:
+                        st.warning("⚠️ NGÀY NGUYỆT PHÁ — Xung tháng, đại kỵ!")
+                    if result.get('is_duong_cong_ky'):
+                        st.error("⛔ DƯƠNG CÔNG KỴ NHẬT — 13 ngày đại kỵ, tuyệt đối không làm việc lớn!")
+
+                # ── LƯU KẾT QUẢ ĐỂ AI TƯ VẤN ──
+                st.session_state['xn_result'] = result
+                st.session_state['xn_ngay_xem'] = ngay_xem
+                st.session_state['xn_loai_viec'] = loai_viec
+                # V42.6d: Lưu custom việc (nếu có)
+                _custom_viec = st.session_state.get('xn_custom_viec_text')
+                if _custom_viec:
+                    st.session_state['xn_result']['loai_viec_custom'] = _custom_viec
+                    st.session_state['xn_result']['loai_viec'] = _custom_viec
+                st.session_state['xn_am_lich'] = f"{ngay_am}/{thang_am}/{nam_am}"
+                st.session_state['xn_can_chi'] = f"{can_ngay} {chi_ngay}"
+
+            # ── AI TƯ VẤN CHUYÊN SÂU ──
+            if st.session_state.get('xn_result'):
+                st.markdown("---")
+                st.markdown("""
+                <div style='background:linear-gradient(135deg,#1e1b4b,#312e81);padding:18px;border-radius:14px;
+                    border-left:4px solid #818cf8;margin:15px 0;'>
+                    <h3 style='color:#c7d2fe;margin:0 0 8px 0;'>🤖 AI Tư Vấn Chuyên Sâu</h3>
+                    <p style='color:#94a3b8;margin:0;font-size:0.85rem;'>Chọn câu hỏi mẫu hoặc tự nhập — AI sẽ phân tích hậu quả, giải pháp, và tìm ngày đẹp thay thế</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # ── CÂU HỎI MẪU NHANH ──
+                xn_viec_ten = st.session_state.get('xn_result', {}).get('loai_viec', 'việc này')
+                xn_ngay_str = str(st.session_state.get('xn_ngay_xem', ''))
+
+                cau_hoi_mau = [
+                    ("💒", f"Tìm ngày cưới đẹp nhất trong 3 tháng tới"),
+                    ("🏠", f"Tìm ngày động thổ / làm nhà đẹp nhất tháng này"),
+                    ("🚀", f"Ngày nào tốt để xuất hành trong tuần tới?"),
+                    ("⚰️", f"Tìm ngày an táng / bốc mộ tốt nhất gần đây"),
+                    ("🏪", f"Tìm ngày khai trương đẹp nhất tháng tới"),
+                    ("📝", f"Ngày nào tốt để ký hợp đồng / giao dịch lớn?"),
+                    ("🪦", f"Tìm ngày tảo mộ đẹp gần Thanh Minh"),
+                    ("🔀", f"Tìm ngày nhập trạch / dọn nhà đẹp nhất"),
+                    ("💰", f"Ngày nào tốt để cầu tài / xin việc / đầu tư?"),
+                    ("⚕️", f"Tìm ngày tốt để phẫu thuật / chữa bệnh"),
+                    ("🙏", f"Ngày nào tốt để cúng tế / lễ bái?"),
+                    ("⚠️", f"Ngày {xn_ngay_str} làm {xn_viec_ten} — hậu quả gì? Cách hóa giải?"),
+                ]
+
+                # Hiển thị 4 cột x 3 hàng
+                for row in range(3):
+                    cols = st.columns(4)
+                    for col_idx in range(4):
+                        i = row * 4 + col_idx
+                        if i < len(cau_hoi_mau):
+                            icon, text = cau_hoi_mau[i]
+                            with cols[col_idx]:
+                                if st.button(f"{icon} {text[:35]}{'...' if len(text) > 35 else ''}", key=f"xn_q_{i}", use_container_width=True, help=text):
+                                    st.session_state['xn_custom_question'] = text
+
+                # Ô nhập câu hỏi tự do
+                custom_q = st.text_input("✍️ Hoặc nhập câu hỏi riêng:", value=st.session_state.get('xn_custom_question', ''), key="xn_custom_input", placeholder="Ví dụ: Tìm ngày cưới đẹp cho tuổi Canh Ngọ 1990...")
+
+                if custom_q:
+                    st.session_state['xn_custom_question'] = custom_q
+
+                if st.button("🧠 AI PHÂN TÍCH & TƯ VẤN", type="primary", key="btn_ai_tu_van", use_container_width=True):
+                    xn_r = st.session_state['xn_result']
+                    xn_viec = VIEC_XEM_NGAY.get(st.session_state.get('xn_loai_viec', 'cuoi_hoi'), {})
+
+                    # Tạo prompt chuyên sâu cho AI
+                    user_question = st.session_state.get('xn_custom_question', '')
+                    ly_do_str = "\n".join(xn_r.get('ly_do_tot', []) + xn_r.get('ly_do_xau', []))
+                    sao_28_str = ""
+                    if xn_r.get('sao_28_tu'):
+                        s28 = xn_r['sao_28_tu']
+                        sao_28_str = f"Nhị Thập Bát Tú: Sao {s28[0]} ({s28[1]}/{s28[2]}) — {s28[3]}"
+
+                    user_q_section = ""
+                    if user_question:
+                        user_q_section = f"\n\nCÂU HỎI CỦA NGƯỜI DÙNG (ưu tiên trả lời):\n{user_question}\n"
+
+                    ai_prompt = f"""Bạn là CHUYÊN GIA XEM NGÀY hàng đầu, tổng hợp từ Hiệp Kỷ Biện Phương Thư, Ngọc Hạp Thông Thư, Đổng Công Trạch Nhật.{user_q_section}
+
+THÔNG TIN NGÀY CẦN PHÂN TÍCH:
+- Ngày dương lịch: {st.session_state.get('xn_ngay_xem', '')}
+- Âm lịch: {st.session_state.get('xn_am_lich', '')}
+- Can Chi ngày: {st.session_state.get('xn_can_chi', '')}
+- Loại việc: {xn_viec.get('ten', '')}
+- Điểm: {xn_r.get('diem', 0)}/100
+- Đánh giá: {xn_r.get('verdict', '')}
+- Trực: {xn_r.get('truc', '')} ({xn_r.get('truc_info', {}).get('cat_hung', '')})
+- Hoàng Đạo/Hắc Đạo: {xn_r.get('sao_hoang_dao', ('','','',''))[0]} — {xn_r.get('sao_hoang_dao', ('','','',''))[1]}
+- {sao_28_str}
+- Tam Nương: {'CÓ' if xn_r.get('is_tam_nuong') else 'Không'}
+- Nguyệt Phá: {'CÓ' if xn_r.get('is_nguyet_pha') else 'Không'}
+- Dương Công Kỵ: {'CÓ' if xn_r.get('is_duong_cong_ky') else 'Không'}
+- Thiên Đức: {'CÓ' if xn_r.get('has_thien_duc') else 'Không'}
+- Nguyệt Đức: {'CÓ' if xn_r.get('has_nguyet_duc') else 'Không'}
+
+THÔNG TIN NGƯỜI HỎI (BẮT BUỘC phân tích theo tuổi cụ thể):
+- Năm sinh: {st.session_state.get('xn_tuoi_info', {}).get('nam_sinh', '')}
+- Giới tính: {st.session_state.get('xn_tuoi_info', {}).get('gioi_tinh', '')}
+- Can Chi tuổi: {st.session_state.get('xn_tuoi_info', {}).get('can_tuoi', '')} {st.session_state.get('xn_tuoi_info', {}).get('chi_tuoi', '')}
+- Tuổi âm: {st.session_state.get('xn_tuoi_info', {}).get('tuoi_am', '')}
+- Tuổi XUNG ngày: {'CÓ — ĐẠI KỴ!' if st.session_state.get('xn_tuoi_info', {}).get('is_xung_tuoi') else 'Không xung'}
+- Kim Lâu: {'CÓ — ' + st.session_state.get('xn_tuoi_info', {}).get('kim_lau_loai', '') if st.session_state.get('xn_tuoi_info', {}).get('is_kim_lau') else 'Không phạm'}
+
+CHI TIẾT ĐÁNH GIÁ:
+{ly_do_str}
+"""
+                    # Liên kết Tử Vi nếu có
+                    tv_ls = st.session_state.get('tv_la_so')
+                    if tv_ls:
+                        from tu_vi import format_la_so_text
+                        ai_prompt += f"""
+
+DỮ LIỆU TỬ VI ĐẨU SỐ CỦA NGƯỜI HỎI (BẮT BUỘC kết hợp phân tích):
+{format_la_so_text(tv_ls)}
+
+QUAN TRỌNG: Kết hợp Tử Vi + Xem Ngày để đưa ra kết luận CHÍNH XÁC:
+- Đại Hạn hiện tại của người này đang ở cung nào? Cung đó có sao tốt/xấu gì?
+- Ngày được chọn có PHÙ HỢP với vận hạn hiện tại không?
+- Nếu đang ở Đại Hạn xấu → cần thận trọng hơn khi chọn ngày
+- Nếu đang ở Đại Hạn tốt → ngày bình thường cũng có thể thuận lợi
+"""
+
+                    ai_prompt += f"""
+YÊU CẦU PHÂN TÍCH (BẮT BUỘC trả lời đầy đủ 5 phần):
+
+1. 📋 PHÁN ĐOÁN TỔNG QUAN: Ngày này {xn_viec.get('ten', '')} tốt hay xấu? Mức độ nào? {"(Kết hợp phân tích Đại Hạn + Lưu Niên Tử Vi)" if tv_ls else ""}
+
+2. ⚠️ HẬU QUẢ NẾU CỐ TÌNH LÀM: Nếu vẫn tiến hành {xn_viec.get('ten', '')} vào ngày này, điều gì CÓ THỂ xảy ra? (Dựa trên Trực, Sao, Thần Sát {"+ vận hạn Tử Vi" if tv_ls else ""})
+
+3. 🛡️ GIẢI PHÁP HÓA GIẢI: Giờ tốt, hướng xuất hành, nghi thức cúng...
+
+4. 📅 ĐỀ XUẤT NGÀY ĐẸP THAY THẾ: 3-5 ngày đẹp gần nhất {"hợp với Tử Vi người hỏi" if tv_ls else ""} cho {xn_viec.get('ten', '')}
+
+5. ⏰ GIỜ ĐẸP: Giờ tốt nhất để tiến hành
+
+Trả lời bằng tiếng Việt, chi tiết, chuyên nghiệp."""
+
+                    # ====== BƯỚC 1: AI OFFLINE phân tích ======
+                    with st.spinner("⚙️ Bước 1/2: AI Offline đang phân tích..."):
+                        try:
+                            from free_ai_helper import FreeAIHelper
+                            _xn_api_key = st.session_state.get('api_key', '') or st.session_state.get('_resolved_api_key', '')
+                            xn_ai = FreeAIHelper(api_key=_xn_api_key)
+                            xn_offline_result = xn_ai.answer_question(
+                                ai_prompt,
+                                chart_data=st.session_state.get('chart_data', {}),
+                                topic="phong_thuy"
+                            )
+                            # V13.0: AI ONLINE đã tích hợp trong answer_question
+                            # Nếu có API key, answer_question tự gọi Gemini bên trong
+                            st.session_state['xn_ai_result'] = xn_offline_result
+                        except Exception as e:
+                            st.error(f"⚠️ Lỗi AI: {e}")
+                            st.session_state['xn_ai_result'] = None
+
+            # ── HIỂN THỊ KẾT QUẢ AI ──
+            if st.session_state.get('xn_ai_result'):
+                ai_text = st.session_state['xn_ai_result']
+                if isinstance(ai_text, dict):
+                    ai_text = ai_text.get('answer', '') or ai_text.get('offline_answer', '') or str(ai_text)
+
+                st.markdown(f"""
+                <div style='background:linear-gradient(135deg,#0f172a,#1e293b);padding:25px;border-radius:16px;
+                    border:1px solid #6366f1;margin:20px 0;box-shadow:0 8px 32px rgba(99,102,241,0.15);'>
+                    <div style='color:#c7d2fe;font-size:1.3rem;font-weight:900;margin-bottom:15px;'>
+                        🧠 PHÂN TÍCH AI CHUYÊN SÂU
+                    </div>
+                    <div style='color:#e2e8f0;font-size:0.95rem;line-height:1.8;white-space:pre-wrap;'>{ai_text}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+
+        # ════════════════ TAB 2: TRA TRÙNG TANG ════════════════
+        with tab_tt:
+            st.markdown("""
+            <div style='background:linear-gradient(135deg,#1a1a2e,#16213e);padding:20px;border-radius:15px;
+                border-left:4px solid #e74c3c;margin-bottom:20px;'>
+                <h3 style='color:#fca5a5;margin:0 0 10px 0;'>⚰️ Tra Cứu Trùng Tang</h3>
+                <p style='color:#94a3b8;margin:0;font-size:0.9rem;'>Theo Thọ Mai Gia Lễ + Tam Giáo Chính Hội</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+            col_tt1, col_tt2 = st.columns(2)
+            with col_tt1:
+                tuoi_mat = st.number_input("Tuổi người mất (tuổi âm):", min_value=1, max_value=120, value=70, key="tt_tuoi")
+                gioi_tinh = st.radio("Giới tính:", ["Nam", "Nữ"], key="tt_gioi", horizontal=True)
+            with col_tt2:
+                nam_mat_val = st.number_input("Chi năm mất (1-12):", min_value=1, max_value=12, value=1, key="tt_nam")
+                thang_mat_val = st.number_input("Tháng mất (ÂL):", min_value=1, max_value=12, value=1, key="tt_thang")
+                ngay_mat_val = st.number_input("Ngày mất (ÂL):", min_value=1, max_value=30, value=1, key="tt_ngay")
+                gio_mat_val = st.number_input("Giờ mất (1-12):", min_value=1, max_value=12, value=1, key="tt_gio")
+
+            if st.button("🔍 TRA TRÙNG TANG", type="primary", key="btn_trung_tang", use_container_width=True):
+                gt = 'nam' if gioi_tinh == "Nam" else 'nu'
+                kq = tinh_trung_tang(tuoi_mat, gt, nam_mat_val, thang_mat_val, ngay_mat_val, gio_mat_val)
+                kl = kq.get('ket_luan', '')
+                kl_color = '#ef4444' if 'TRÙNG TANG' in kl else ('#22c55e' if 'NHẬP MỘ' in kl or 'AN TOÀN' in kl else '#fbbf24')
+                st.markdown(f"""
+                <div style='background:linear-gradient(135deg,#0f0c29,#302b63);padding:25px;border-radius:15px;
+                    border:2px solid {kl_color};text-align:center;margin:15px 0;'>
+                    <div style='font-size:1.5rem;font-weight:900;color:{kl_color};'>{kl}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                cols_tru = st.columns(4)
+                for i, tru_name in enumerate(["Năm", "Tháng", "Ngày", "Giờ"]):
+                    data = kq.get(tru_name, {})
+                    if isinstance(data, dict):
+                        cung = data.get('cung', '?')
+                        loai = data.get('loai', '?')
+                        bg = '#7f1d1d' if loai == 'TRÙNG TANG' else ('#064e3b' if loai == 'NHẬP MỘ' else '#78350f')
+                        icon = '🔴' if loai == 'TRÙNG TANG' else ('🟢' if loai == 'NHẬP MỘ' else '🟡')
+                        with cols_tru[i]:
+                            st.markdown(f"""
+                            <div style='background:{bg};padding:15px;border-radius:12px;text-align:center;'>
+                                <div style='color:#94a3b8;font-size:0.8rem;'>{tru_name}</div>
+                                <div style='font-size:1.5rem;font-weight:900;color:white;'>{cung}</div>
+                                <div style='font-size:0.85rem;color:white;'>{icon} {loai}</div>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+        # ════════════════ TAB 3: BẢNG TRA CỨU ════════════════
+        with tab_ref:
+            ref_tab1, ref_tab2 = st.tabs(["📋 12 Trực", "⭐ Hoàng Đạo/Hắc Đạo"])
+            with ref_tab1:
+                st.markdown("### 📋 BẢNG 12 TRỰC (Đổng Công Trạch Nhật)")
+                for truc_name, info in TRUC_TINH_CHAT.items():
+                    bg = '#064e3b' if info['cat_hung'] == 'Cát' else ('#7f1d1d' if info['cat_hung'] == 'Hung' else '#78350f')
+                    st.markdown(f"""
+                    <div style='background:{bg};padding:12px 18px;border-radius:10px;margin:6px 0;'>
+                        <span style='font-size:1.1rem;font-weight:800;color:white;'>{info['icon']} {truc_name}</span>
+                        <span style='color:#d1d5db;margin-left:10px;'>{info['mo_ta']} ({info['cat_hung']})</span><br>
+                        <span style='color:#86efac;font-size:0.85rem;'>✅ {', '.join(info['nen'])}</span>
+                        <span style='color:#fca5a5;font-size:0.85rem;margin-left:15px;'>❌ {', '.join(info['ky'])}</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            with ref_tab2:
+                st.markdown("### ⭐ 12 SAO HOÀNG ĐẠO / HẮC ĐẠO")
+                for sao_name, loai, icon, mota in SAO_12:
+                    bg = '#064e3b' if loai == 'Hoàng Đạo' else '#7f1d1d'
+                    st.markdown(f"""
+                    <div style='background:{bg};padding:10px 18px;border-radius:10px;margin:5px 0;'>
+                        <span style='font-size:1.1rem;font-weight:800;color:white;'>{icon} {sao_name}</span>
+                        <span style='color:#fbbf24;margin-left:10px;font-weight:700;'>[{loai}]</span>
+                        <span style='color:#d1d5db;margin-left:10px;'>{mota}</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+    except ImportError as e:
+        st.error(f"⚠️ Chưa có module xem_ngay_dep.py: {e}")
+    except Exception as e:
+        st.error(f"⚠️ Lỗi: {e}")
+        import traceback
+        st.code(traceback.format_exc())
+
+# ══════════════════════════════════════════════════════════════
+# TỬ VI ĐẨU SỐ VIEW
+# ══════════════════════════════════════════════════════════════
+elif st.session_state.current_view == "tu_vi":
+    st.markdown("""
+    <h1 style='background:linear-gradient(90deg,#7c3aed,#a78bfa,#7c3aed);-webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;font-size:2.2rem;text-align:center;margin-bottom:5px;'>🔯 TỬ VI ĐẨU SỐ</h1>
+    <p style='text-align:center;color:#94a3b8;margin-bottom:20px;'>Lá số trọn đời — Vận hạn — Kết nối Xem Ngày</p>
+    """, unsafe_allow_html=True)
+
+    try:
+        from tu_vi import lap_la_so, format_la_so_text, CAN, CHI, CUNG_12
+        from xem_ngay_dep import solar2lunar
+        import datetime
+
+        # ── NHẬP THÔNG TIN ──
+        # V42.6c: CSS tùy chỉnh cho input TO + ĐẸP
+        st.markdown("""
+        <style>
+            /* Làm to các input trong Tu Vi */
+            [data-testid="stNumberInput"] input,
+            [data-testid="stDateInput"] input {
+                font-size: 1.2rem !important;
+                padding: 12px 16px !important;
+                font-weight: 700 !important;
+            }
+            [data-testid="stSelectbox"] > div > div {
+                font-size: 1.1rem !important;
+                padding: 8px 12px !important;
+            }
+            /* Card wrapper cho input */
+            .tv-input-card {
+                background: linear-gradient(145deg, #1e1b4b, #312e81);
+                padding: 20px 24px;
+                border-radius: 16px;
+                border: 1px solid rgba(167, 139, 250, 0.3);
+                box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+                margin-bottom: 16px;
+            }
+            .tv-input-card h3 {
+                color: #c4b5fd;
+                margin: 0 0 16px 0;
+                font-size: 1.3rem;
+            }
+            .tv-input-label {
+                color: #a78bfa;
+                font-size: 0.95rem;
+                font-weight: 600;
+                margin-bottom: 6px;
+            }
+            .tv-lunar-result {
+                background: linear-gradient(135deg, #312e81, #4c1d95);
+                padding: 20px;
+                border-radius: 14px;
+                text-align: center;
+                border: 2px solid #7c3aed;
+                box-shadow: 0 4px 24px rgba(124, 58, 237, 0.25);
+                margin-top: 8px;
+            }
+            .tv-lunar-result .date {
+                color: #fbbf24;
+                font-weight: 900;
+                font-size: 1.4rem;
+            }
+            .tv-lunar-result .year {
+                color: #c4b5fd;
+                font-size: 1.1rem;
+                margin-top: 6px;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class='tv-input-card'>
+            <h3>👤 NHẬP THÔNG TIN NGÀY SINH</h3>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # ── Chọn cách nhập + Giới tính ──
+        col_mode, col_gt = st.columns([3, 1])
+        with col_mode:
+            tv_input_mode = st.radio(
+                "📅 Cách nhập ngày sinh:",
+                ["🌞 Dương lịch (tự đổi sang Âm)", "🌙 Âm lịch (nhập trực tiếp)"],
+                key="tv_input_mode", horizontal=True
+            )
+        with col_gt:
+            tv_gt = st.radio("⚧ Giới tính:", ["Nam","Nữ"], key="tv_gt", horizontal=True)
+
+        if tv_input_mode.startswith("🌞"):
+            # ═══ NHẬP DƯƠNG LỊCH → TỰ CONVERT SANG ÂM ═══
+            c_dl1, c_dl2 = st.columns(2)
+            with c_dl1:
+                st.markdown("<div class='tv-input-label'>📆 Ngày sinh dương lịch</div>", unsafe_allow_html=True)
+                tv_ngay_dl = st.date_input("Ngày sinh dương lịch:", value=datetime.date(1990, 1, 15), key="tv_ngay_dl", label_visibility="collapsed")
+            with c_dl2:
+                st.markdown("<div class='tv-input-label'>🕐 Giờ sinh (12 chi)</div>", unsafe_allow_html=True)
+                gio_labels = [f"{CHI[i]} ({i*2}h-{i*2+2}h)" for i in range(12)]
+                tv_gio = st.selectbox("Giờ sinh:", range(12), format_func=lambda i: gio_labels[i], key="tv_gio_dl", label_visibility="collapsed")
+            
+            # Convert dương → âm + hiển thị đẹp
+            try:
+                d_al, m_al, y_al, is_leap = solar2lunar(tv_ngay_dl.day, tv_ngay_dl.month, tv_ngay_dl.year)
+                _leap_text = " (Nhuận)" if is_leap else ""
+                # V42.8 FIX: Dùng năm ÂM LỊCH (y_al) để tính Can Chi, không dùng năm DL
+                # Ví dụ: 15/01/1990 DL = 19/12/Kỷ Tỵ (1989), KHÔNG PHẢI Canh Ngọ (1990)
+                can_nam_idx = (y_al - 4) % 10
+                chi_nam_idx = (y_al - 4) % 12
+                _gio_chi = CHI[tv_gio]
+                
+                st.markdown(f"""
+                <div class='tv-lunar-result'>
+                    <div style='color:#94a3b8;font-size:0.85rem;margin-bottom:6px;'>🔄 Kết quả chuyển đổi Âm lịch</div>
+                    <div class='date'>📆 Ngày {d_al} Tháng {m_al} Năm {y_al}{_leap_text}</div>
+                    <div class='year'>🐉 Năm {CAN[can_nam_idx]} {CHI[chi_nam_idx]} — Giờ {_gio_chi}</div>
+                    <div style='color:#6ee7b7;font-size:0.9rem;margin-top:8px;'>
+                        ✅ Dương lịch: {tv_ngay_dl.strftime('%d/%m/%Y')} → Âm lịch: {d_al}/{m_al}/{y_al}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"⚠️ Lỗi chuyển đổi âm lịch: {e}")
+                d_al, m_al, y_al = 15, 1, 1990
+            
+            # V42.8 FIX: Dùng năm ÂM LỊCH cho Tử Vi (quan trọng: ảnh hưởng toàn bộ lá số)
+            tv_nam = y_al
+            tv_thang = m_al
+            tv_ngay = d_al
+        else:
+            # ═══ NHẬP ÂM LỊCH TRỰC TIẾP ═══
+            c_al1, c_al2, c_al3, c_al4 = st.columns(4)
+            with c_al1:
+                st.markdown("<div class='tv-input-label'>📅 Năm sinh (DL)</div>", unsafe_allow_html=True)
+                tv_nam = st.number_input("Năm sinh:", 1920, 2026, 1990, key="tv_nam", label_visibility="collapsed")
+            with c_al2:
+                st.markdown("<div class='tv-input-label'>🌙 Tháng ÂL</div>", unsafe_allow_html=True)
+                tv_thang = st.number_input("Tháng ÂL:", 1, 12, 1, key="tv_thang", label_visibility="collapsed")
+            with c_al3:
+                st.markdown("<div class='tv-input-label'>🌙 Ngày ÂL</div>", unsafe_allow_html=True)
+                tv_ngay = st.number_input("Ngày ÂL:", 1, 30, 15, key="tv_ngay", label_visibility="collapsed")
+            with c_al4:
+                st.markdown("<div class='tv-input-label'>🕐 Giờ sinh</div>", unsafe_allow_html=True)
+                gio_labels = [f"{CHI[i]} ({i*2}h-{i*2+2}h)" for i in range(12)]
+                tv_gio = st.selectbox("Giờ sinh:", range(12), format_func=lambda i: gio_labels[i], key="tv_gio", label_visibility="collapsed")
+
+        st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+        if st.button("🔯 LẬP LÁ SỐ TỬ VI", type="primary", key="btn_lap_tu_vi", use_container_width=True):
+            gt = 'nam' if tv_gt == 'Nam' else 'nu'
+            la_so = lap_la_so(tv_nam, tv_thang, tv_ngay, tv_gio, gt)
+            st.session_state['tv_la_so'] = la_so
+
+        # ── HIỂN THỊ LÁ SỐ ──
+        if st.session_state.get('tv_la_so'):
+            ls = st.session_state['tv_la_so']
+
+            # Header
+            st.markdown(f"""
+            <div style='background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);padding:25px;border-radius:18px;
+                border:2px solid #a78bfa;text-align:center;margin:15px 0;'>
+                <div style='color:#fbbf24;font-size:2rem;font-weight:900;'>{ls['can_nam']} {ls['chi_nam']} ({ls['nam_sinh']})</div>
+                <div style='color:#c4b5fd;font-size:1.1rem;margin:8px 0;'>Ngày {ls['ngay_am']} Tháng {ls['thang_am']} ÂL — Giờ {ls['gio']} — {ls['gioi_tinh'].upper()}</div>
+                <div style='color:#fbbf24;font-size:1rem;'>🏛️ Nạp Âm: {ls['nap_am']} | 📍 Mệnh: {ls['menh_cung']['chi']} | 🎭 Thân: {ls['than_cung']['chi']} | 🔢 {ls['cuc_ten']}</div>
+                <div style='color:#86efac;font-size:0.9rem;margin-top:8px;'>Tứ Hóa: Lộc={ls['tu_hoa']['Hóa Lộc']} | Quyền={ls['tu_hoa']['Hóa Quyền']} | Khoa={ls['tu_hoa']['Hóa Khoa']} | Kỵ={ls['tu_hoa']['Hóa Kỵ']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # 12 Cung Grid (4x3)
+            st.markdown("### 🏛️ 12 Cung")
+            for row in range(4):
+                cols = st.columns(3)
+                for ci in range(3):
+                    idx = row * 3 + ci
+                    if idx < 12:
+                        cung_name = CUNG_12[idx]
+                        data = ls['cung_map'][cung_name]
+                        stars = ", ".join(data['chinh_tinh']) if data['chinh_tinh'] else "—"
+                        phu = ", ".join(data['phu_tinh']) if data['phu_tinh'] else ""
+                        is_menh = data['chi'] == ls['menh_cung']['chi'] and cung_name == 'Mệnh'
+                        is_than = data['chi'] == ls['than_cung']['chi']
+                        border_c = '#fbbf24' if is_menh else ('#a78bfa' if is_than else '#334155')
+                        with cols[ci]:
+                            st.markdown(f"""
+                            <div style='background:linear-gradient(135deg,#1a1a2e,#16213e);padding:14px;border-radius:12px;
+                                border:2px solid {border_c};margin:4px 0;min-height:120px;'>
+                                <div style='color:#fbbf24;font-weight:800;font-size:1rem;'>{cung_name} ({data['chi']})</div>
+                                <div style='color:#e2e8f0;font-size:0.9rem;margin-top:5px;'>⭐ {stars}</div>
+                                {f"<div style='color:#86efac;font-size:0.8rem;margin-top:3px;'>🔹 {phu}</div>" if phu else ''}
+                            </div>
+                            """, unsafe_allow_html=True)
+
+            # Đại Hạn
+            st.markdown("### 📊 Đại Hạn (10 năm)")
+            dh_cols = st.columns(4)
+            for i, dh in enumerate(ls['dai_han'][:8]):
+                tuoi_now = ls['luu_nien']['tuoi']
+                is_current = dh['tu'] <= tuoi_now <= dh['den']
+                bg = '#064e3b' if is_current else '#1e293b'
+                with dh_cols[i % 4]:
+                    st.markdown(f"""
+                    <div style='background:{bg};padding:10px;border-radius:10px;margin:4px 0;
+                        border:{'2px solid #22c55e' if is_current else '1px solid #334155'};text-align:center;'>
+                        <div style='color:{'#22c55e' if is_current else '#94a3b8'};font-weight:800;'>{dh['tuoi_range']}</div>
+                        <div style='color:white;font-size:0.85rem;'>{dh['cung']} ({dh['chi']})</div>
+                        {'<div style="color:#22c55e;font-size:0.75rem;">◄ HIỆN TẠI</div>' if is_current else ''}
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            # Lưu Niên
+            st.markdown(f"""
+            <div style='background:linear-gradient(135deg,#064e3b,#065f46);padding:18px;border-radius:14px;
+                border:2px solid #22c55e;margin:15px 0;text-align:center;'>
+                <div style='color:#86efac;font-size:1.2rem;font-weight:900;'>📅 LƯU NIÊN {ls['luu_nien']['nam']}</div>
+                <div style='color:white;font-size:1rem;'>Tuổi {ls['luu_nien']['tuoi']} → Cung {ls['luu_nien']['cung']} ({ls['luu_nien']['chi']})</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # ── AI LUẬN GIẢI ──
+            st.markdown("---")
+            st.markdown("""
+            <div style='background:linear-gradient(135deg,#1e1b4b,#312e81);padding:18px;border-radius:14px;
+                border-left:4px solid #818cf8;margin:15px 0;'>
+                <h3 style='color:#c7d2fe;margin:0 0 8px 0;'>🧠 AI Luận Giải Lá Số</h3>
+                <p style='color:#94a3b8;margin:0;font-size:0.85rem;'>AI phân tích vận mệnh, đại hạn, lưu niên + kết nối xem ngày</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+            tv_questions = [
+                ("🌟", "Phân tích tổng quan lá số — vận mệnh cả đời"),
+                ("💰", "Tài lộc, sự nghiệp — bao giờ phát tài?"),
+                ("💒", "Hôn nhân, tình duyên — năm nào kết hôn?"),
+                ("⚕️", "Sức khỏe, tật ách — giai đoạn nào nguy hiểm?"),
+                ("📅", f"Lưu niên {ls['luu_nien']['nam']} — năm nay vận hạn ra sao?"),
+                ("🔮", "Đại hạn hiện tại — 10 năm này thế nào?"),
+            ]
+            tv_cols = st.columns(3)
+            for i, (icon, text) in enumerate(tv_questions):
+                with tv_cols[i % 3]:
+                    if st.button(f"{icon} {text[:40]}...", key=f"tv_q_{i}", use_container_width=True, help=text):
+                        st.session_state['tv_custom_q'] = text
+
+            tv_cq = st.text_input("✍️ Hoặc nhập câu hỏi:", value=st.session_state.get('tv_custom_q', ''), key="tv_q_input", placeholder="Ví dụ: Năm 2027 tôi có nên đầu tư?")
+            if tv_cq:
+                st.session_state['tv_custom_q'] = tv_cq
+
+            if st.button("🧠 AI LUẬN GIẢI", type="primary", key="btn_tv_ai", use_container_width=True):
+                la_so_text = format_la_so_text(ls)
+                user_q = st.session_state.get('tv_custom_q', 'Phân tích tổng quan lá số')
+
+                ai_prompt = f"""Bạn là ĐẠI SƯ TỬ VI ĐẨU SỐ hàng đầu. Hãy luận giải lá số sau:
+
+{la_so_text}
+
+CÂU HỎI: {user_q}
+"""
+                # Liên kết Xem Ngày Đẹp nếu có
+                xn_r = st.session_state.get('xn_result')
+                if xn_r:
+                    xn_info = f"""
+DỮ LIỆU XEM NGÀY ĐẸP (đã phân tích trước đó):
+- Ngày: {st.session_state.get('xn_ngay_xem', '')} | Âm lịch: {st.session_state.get('xn_am_lich', '')}
+- Can Chi ngày: {st.session_state.get('xn_can_chi', '')}
+- Loại việc: {xn_r.get('loai_viec', '')}
+- Điểm: {xn_r.get('diem', 0)}/100 — {xn_r.get('verdict', '')}
+- Trực: {xn_r.get('truc', '')} | Hoàng Đạo: {xn_r.get('sao_hoang_dao', ('',''))[0]}
+- Tam Nương: {'CÓ' if xn_r.get('is_tam_nuong') else 'Không'} | Nguyệt Phá: {'CÓ' if xn_r.get('is_nguyet_pha') else 'Không'}
+
+KẾT HỢP TỬ VI + XEM NGÀY: Phân tích ngày trên có phù hợp với vận hạn Tử Vi không?
+"""
+                    ai_prompt += xn_info
+
+                ai_prompt += """
+YÊU CẦU (BẮT BUỘC):
+1. Phân tích Chính Tinh + Phụ Tinh + Tứ Hóa + Trường Sinh trong từng cung
+2. Nêu giai đoạn TỐT (năm nào, tháng nào phát tài/kết hôn) và XẤU (năm nào tật ách/tai họa)
+3. Dự báo sự kiện CỤ THỂ: năm kết hôn, phát tài, tai nạn, bệnh...
+4. GỢI Ý NGÀY TỐT kết hợp Hoàng Đạo + 12 Trực + 28 Tú + vận hạn Tử Vi
+5. CẢNH BÁO: Giai đoạn nguy hiểm + cách hóa giải + năm/tháng cần tránh
+
+Trả lời bằng tiếng Việt, chi tiết, chuyên nghiệp."""
+
+                # ====== BƯỚC 1: AI OFFLINE phân tích ======
+                with st.spinner("⚙️ Bước 1/2: AI Offline đang luận giải lá số..."):
+                    try:
+                        from free_ai_helper import FreeAIHelper
+                        _tv_api_key = st.session_state.get('api_key', '') or st.session_state.get('_resolved_api_key', '')
+                        tv_ai = FreeAIHelper(api_key=_tv_api_key)
+                        tv_offline_result = tv_ai.answer_question(
+                            ai_prompt,
+                            chart_data=st.session_state.get('chart_data', {}),
+                            topic='tu_vi'
+                        )
+                        # V13.0: AI ONLINE đã tích hợp trong answer_question
+                        # Nếu có API key, answer_question tự gọi Gemini bên trong
+                        st.session_state['tv_ai_result'] = tv_offline_result
+                    except Exception as e:
+                        st.error(f"⚠️ Lỗi AI: {e}")
+
+        if st.session_state.get('tv_ai_result'):
+            ai_text = st.session_state['tv_ai_result']
+            if isinstance(ai_text, dict):
+                ai_text = ai_text.get('answer', '') or ai_text.get('offline_answer', '') or str(ai_text)
+            st.markdown(f"""
+            <div style='background:linear-gradient(135deg,#0f172a,#1e293b);padding:25px;border-radius:16px;
+                border:1px solid #7c3aed;margin:20px 0;box-shadow:0 8px 32px rgba(124,58,237,0.15);'>
+                <div style='color:#c4b5fd;font-size:1.3rem;font-weight:900;margin-bottom:15px;'>🔯 LUẬN GIẢI TỬ VI</div>
+                <div style='color:#e2e8f0;font-size:0.95rem;line-height:1.8;white-space:pre-wrap;'>{ai_text}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    except ImportError as e:
+        st.error(f"⚠️ Chưa có module tu_vi.py: {e}")
+    except Exception as e:
+        st.error(f"⚠️ Lỗi: {e}")
+        import traceback
+        st.code(traceback.format_exc())
 
 st.markdown("---")
 st.markdown("""

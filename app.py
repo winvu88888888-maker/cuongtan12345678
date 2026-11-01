@@ -1,8 +1,8 @@
 import streamlit as st
 
 # ═══ PHIÊN BẢN — CHỈ SỬA Ở ĐÂY, TỰ ĐỘNG CẬP NHẬT TOÀN BỘ APP ═══
-APP_VERSION = "V42.9.2"
-APP_VERSION_FULL = f"{APP_VERSION} — THIÊN CƠ ĐẠI SƯ (Siêu Premium UI + Answer-First + 28 Handlers + Vạn Vật 3378+ + 12 Trường Sinh + KV/DM Chuẩn QMDG)"
+APP_VERSION = "V6886"
+APP_VERSION_FULL = f"{APP_VERSION} — THIÊN CƠ ĐẠI SƯ (Cross-Reference 📊 + Unleashed Intelligence 🧠 + Deep Forensic 🕵️‍♂️ + Internet 🌐)"
 # ═══════════════════════════════════════════════════════════════════════
 try:
     st.set_page_config(
@@ -18,6 +18,12 @@ import sys
 import os
 import traceback
 import re
+
+# Performance Optimization: Load free_ai_helper once in memory instead of reloading 18k lines every rerun
+try:
+    import free_ai_helper as _fah_mod
+except Exception:
+    pass
 
 import extra_streamlit_components as stx
 # REMOVED: st_autorefresh was causing full page rerun every 60s, wiping AI analysis data
@@ -37,6 +43,13 @@ def show_fatal_error(e):
 import random
 import textwrap
 import datetime as dt_module
+import time
+import json
+
+try:
+    import requests
+except ImportError:
+    requests = None
 
 try:
     import pytz
@@ -220,6 +233,48 @@ st.markdown(f"""
     body {{
         font-size: 1rem; 
     }}
+
+    /* === RESPONSIVE UI/UX OPTIMIZATION (DESKTOP & MOBILE) === */
+    .block-container {{
+        padding-top: 1.5rem !important;
+        padding-bottom: 2.5rem !important;
+        max-width: 1400px !important;
+    }}
+    [data-testid="stTabs"] [data-baseweb="tab-list"] {{
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+    }}
+    [data-testid="stTabs"] [data-baseweb="tab"] {{
+        border-radius: 8px 8px 0 0 !important;
+        padding: 8px 14px !important;
+        font-weight: 700 !important;
+    }}
+    table {{
+        width: 100% !important;
+    }}
+    @media (max-width: 768px) {{
+        .block-container {{
+            padding-left: 0.65rem !important;
+            padding-right: 0.65rem !important;
+            padding-top: 1rem !important;
+        }}
+        h1 {{
+            font-size: 1.45rem !important;
+        }}
+        h2 {{
+            font-size: 1.25rem !important;
+        }}
+        h3 {{
+            font-size: 1.1rem !important;
+        }}
+        [data-testid="stVerticalBlock"] > div {{
+            word-break: break-word !important;
+        }}
+        table td, table th {{
+            padding: 5px 6px !important;
+            font-size: 0.85rem !important;
+        }}
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -281,6 +336,18 @@ st.sidebar.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# ═══ V42.9.5: TOGGLE ON/OFF cho Tử Vi + Xem Ngày ═══
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🔌 Module Bổ Sung")
+_tv_on = st.sidebar.toggle("🔮 Tử Vi Đẩu Số", value=st.session_state.get('tv_module_on', False), key="tv_toggle")
+_xn_on = st.sidebar.toggle("📅 Xem Ngày Đẹp", value=st.session_state.get('xn_module_on', False), key="xn_toggle")
+st.session_state['tv_module_on'] = _tv_on
+st.session_state['xn_module_on'] = _xn_on
+if _tv_on:
+    st.sidebar.caption("✅ Tử Vi → inject vào Pipeline 7 tầng")
+if _xn_on:
+    st.sidebar.caption("✅ Xem Ngày → inject vào Pipeline 7 tầng")
+
 # Add project root and dist directory to Python path
 root_path = os.path.dirname(os.path.abspath(__file__))
 dist_path = os.path.join(root_path, 'dist')
@@ -290,13 +357,10 @@ for path in [root_path, dist_path, ai_modules_path]:
     if path not in sys.path:
         sys.path.insert(0, path)
 
-# FORCE RELOAD CUSTOM MODULES
-import importlib
+# Performance Optimization: Import custom modules once without forced disk reload on every UI click
 try:
     import mai_hoa_dich_so
-    importlib.reload(mai_hoa_dich_so)
     import luc_hao_kinh_dich
-    importlib.reload(luc_hao_kinh_dich)
 except Exception:
     pass
 
@@ -382,8 +446,15 @@ except ImportError:
     FREE_AI_AVAILABLE = False
 
 # ======================================================================
-# INITIALIZE SESSION STATE
+# INITIALIZE SESSION STATE & CACHE BUSTING
 # ======================================================================
+# V42.9.9i: FORCE CACHE BUST WHEN VERSION CHANGES
+if st.session_state.get('saved_app_version') != APP_VERSION:
+    _saved_keys = {k: st.session_state[k] for k in st.session_state if 'api_key' in k.lower() or 'cookie' in k.lower()}
+    st.session_state.clear()
+    for k, v in _saved_keys.items():
+        st.session_state[k] = v
+    st.session_state['saved_app_version'] = APP_VERSION
 if 'zoom_level' not in st.session_state:
     st.session_state.zoom_level = 100
 if 'chu_de_hien_tai' not in st.session_state:
@@ -1493,6 +1564,11 @@ with col_header3:
 st.markdown("---")
 # DEPLOYMENT VERIFICATION BANNER
 st.success(f"✅ SYSTEM ONLINE: {APP_VERSION_FULL}")
+try:
+    from lich_van_nien_thien_van import render_compact_today_banner
+    render_compact_today_banner()
+except Exception:
+    pass
 
 # ======================================================================
 # SIDEBAR - CONTROLS
@@ -1503,12 +1579,14 @@ with st.sidebar:
     # View selection
     view_option = st.radio(
         "Chọn Phương Pháp:",
-        ["🔮 Kỳ Môn Độn Giáp", "🏭 Nhà Máy AI", "🌟 40 Chuyên Gia AI", "📖 Mai Hoa 64 Quẻ", "☯️ Lục Hào Kinh Dịch", "📜 Thiết Bản Thần Toán", "📊 Vạn Vật Loại Tượng", "🌊 Đại Lục Nhâm", "⭐ Thái Ất Thần Số", "📅 Xem Ngày Đẹp", "🔯 Tử Vi Đẩu Số", "🤖 Hỏi Gemini AI"],
+        ["🔮 Kỳ Môn Độn Giáp", "🗓️ Lịch Vạn Niên & Thiên Văn", "🏭 Nhà Máy AI", "🌟 40 Chuyên Gia AI", "📖 Mai Hoa 64 Quẻ", "☯️ Lục Hào Kinh Dịch", "📜 Thiết Bản Thần Toán", "📊 Vạn Vật Loại Tượng", "🌊 Đại Lục Nhâm", "⭐ Thái Ất Thần Số", "📅 Xem Ngày Đẹp", "🔯 Tử Vi Đẩu Số", "🤖 Hỏi Gemini AI"],
         index=0
     )
     
     if view_option == "🔮 Kỳ Môn Độn Giáp":
         st.session_state.current_view = "ky_mon"
+    elif view_option == "🗓️ Lịch Vạn Niên & Thiên Văn":
+        st.session_state.current_view = "lich_van_nien"
     elif view_option == "🏭 Nhà Máy AI":
         st.session_state.current_view = "ai_factory"
     elif view_option == "🌟 40 Chuyên Gia AI":
@@ -1687,9 +1765,9 @@ class PhoenixOrchestrator:
     def render_logs(self):
         pass
 
-    def run_pipeline(self, user_question, current_topic="Chung", chart_data=None, mai_hoa_data=None, luc_hao_data=None, tb_context=""):
+    def run_pipeline(self, user_question, current_topic="Chung", chart_data=None, mai_hoa_data=None, luc_hao_data=None, tb_context="", **kwargs):
         enhanced_question = user_question + tb_context if tb_context else user_question
-        return self.gemini.answer_question(enhanced_question, chart_data=chart_data, topic=current_topic, mai_hoa_data=mai_hoa_data, luc_hao_data=luc_hao_data)
+        return self.gemini.answer_question(enhanced_question, chart_data=chart_data, topic=current_topic, mai_hoa_data=mai_hoa_data, luc_hao_data=luc_hao_data, **kwargs)
 
 # Auto-Init logic — GUARD: Only init if not already in session_state
 if 'gemini_helper' not in st.session_state:
@@ -2908,6 +2986,39 @@ if st.session_state.current_view == "ky_mon":
             with st.container():
                 st.markdown("### 🎯 KẾT LUẬN TỔNG HỢP TỪ AI (Dụng Thần)")
                 
+                # V42.9.42: TOGGLE GIEO QUẺ NGẪU NHIÊN — mỗi lần hỏi = quẻ mới
+                _col_toggle, _col_info = st.columns([1, 3])
+                with _col_toggle:
+                    _random_on = st.toggle(
+                        "🎲 Gieo Ngẫu Nhiên",
+                        value=st.session_state.get('random_hexagram_mode', False),
+                        key="random_hex_toggle",
+                        help="ON = Mỗi lần hỏi gieo quẻ Lục Hào + Mai Hoa MỚI (ngẫu nhiên). OFF = Giữ nguyên quẻ theo thời gian."
+                    )
+                    st.session_state['random_hexagram_mode'] = _random_on
+                with _col_info:
+                    if _random_on:
+                        st.markdown("""
+                        <div style='background:linear-gradient(135deg,#1e3a5f,#2d5a3d);padding:10px 16px;border-radius:12px;
+                                    border:1px solid rgba(34,197,94,0.4);margin-bottom:8px;'>
+                            <span style='color:#86efac;font-weight:800;font-size:0.9rem;'>🎲 CHẾ ĐỘ NGẪU NHIÊN: BẬT</span>
+                            <span style='color:#94a3b8;font-size:0.78rem;margin-left:8px;'>
+                                Mỗi lần ấn Phân Tích → Lục Hào & Mai Hoa sẽ được gieo LẠI hoàn toàn mới.
+                                Cùng 1 câu hỏi nhưng mỗi người hỏi sẽ nhận kết quả KHÁC NHAU.
+                            </span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        st.markdown("""
+                        <div style='background:linear-gradient(135deg,#1e293b,#334155);padding:10px 16px;border-radius:12px;
+                                    border:1px solid rgba(148,163,184,0.3);margin-bottom:8px;'>
+                            <span style='color:#94a3b8;font-weight:700;font-size:0.9rem;'>📌 CHẾ ĐỘ MẶC ĐỊNH: TẮT</span>
+                            <span style='color:#64748b;font-size:0.78rem;margin-left:8px;'>
+                                Quẻ Lục Hào & Mai Hoa giữ nguyên theo thời gian đã chọn (web mặc định).
+                            </span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                
                 # V8.2: MỘT NÚT DUY NHẤT — Kết hợp AI Offline + Online
                 unified_clicked = st.button("🔮 PHÂN TÍCH TỔNG HỢP AI", type="primary", key="ai_unified_btn", use_container_width=True)
                 
@@ -2924,11 +3035,22 @@ if st.session_state.current_view == "ky_mon":
                         # V10.2: role_label phải phản ánh đúng đối tượng, KHÔNG hardcode
                         role_label = rel_type if rel_type and rel_type != 'Bản thân' else 'Bản thân'
                         
-                        # V28.0: Fix Lỗi 1 — GỬI CÂU HỎI THỰC thay vì prompt template
-                        # Prompt template cũ chứa "Bạn là đại sư..." khiến Smart Category phân loại SAI
-                        actual_question = f"Phân tích về {selected_topic}"
-                        if role_label and role_label != 'Bản thân':
-                            actual_question += f" cho {role_label}"
+                        # V42.9.9i: Fix — XÂY CÂU HỎI CÓ NGỮ CẢNH thay vì generic
+                        # "Phân tích về Chung" → engine classify = CHUNG → DT sai
+                        # Cần tạo câu hỏi mô phỏng intent thật dựa trên topic
+                        _TOPIC_TO_QUESTION = {
+                            'Tài lộc': f'Tài chính năm nay có thuận lợi không, {role_label} có kiếm được tiền không',
+                            'Công danh': f'{role_label} có thăng tiến trong công việc không, sự nghiệp có phát triển không',
+                            'Tình cảm': f'{role_label} có tình duyên thuận lợi không, tình cảm có tốt không',
+                            'Sức khỏe': f'Sức khỏe của {role_label} có tốt không, bệnh tật có nguy hiểm không',
+                            'Kiện tụng': f'{role_label} có thắng kiện không, vụ kiện có thuận lợi không',
+                            'Xuất hành': f'{role_label} đi xa có thuận lợi không, chuyến đi có an toàn không',
+                            'Nhà cửa': f'{role_label} có mua được nhà không, nhà cửa có thuận lợi không',
+                            'Hôn nhân': f'{role_label} hôn nhân có hạnh phúc không, kết hôn có thuận lợi không',
+                            'Thai sản': f'Thai sản của {role_label} có thuận lợi không, mẹ con có khỏe mạnh không',
+                            'Mất đồ': f'{role_label} có tìm lại được đồ bị mất không, đồ ở đâu',
+                        }
+                        actual_question = _TOPIC_TO_QUESTION.get(selected_topic, f"Phân tích tổng hợp về {selected_topic} cho {role_label}, có thuận lợi không")
                         
                         # ====== BƯỚC 1: AI OFFLINE phân tích quẻ trước ======
                         with st.spinner("⚙️ Bước 1/2: AI Offline đang phân tích quẻ..."):
@@ -2937,12 +3059,57 @@ if st.session_state.current_view == "ky_mon":
                             offline_ai = FreeAIHelper(api_key=_offline_api_key)
                             
                             # Auto-compute Mai Hoa & Lục Hào
-                            mai_hoa_for_offline = st.session_state.get('mai_hoa_result')
-                            luc_hao_for_offline = st.session_state.get('luc_hao_result')
+                            # V42.9.42: Chế độ Gieo Ngẫu Nhiên
+                            _use_random = st.session_state.get('random_hexagram_mode', False)
+                            
+                            if _use_random:
+                                # ═══ CHẾ ĐỘ NGẪU NHIÊN: Gieo quẻ MỚI mỗi lần ấn ═══
+                                try:
+                                    import random as _rnd_mod
+                                    # Mai Hoa: Gieo ngẫu nhiên hoàn toàn
+                                    mai_hoa_for_offline = tinh_qua_ngau_nhien()
+                                    mai_hoa_for_offline['interpretation'] = giai_qua(mai_hoa_for_offline, selected_topic)
+                                    mai_hoa_for_offline['_random_cast'] = True
+                                    st.session_state.mai_hoa_result = mai_hoa_for_offline
+                                    
+                                    # Lục Hào: Gieo với seed ngẫu nhiên (biến đổi giờ + random offset)
+                                    _chart = st.session_state.get('chart_data', {})
+                                    _cans_rnd = ['Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý']
+                                    _chis_rnd = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tị', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi']
+                                    # Random Can/Chi Ngày → tạo quẻ hoàn toàn khác
+                                    _rnd_can = _rnd_mod.choice(_cans_rnd)
+                                    _rnd_chi = _rnd_mod.choice(_chis_rnd)
+                                    _rnd_can_t = _rnd_mod.choice(_cans_rnd)
+                                    _rnd_chi_t = _rnd_mod.choice(_chis_rnd)
+                                    # Random giờ để biến đổi quẻ
+                                    _rnd_hour = _rnd_mod.randint(0, 23)
+                                    _rnd_day = _rnd_mod.randint(1, 28)
+                                    _rnd_month = _rnd_mod.randint(1, 12)
+                                    dt_now = selected_datetime
+                                    luc_hao_for_offline = lap_qua_luc_hao(
+                                        dt_now.year, _rnd_month, _rnd_day, _rnd_hour,
+                                        topic=selected_topic,
+                                        can_ngay=_rnd_can,
+                                        chi_ngay=_rnd_chi,
+                                        can_thang=_rnd_can_t,
+                                        chi_thang=_rnd_chi_t
+                                    )
+                                    luc_hao_for_offline['_random_cast'] = True
+                                    st.session_state.luc_hao_result = luc_hao_for_offline
+                                    
+                                    st.toast("🎲 Đã gieo quẻ Lục Hào + Mai Hoa NGẪU NHIÊN!", icon="🎲")
+                                except Exception as _rnd_err:
+                                    st.warning(f"⚠️ Lỗi gieo ngẫu nhiên: {str(_rnd_err)[:80]}")
+                                    mai_hoa_for_offline = st.session_state.get('mai_hoa_result')
+                                    luc_hao_for_offline = st.session_state.get('luc_hao_result')
+                            else:
+                                # ═══ CHẾ ĐỘ MẶC ĐỊNH: Giữ nguyên quẻ theo thời gian ═══
+                                mai_hoa_for_offline = st.session_state.get('mai_hoa_result')
+                                luc_hao_for_offline = st.session_state.get('luc_hao_result')
                             
                             if not mai_hoa_for_offline:
                                 try:
-                                    dt_now = dt_module.datetime.now(vn_tz)
+                                    dt_now = selected_datetime
                                     mai_hoa_for_offline = tinh_qua_theo_thoi_gian(dt_now.year, dt_now.month, dt_now.day, dt_now.hour)
                                     mai_hoa_for_offline['interpretation'] = giai_qua(mai_hoa_for_offline, selected_topic)
                                     st.session_state.mai_hoa_result = mai_hoa_for_offline
@@ -2951,7 +3118,7 @@ if st.session_state.current_view == "ky_mon":
                             
                             if not luc_hao_for_offline:
                                 try:
-                                    dt_now = dt_module.datetime.now(vn_tz)
+                                    dt_now = selected_datetime
                                     # V28.0: Fix Lỗi 6 — Lấy Can/Chi từ chart_data thay vì params rỗng
                                     _chart = st.session_state.get('chart_data', {})
                                     can_ngay_val = _chart.get('can_ngay', 'Giáp') if _chart else 'Giáp'
@@ -2969,14 +3136,58 @@ if st.session_state.current_view == "ky_mon":
                                     st.session_state.luc_hao_result = luc_hao_for_offline
                                 except Exception:
                                     pass
+                            # V42.9.5: Tự động lập Tử Vi + Xem Ngày khi toggle ON
+                            _extra_kw = {}
+                            
+                            if st.session_state.get('tv_module_on'):
+                                try:
+                                    from tu_vi import lap_la_so
+                                    from xem_ngay_dep import solar2lunar as _s2l_auto
+                                    _dt_auto = dt_module.datetime.now()
+                                    # Lấy ngày sinh từ session nếu có, không thì dùng thời gian hiện tại
+                                    _tv_ns = st.session_state.get('tv_la_so')
+                                    if not _tv_ns:
+                                        # Tự lập lá số theo giờ gieo quẻ (Y/M/D/H hiện tại, âm lịch)
+                                        _al_auto = _s2l_auto(_dt_auto.day, _dt_auto.month, _dt_auto.year)
+                                        _tv_ns = lap_la_so(_al_auto[2], _al_auto[1], _al_auto[0], _dt_auto.hour, 'nam')
+                                        st.session_state['tv_la_so'] = _tv_ns
+                                    _extra_kw['tu_vi_data'] = _tv_ns
+                                    st.toast("🔮 Tử Vi: Đã tự động lập lá số", icon="✅")
+                                except Exception as _tv_err:
+                                    st.toast(f"⚠️ Tử Vi auto-calc lỗi: {str(_tv_err)[:50]}", icon="⚠️")
+                            
+                            if st.session_state.get('xn_module_on'):
+                                try:
+                                    from xem_ngay_dep import danh_gia_ngay as _dg_auto, solar2lunar as _s2l_auto2
+                                    _dt_auto2 = dt_module.datetime.now()
+                                    _al_auto2 = _s2l_auto2(_dt_auto2.day, _dt_auto2.month, _dt_auto2.year)
+                                    _xn_ns = st.session_state.get('xn_result')
+                                    if not _xn_ns:
+                                        # Tính can chi ngày hiện tại
+                                        _cans_auto = ['Giáp','Ất','Bính','Đinh','Mậu','Kỷ','Canh','Tân','Nhâm','Quý']
+                                        _chis_auto = ['Tý','Sửu','Dần','Mão','Thìn','Tị','Ngọ','Mùi','Thân','Dậu','Tuất','Hợi']
+                                        _a_j = (14 - _dt_auto2.month) // 12
+                                        _yy_j = _dt_auto2.year + 4800 - _a_j
+                                        _mm_j = _dt_auto2.month + 12 * _a_j - 3
+                                        _jdn_auto = _dt_auto2.day + (153 * _mm_j + 2) // 5 + 365 * _yy_j + _yy_j // 4 - _yy_j // 100 + _yy_j // 400 - 32045
+                                        _cn_auto = _cans_auto[(_jdn_auto + 9) % 10]
+                                        _chi_n_auto = _chis_auto[(_jdn_auto + 1) % 12]
+                                        _xn_ns = _dg_auto(_al_auto2[1], _al_auto2[0], _cn_auto, _chi_n_auto, 'chung',
+                                                          ngay_dl=(_dt_auto2.day, _dt_auto2.month, _dt_auto2.year))
+                                        st.session_state['xn_result'] = _xn_ns
+                                    _extra_kw['xem_ngay_data'] = _xn_ns
+                                    st.toast("📅 Xem Ngày: Đã tự động đánh giá ngày hôm nay", icon="✅")
+                                except Exception as _xn_err:
+                                    st.toast(f"⚠️ Xem Ngày auto-calc lỗi: {str(_xn_err)[:50]}", icon="⚠️")
                             
                             offline_result = offline_ai.answer_question(
                                 actual_question,
                                 chart_data=st.session_state.chart_data,
-                                topic=selected_topic,  # V28.0: PHẢI truyền topic để match đúng DT
+                                topic=selected_topic,
                                 selected_subject=rel_type,
                                 mai_hoa_data=mai_hoa_for_offline,
-                                luc_hao_data=luc_hao_for_offline
+                                luc_hao_data=luc_hao_for_offline,
+                                **_extra_kw
                             )
                         
                         # ====== V13.0: AI ONLINE đã tích hợp trong answer_question ======
@@ -3400,6 +3611,20 @@ PHÂN TÍCH LIÊN MẠCH:
             st.session_state['selected_doi_tuong'] = qa_luc_than
             
             user_question = st.text_area("💬 Đặt câu hỏi bất kỳ (tự do, không giới hạn chủ đề):", placeholder="Ví dụ: Năm nay có mua được nhà không? / Con mèo lạc tìm ở đâu? / Bao giờ tìm được việc?...", key="ai_q_input", height=80)
+            
+            # V42.9.42: Hiển thị trạng thái Gieo Ngẫu Nhiên cho nút Q&A
+            _qa_random_status = st.session_state.get('random_hexagram_mode', False)
+            if _qa_random_status:
+                st.markdown("""
+                <div style='background:linear-gradient(135deg,#1e3a5f,#2d5a3d);padding:8px 14px;border-radius:10px;
+                            border:1px solid rgba(34,197,94,0.4);margin-bottom:6px;text-align:center;'>
+                    <span style='color:#86efac;font-weight:800;font-size:0.85rem;'>🎲 GIEO NGẪU NHIÊN: BẬT</span>
+                    <span style='color:#94a3b8;font-size:0.75rem;margin-left:6px;'>
+                        Mỗi lần ấn → Quẻ Lục Hào & Mai Hoa sẽ được gieo MỚI hoàn toàn
+                    </span>
+                </div>
+                """, unsafe_allow_html=True)
+            
             if st.button("🔮 PHÂN TÍCH TỔNG HỢP AI", key="ai_ask_unified", type="primary", use_container_width=True):
                 if user_question:
                     try:
@@ -3565,12 +3790,52 @@ PHÂN TÍCH LIÊN MẠCH:
                             offline_ai = FreeAIHelper(api_key=_api_key)
                             
                             # Auto-compute Mai Hoa & Lục Hào
-                            mai_hoa_for_q = st.session_state.get('mai_hoa_result')
-                            luc_hao_for_q = st.session_state.get('luc_hao_result')
+                            # V42.9.42: Chế độ Gieo Ngẫu Nhiên (Q&A box)
+                            _use_random_q = st.session_state.get('random_hexagram_mode', False)
+                            
+                            if _use_random_q:
+                                # ═══ CHẾ ĐỘ NGẪU NHIÊN: Gieo quẻ MỚI mỗi lần hỏi ═══
+                                try:
+                                    import random as _rnd_q
+                                    # Mai Hoa: Gieo ngẫu nhiên
+                                    mai_hoa_for_q = tinh_qua_ngau_nhien()
+                                    mai_hoa_for_q['interpretation'] = giai_qua(mai_hoa_for_q, selected_topic)
+                                    mai_hoa_for_q['_random_cast'] = True
+                                    st.session_state.mai_hoa_result = mai_hoa_for_q
+                                    
+                                    # Lục Hào: Gieo với Can/Chi ngẫu nhiên
+                                    _cans_rq = ['Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý']
+                                    _chis_rq = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tị', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi']
+                                    _rq_can = _rnd_q.choice(_cans_rq)
+                                    _rq_chi = _rnd_q.choice(_chis_rq)
+                                    _rq_can_t = _rnd_q.choice(_cans_rq)
+                                    _rq_chi_t = _rnd_q.choice(_chis_rq)
+                                    _rq_hour = _rnd_q.randint(0, 23)
+                                    _rq_day = _rnd_q.randint(1, 28)
+                                    _rq_month = _rnd_q.randint(1, 12)
+                                    dt_now = selected_datetime
+                                    luc_hao_for_q = lap_qua_luc_hao(
+                                        dt_now.year, _rq_month, _rq_day, _rq_hour,
+                                        topic=selected_topic,
+                                        can_ngay=_rq_can, chi_ngay=_rq_chi,
+                                        can_thang=_rq_can_t, chi_thang=_rq_chi_t
+                                    )
+                                    luc_hao_for_q['_random_cast'] = True
+                                    st.session_state.luc_hao_result = luc_hao_for_q
+                                    
+                                    st.toast("🎲 Đã gieo quẻ Lục Hào + Mai Hoa NGẪU NHIÊN!", icon="🎲")
+                                except Exception as _rnd_q_err:
+                                    st.warning(f"⚠️ Lỗi gieo ngẫu nhiên: {str(_rnd_q_err)[:80]}")
+                                    mai_hoa_for_q = st.session_state.get('mai_hoa_result')
+                                    luc_hao_for_q = st.session_state.get('luc_hao_result')
+                            else:
+                                # ═══ CHẾ ĐỘ MẶC ĐỊNH: Giữ nguyên quẻ ═══
+                                mai_hoa_for_q = st.session_state.get('mai_hoa_result')
+                                luc_hao_for_q = st.session_state.get('luc_hao_result')
                             
                             if not mai_hoa_for_q:
                                 try:
-                                    dt_now = dt_module.datetime.now(vn_tz)
+                                    dt_now = selected_datetime
                                     mai_hoa_for_q = tinh_qua_theo_thoi_gian(dt_now.year, dt_now.month, dt_now.day, dt_now.hour)
                                     mai_hoa_for_q['interpretation'] = giai_qua(mai_hoa_for_q, selected_topic)
                                     st.session_state.mai_hoa_result = mai_hoa_for_q
@@ -3579,7 +3844,7 @@ PHÂN TÍCH LIÊN MẠCH:
                             
                             if not luc_hao_for_q:
                                 try:
-                                    dt_now = dt_module.datetime.now(vn_tz)
+                                    dt_now = selected_datetime
                                     # V28.0: Fix Lỗi 6 — Lấy Can/Chi từ chart_data thay vì params rỗng
                                     _chart_q = st.session_state.get('chart_data', {})
                                     can_ngay_val = _chart_q.get('can_ngay', 'Giáp') if _chart_q else 'Giáp'
@@ -3635,12 +3900,22 @@ elif st.session_state.current_view == "mai_hoa":
     
     st.markdown("### 🎯 Chủ đề: **{selected_topic}**")
 
-    # AUTO CAST TIME
-    dt = dt_module.datetime.now(vn_tz)
-    st.info(f"🕒 Giờ hiện tại: {dt.strftime('%H:%M - %d/%m/%Y')}. Quẻ tự động cập nhật theo thời gian thực.")
-    res = tinh_qua_theo_thoi_gian(dt.year, dt.month, dt.day, dt.hour)
-    res['interpretation'] = giai_qua(res, selected_topic)
-    st.session_state.mai_hoa_result = res
+    # V42.9.9i: Sử dụng thời gian được chọn từ sidebar
+    dt = selected_datetime
+    
+    # V42.9.42: Nếu chế độ ngẫu nhiên BẬT và đã có quẻ ngẫu nhiên → hiển thị quẻ đó
+    _mh_random_mode = st.session_state.get('random_hexagram_mode', False)
+    _mh_existing = st.session_state.get('mai_hoa_result')
+    
+    if _mh_random_mode and _mh_existing and _mh_existing.get('_random_cast'):
+        # Hiển thị quẻ ngẫu nhiên đã gieo
+        res = _mh_existing
+        st.info(f"🎲 Chế độ Ngẫu Nhiên: Đang hiển thị quẻ đã gieo ngẫu nhiên. Tắt toggle để về quẻ theo thời gian.")
+    else:
+        st.info(f"🕒 Giờ gieo quẻ: {dt.strftime('%H:%M - %d/%m/%Y')}.")
+        res = tinh_qua_theo_thoi_gian(dt.year, dt.month, dt.day, dt.hour)
+        res['interpretation'] = giai_qua(res, selected_topic)
+        st.session_state.mai_hoa_result = res
 
     if 'mai_hoa_result' in st.session_state:
         res = st.session_state.mai_hoa_result
@@ -3742,8 +4017,8 @@ elif st.session_state.current_view == "luc_hao":
 
     show_debug_ih = st.checkbox("🐛 Chế độ Kiểm tra Dữ liệu", key="debug_iching_mode")
 
-    # AUTO CAST TIME
-    dt = dt_module.datetime.now(vn_tz)
+    # V42.9.9i: Sử dụng thời gian được chọn từ sidebar
+    dt = selected_datetime
     can_ngay = params.get('can_ngay', 'Giáp') if params else "Giáp"
     chi_ngay = params.get('chi_ngay', 'Tý') if params else "Tý"
     can_gio = params.get('can_gio', '') if params else ""
@@ -3758,35 +4033,51 @@ elif st.session_state.current_view == "luc_hao":
     nhat_than = f"{chi_ngay}"
     nguyet_lenh = f"{chi_thang}"
     
-    try:
-        st.session_state.luc_hao_result = lap_qua_luc_hao(
-            dt.year, dt.month, dt.day, dt.hour,
-            topic=selected_topic,
-            can_ngay=can_ngay,
-            chi_ngay=chi_ngay,
-            can_thang=can_thang,
-            chi_thang=chi_thang
-        )
-    except Exception as e:
-        st.error(f"Lỗi lập quẻ Lục Hào: {e}")
+    # V42.9.42: Nếu chế độ ngẫu nhiên BẬT và đã có quẻ ngẫu nhiên → hiển thị quẻ đó
+    _lh_random_mode = st.session_state.get('random_hexagram_mode', False)
+    _lh_existing = st.session_state.get('luc_hao_result')
+    
+    if _lh_random_mode and _lh_existing and isinstance(_lh_existing, dict) and _lh_existing.get('_random_cast'):
+        # Hiển thị quẻ ngẫu nhiên đã gieo
+        st.info(f"🎲 Chế độ Ngẫu Nhiên: Đang hiển thị quẻ Lục Hào đã gieo ngẫu nhiên. Tắt toggle để về quẻ theo thời gian.")
+    else:
+        try:
+            st.session_state.luc_hao_result = lap_qua_luc_hao(
+                dt.year, dt.month, dt.day, dt.hour,
+                topic=selected_topic,
+                can_ngay=can_ngay,
+                chi_ngay=chi_ngay,
+                can_thang=can_thang,
+                chi_thang=chi_thang
+            )
+        except Exception as e:
+            st.error(f"Lỗi lập quẻ Lục Hào: {e}")
 
     if 'luc_hao_result' in st.session_state:
         res = st.session_state.luc_hao_result
+        
+        # V42.9.42 Fix: Read actual can/chi from the result (vital for random cast)
+        _d_can_ngay = res.get('can_ngay', can_ngay)
+        _d_chi_ngay = res.get('chi_ngay', chi_ngay)
+        _d_can_thang = res.get('can_thang', can_thang)
+        _d_chi_thang = res.get('chi_thang', chi_thang)
+        _d_nhat_than = res.get('nhat_than', f"{_d_chi_ngay}")
+        _d_nguyet_lenh = res.get('nguyet_lenh', f"{_d_chi_thang}")
         
         # ========== COMPACT HEADER (giống xinhdich.com) ==========
         st.markdown(f"""
         <div style="background: linear-gradient(135deg, rgba(30,27,75,0.9), rgba(22,33,62,0.9)); border: 2px solid #7c3aed; border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; font-size: 13px;">
             <div style="text-align:center; font-weight:900; font-size:15px; color:#a78bfa; margin-bottom:6px;">
-                📜 PHẦN MỀM LẬP QUẺ DỊCH — Phương pháp: Mai Hoa
+                📜 PHẦN MỀM LẬP QUẺ DỊCH — Phương pháp: Lục Hào
             </div>
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
                 <span>⏰ <b>Thời gian:</b> {dt.strftime('%H:%M %d/%m/%Y')}</span>
-                <span>🌙 <b>Can Chi:</b> giờ {can_gio} {chi_gio}, ngày {can_ngay} {chi_ngay}, tháng {can_thang} {chi_thang}, năm {can_nam} {chi_nam}</span>
+                <span>🌙 <b>Can Chi:</b> giờ {can_gio} {chi_gio}, ngày {_d_can_ngay} {_d_chi_ngay}, tháng {_d_can_thang} {_d_chi_thang}, năm {can_nam} {chi_nam}</span>
             </div>
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px; margin-top:4px;">
                 <span>🌿 <b>Tiết khí:</b> {tiet_khi}</span>
-                <span>☀️ <b>Nhật thần:</b> {nhat_than}</span>
-                <span>🌙 <b>Nguyệt lệnh:</b> {nguyet_lenh}</span>
+                <span>☀️ <b>Nhật thần:</b> {_d_nhat_than}</span>
+                <span>🌙 <b>Nguyệt lệnh:</b> {_d_nguyet_lenh}</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -3952,9 +4243,9 @@ elif st.session_state.current_view == "thiet_ban":
     
     st.markdown(f"### 🎯 Chủ đề: **{selected_topic}**")
     
-    # AUTO CAST TIME
-    dt = dt_module.datetime.now(vn_tz)
-    st.info(f"🕒 Giờ hiện tại: {dt.strftime('%H:%M - %d/%m/%Y')}. Kết quả tự động cập nhật theo thời gian thực.")
+    # V42.9.9i: Sử dụng thời gian được chọn từ sidebar
+    dt = selected_datetime
+    st.info(f"🕒 Giờ gieo quẻ: {dt.strftime('%H:%M - %d/%m/%Y')}.")
     now = dt
 
     import qmdg_data
@@ -4243,7 +4534,7 @@ elif st.session_state.current_view == "gemini_ai":
                         import hashlib
                         import datetime as dt_module
                         vn_tz = dt_module.timezone(dt_module.timedelta(hours=7))
-                        current_dt = dt_module.datetime.now(vn_tz) # Use the real-time auto-refresh datetime
+                        current_dt = selected_datetime # V42.9.9i: Đồng bộ giờ
                         
                         # 1. KỲ MÔN ĐỘN GIÁP
                         temp_chart_data = st.session_state.get('chart_data')
@@ -4318,13 +4609,21 @@ elif st.session_state.current_view == "gemini_ai":
                         # CALL PHOENIX MASTER (FULL PIPELINE)
                         orc = PhoenixOrchestrator(st.session_state.gemini_helper)
                         
+                        # V42.9.5: Inject Tử Vi + Xem Ngày khi toggle ON
+                        _extra_kwargs = {}
+                        if st.session_state.get('tv_module_on') and st.session_state.get('tv_la_so'):
+                            _extra_kwargs['tu_vi_data'] = st.session_state['tv_la_so']
+                        if st.session_state.get('xn_module_on') and st.session_state.get('xn_result'):
+                            _extra_kwargs['xem_ngay_data'] = st.session_state['xn_result']
+                        
                         raw_response = orc.run_pipeline(
                             user_question, 
                             current_topic=safe_topic,
                             chart_data=temp_chart_data,
                             mai_hoa_data=temp_mai_hoa,
                             luc_hao_data=temp_luc_hao,
-                            tb_context=tb_context
+                            tb_context=tb_context,
+                            **_extra_kwargs
                         )
                     
                     # PROCESS & DISPLAY
@@ -4535,6 +4834,16 @@ elif st.session_state.current_view == "thai_at":
         st.error(f"⚠️ Lỗi Thái Ất Thần Số: {e}")
 
 # ======================================================================
+# LỊCH VẠN NIÊN & ĐỔI NGÀY ÂM - DƯƠNG THIÊN VĂN VIEW
+# ======================================================================
+elif st.session_state.current_view == "lich_van_nien":
+    try:
+        from lich_van_nien_thien_van import render_lich_van_nien_view
+        render_lich_van_nien_view()
+    except Exception as e:
+        st.error(f"⚠️ Lỗi Lịch Vạn Niên & Thiên Văn: {e}")
+
+# ======================================================================
 # XEM NGÀY ĐẸP VIEW (V42.4)
 # ======================================================================
 elif st.session_state.current_view == "xem_ngay":
@@ -4557,7 +4866,13 @@ elif st.session_state.current_view == "xem_ngay":
         import datetime
 
         # ── TABS ──
-        tab_xn, tab_tt, tab_ref = st.tabs(["📅 Xem Ngày", "⚰️ Tra Trùng Tang", "📚 Bảng Tra Cứu"])
+        tab_xn, tab_lvn, tab_tt, tab_ref = st.tabs(["📅 Xem Ngày", "🗓️ Lịch Vạn Niên & Đổi Ngày Âm-Dương", "⚰️ Tra Trùng Tang", "📚 Bảng Tra Cứu"])
+        with tab_lvn:
+            try:
+                from lich_van_nien_thien_van import render_lich_van_nien_view
+                render_lich_van_nien_view()
+            except Exception as _lvn_e:
+                st.error(f"⚠️ Lỗi tải Lịch Vạn Niên: {_lvn_e}")
 
         # ════════════════ TAB 1: XEM NGÀY ════════════════
         with tab_xn:

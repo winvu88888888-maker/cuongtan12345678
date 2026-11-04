@@ -22,80 +22,177 @@ V31.0: Thêm SĐ_MASTER — SƠ ĐỒ QUAN TRỌNG NHẤT
 
 DIAGRAM_MASTER = {
     'id': 'SD_MASTER',
-    'name': 'SĐ MASTER: DỤNG THẦN → SUY VƯỢNG → VẠN VẬT LOẠI TƯỢNG',
-    'pp_goc': ['Lục Hào', 'Kỳ Môn', 'Mai Hoa', 'Thiết Bản', 'Vạn Vật'],
+    'name': 'SĐ MASTER: DỤNG THẦN → SUY VƯỢNG → VẠN VẬT LOẠI TƯỢNG (V42.9)',
+    'pp_goc': ['Lục Hào', 'Kỳ Môn', 'Mai Hoa', 'Thiết Bản', 'Đại Lục Nhâm', 'Thái Ất'],
     'keywords': [],  # Luôn hiển thị — không cần match
-    'description': 'Sơ đồ trung tâm: Xác định Dụng Thần → Đánh giá Suy/Vượng 3 tầng → Tra Vạn Vật Loại Tượng → Chi tiết trả lời',
+    'description': 'Sơ đồ trung tâm V42.9: Tất cả yếu tố TOÀN BỘ 6 phương pháp tác động lên DT',
     'template': """
-╔══════════════════════════════════════════════════════════════════════════╗
-║  📐 SĐ MASTER: DỤNG THẦN → SUY VƯỢNG → VẠN VẬT LOẠI TƯỢNG            ║
-╠══════════════════════════════════════════════════════════════════════════╣
-║                                                                        ║
-║  ① XÁC ĐỊNH DỤNG THẦN                                                 ║
-║  ┌─────────────────────────────────────────────┐                       ║
-║  │ Câu hỏi: {question_short}                  │                       ║
-║  │ Nhóm: {category_label}                      │                       ║
-║  │ ➜ DỤNG THẦN: {dung_than}                    │                       ║
-║  │   Hành DT: {hanh_dt}                        │                       ║
-║  └─────────────────────────────────────────────┘                       ║
-║       │                                                                ║
-║       ▼                                                                ║
-║  ② ĐÁNH GIÁ SUY VƯỢNG (3 Tầng)                                        ║
-║  ┌─────────────────────────────────────────────────────────────┐       ║
-║  │ Tầng 1: Lục Hào Raw Score                                  │       ║
-║  │   Nguyệt Lệnh({nguyet_lenh}) {nguyet_tac_dong} DT          │       ║
-║  │   + Nhật Thần({nhat_than}) {nhat_tac_dong} DT               │       ║
-║  │   + NT({nguyen_than}) {nt_state}                            │       ║
-║  │   − KT({ky_than}) {kt_state}                               │       ║
-║  │   ± Đặc biệt: {dac_biet}                                   │       ║
-║  │   ═══ LH Raw = {lh_raw_score:+d} → {lh_pct}%               │       ║
-║  ├─────────────────────────────────────────────────────────────┤       ║
-║  │ Tầng 2: 12 Trường Sinh                                     │       ║
-║  │   {hanh_dt} tại {chi_reference} = {ts_stage}                │       ║
-║  │   {ts_icon} Power = {ts_power}%                             │       ║
-║  │   {ts_mota}                                                 │       ║
-║  ├─────────────────────────────────────────────────────────────┤       ║
-║  │ Tầng 3: Ngũ Khí                                            │       ║
-║  │   {hanh_dt} tại Cung {cung_hanh} = {ngu_khi}               │       ║
-║  │   Power = {nk_power}%                                       │       ║
-║  └─────────────────────────────────────────────────────────────┘       ║
-║       │                                                                ║
-║       ▼                                                                ║
-║  ╔═════════════════════════════════════════╗                           ║
-║  ║ UNIFIED: {unified_pct}% — {tier_cap}   ║                           ║
-║  ║ = LH({lh_pct}%)×50% + TS({ts_power}%)×30% + NK({nk_power}%)×20%   ║
-║  ╚═════════════════════════════════════════╝                           ║
-║       │                                                                ║
-║       ▼                                                                ║
-║  ③ VẠN VẬT LOẠI TƯỢNG (Hành {hanh_dt} × {tier_cap})                   ║
-║  ┌─────────────────────────────────────────────────────────────┐       ║
-║  │ 📐 Hình dáng   : {hinh_dang}                               │       ║
-║  │ 🔧 Chất liệu   : {chat_lieu}                               │       ║
-║  │ 🎨 Màu sắc     : {mau_sac}                                 │       ║
-║  │ 🧭 Hướng       : {huong}                                   │       ║
-║  │ 📏 Kích thước  : {kich_thuoc}                               │       ║
-║  │ 🆕 Tình trạng  : {tinh_trang}                              │       ║
-║  │ 🔢 Số lượng    : {so_luong}                                 │       ║
-║  │ 💎 Chất lượng  : {chat_luong}                               │       ║
-║  │ 🧑 Con người   : {con_nguoi}                                │       ║
-║  │ 🏥 Sức khỏe    : {suc_khoe}                                │       ║
-║  ├─────────────────────────────────────────────────────────────┤       ║
-║  │ 🔮 Đồ vật cụ thể: {do_vat}                                 │       ║
-║  │ 🏠 Nhà cửa      : {nha_cua}                                │       ║
-║  │ 🧑 Người liên quan: {nguoi_lien_quan}                      │       ║
-║  │ 🏥 Bệnh tật     : {benh_tat}                               │       ║
-║  └─────────────────────────────────────────────────────────────┘       ║
-║                                                                        ║
-║  CÔNG THỨC: Unified% = LH×50% + TS×30% + NK×20%                       ║
-║  → Unified ≥70% = VƯỢNG (CÁT) | 50-69% = TRUNG BÌNH | <50% = SUY     ║
-╚══════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  📐 SĐ MASTER V42.9: DỤNG THẦN → TẤT CẢ YẾU TỐ → VẠN VẬT LOẠI TƯỢNG    ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  ① XÁC ĐỊNH DỤNG THẦN                                                     ║
+║  ┌───────────────────────────────────────────────────┐                     ║
+║  │ Câu hỏi: {question_short}                        │                     ║
+║  │ Nhóm: {category_label}                            │                     ║
+║  │ ➜ DỤNG THẦN: {dung_than}                          │                     ║
+║  │   Hành DT: {hanh_dt}                              │                     ║
+║  └───────────────────────────────────────────────────┘                     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ② LỤC HÀO — 16 YẾU TỐ TÁC ĐỘNG                                          ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ ⊕ Nguyệt Lệnh({nguyet_lenh}) {nguyet_tac_dong} DT              │     ║
+║  │ ⊕ Nhật Thần({nhat_than}) {nhat_tac_dong} DT                     │     ║
+║  │ ⊕ NT({nguyen_than}) {nt_state} — Nguyên Thần sinh DT            │     ║
+║  │ ⊖ KT({ky_than}) {kt_state} — Kỵ Thần khắc DT                   │     ║
+║  │ ⊕ CừuT({cuu_than}) {cuu_state} — Cừu Thần khắc KT              │     ║
+║  │ ⭕ Tuần Không: {tuan_khong}                                      │     ║
+║  │ 💥 Nguyệt Phá: {nguyet_pha}                                     │     ║
+║  │ ⚡ TSVK: {tham_sinh_vong_khac}                                   │     ║
+║  │ 🔄 Phản/Phục Ngâm: {phan_phuc_ngam}                             │     ║
+║  │ 🔄 Thế({the_state}) ↔ Ứng({ung_state})                          │     ║
+║  │                                                                   │     ║
+║  │ 🔥 BIẾN HÀO: {bien_hao}                                         │     ║
+║  │   Hào động: {dong_hao_list}                                      │     ║
+║  │   Biến quẻ: {bien_que}                                           │     ║
+║  │   Hào biến DT: {bien_hao_dt}                                    │     ║
+║  │                                                                   │     ║
+║  │ ☯ Lục Hợp/Xung: {luc_hop_xung}                                  │     ║
+║  │ △ Tam Hợp Cục: {tam_hop_cuc}                                    │     ║
+║  │ ↗ Tiến/Thoái Thần: {tien_thoai}                                 │     ║
+║  │ 👻 Phục Thần: {phuc_than_info}                                   │     ║
+║  │                                                                   │     ║
+║  │ ═══ LH Thô = {lh_raw_score:+d} → {lh_pct}%                      │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ③ KỲ MÔN ĐỘN GIÁP — 14 YẾU TỐ                                           ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ 🏛 Cung DT: Cung {cung_dt} ({cung_dt_hanh})                     │     ║
+║  │ ⭐ Sao DT: {sao_dt}                                              │     ║
+║  │ 🚪 Cửa DT: {cua_dt}                                              │     ║
+║  │ 🐉 Thần DT: {than_dt}                                            │     ║
+║  │                                                                   │     ║
+║  │ 📍 Trực Phù: {truc_phu} (Sứ Tinh — sao trực)                   │     ║
+║  │ 📍 Trực Sử: {truc_su} (Sứ Môn — cửa trực)                      │     ║
+║  │ ⭕ Không Vong KM: {khong_vong_km}                                │     ║
+║  │ 🐎 Mã Tinh: Cung {ma_tinh}                                      │     ║
+║  │ ✨ Tam Kỳ: {tam_ky}                                              │     ║
+║  │                                                                   │     ║
+║  │ 🔢 Cục: {km_cuc} | {am_duong_don}                               │     ║
+║  │ 📅 4 Trụ: {tu_tru}                                               │     ║
+║  │ 🏛 BT(Cung{cung_bt}) {bt_sv_rel} SV(Cung{cung_sv})             │     ║
+║  │ 📍 Địa Bàn DT: {dia_ban_dt}                                     │     ║
+║  │ 🔄 Phản/Phục Ngâm cung: {km_phan_phuc}                          │     ║
+║  │ 🔭 Nhìn xa-gần: {km_xa_gan}                                     │     ║
+║  │ 👁 Bốn cách nhìn: {km_4_cach_nhin}                               │     ║
+║  │ ⏳ Vận Hạn: {km_van_han}                                        │     ║
+║  │ 🔍 Xem Tổng Quát: {km_xem_tong_quat}                            │     ║
+║  │ 🎯 DT Đặc Thù KM: {km_dt_dac_thu}                               │     ║
+║  │                                                                   │     ║
+║  │ 🚪 Bát Môn Cát/Hung: {bat_mon_cat_hung}                         │     ║
+║  │ ⭐ Cửu Tinh Cát/Hung: {cuu_tinh_cat_hung}                       │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ④ MAI HOA DỊCH SỐ — 10 YẾU TỐ                                            ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ ☰ Thể Quái: {the_quai} ({the_quai_hanh}) — {the_vuong_suy}      │     ║
+║  │ ☰ Dụng Quái: {dung_quai} ({dung_quai_hanh}) — {dung_vuong_suy}  │     ║
+║  │ ☰ Hỗ Quái: {ho_quai}                                            │     ║
+║  │ ☰ Biến Quái: {bien_quai_mh}                                     │     ║
+║  │                                                                   │     ║
+║  │ ⚡ Thể {the_dung_rel} Dụng → {the_dung_y_nghia}                  │     ║
+║  │ ⚡ Hỗ → Thể: {ho_the_rel} → {ho_the_y_nghia}                    │     ║
+║  │ ⚡ Hỗ → Dụng: {ho_dung_rel} → {ho_dung_y_nghia}                 │     ║
+║  │ 🔥 Động Hào MH: hào {dong_hao_mh}                               │     ║
+║  │ 📝 Quẻ Giải: {mh_interpretation}                                 │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ⑤ ĐẠI LỤC NHÂM — 7 YẾU TỐ                                               ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ 📊 Tam Truyền:                                                   │     ║
+║  │   [Sơ: {so_truyen}] → [Trung: {trung_truyen}] → [Mạt: {mat_truyen}] │ ║
+║  │    (quá khứ)          (hiện tại)                (tương lai)      │     ║
+║  │ 🎖 Thiên Tướng: {thien_tuong}                                    │     ║
+║  │ 🔑 Tứ Khóa: {tu_khoa}                                           │     ║
+║  │ 📍 Can Chi lạc cung: {can_chi_lac_cung}                          │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ⑥ THIẾT BẢN + THÁI ẤT — 5 YẾU TỐ                                         ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ 📜 Nạp Âm: {nap_am_ten} ({nap_am_hanh})                         │     ║
+║  │ 📜 Nạp Âm giải thích: {nap_am_giai_thich}                       │     ║
+║  │ 🏛 Thái Ất Chủ↔Khách: {chu_khach}                               │     ║
+║  │ 🏛 Thái Ất Cục: {ta_cuc}                                        │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ⑥b TỬ VI ĐẨU SỐ (tham chiếu)                                             ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ ⭐ Chính Tinh tham chiếu: {tv_chinh_tinh}                        │     ║
+║  │ 🔮 Hành DT ↔ Chính Tinh: {tv_hanh_mapping}                      │     ║
+║  │ 📊 Đại Hạn/Lưu Niên: {tv_dai_han}                               │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ⑥c XEM NGÀY ĐẸP (tham chiếu)                                              ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ 📅 Ngày hiện tại: {xnd_ngay}                                     │     ║
+║  │ ☀️ Hoàng Đạo/Hắc Đạo: {xnd_hoang_hac}                           │     ║
+║  │ 📜 12 Trực: {xnd_truc}                                           │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ⑦ ĐÁNH GIÁ TỔNG HỢP (3 Tầng)                                             ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ Tầng 1: LH Điểm = {lh_pct}%                                    │     ║
+║  │ Tầng 2: 12 Trường Sinh: {hanh_dt} tại {chi_reference} = {ts_stage} │  ║
+║  │   {ts_icon} Power = {ts_power}% | {ts_mota}                     │     ║
+║  │ Tầng 3: Ngũ Khí: {hanh_dt} tại Cung {cung_hanh} = {ngu_khi}    │     ║
+║  │   Power = {nk_power}%                                            │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ╔══════════════════════════════════════════════╗                          ║
+║  ║ TỔNG HỢP: {unified_pct}% — {tier_cap}        ║                          ║
+║  ║ = LH({lh_pct}%)×50% + TS({ts_power}%)×30%   ║                          ║
+║  ║   + NK({nk_power}%)×20%                      ║                          ║
+║  ╚══════════════════════════════════════════════╝                          ║
+║       │                                                                    ║
+║       ▼                                                                    ║
+║  ⑧ VẠN VẬT LOẠI TƯỢNG (Hành {hanh_dt} × {tier_cap})                       ║
+║  ┌───────────────────────────────────────────────────────────────────┐     ║
+║  │ 📐 Hình dáng   : {hinh_dang}                                    │     ║
+║  │ 🔧 Chất liệu   : {chat_lieu}                                    │     ║
+║  │ 🎨 Màu sắc     : {mau_sac}                                      │     ║
+║  │ 🧭 Hướng       : {huong}                                        │     ║
+║  │ 📏 Kích thước  : {kich_thuoc}                                    │     ║
+║  │ 🆕 Tình trạng  : {tinh_trang}                                   │     ║
+║  │ 🔢 Số lượng    : {so_luong}                                      │     ║
+║  │ 💎 Chất lượng  : {chat_luong}                                    │     ║
+║  │ 🧑 Con người   : {con_nguoi}                                     │     ║
+║  │ 🏥 Sức khỏe    : {suc_khoe}                                     │     ║
+║  ├───────────────────────────────────────────────────────────────────┤     ║
+║  │ 🔮 Đồ vật cụ thể: {do_vat}                                      │     ║
+║  │ 🏠 Nhà cửa      : {nha_cua}                                     │     ║
+║  │ 🧑 Người liên quan: {nguoi_lien_quan}                            │     ║
+║  │ 🏥 Bệnh tật     : {benh_tat}                                    │     ║
+║  └───────────────────────────────────────────────────────────────────┘     ║
+║                                                                            ║
+║  CÔNG THỨC: Tổng Hợp% = LH×50% + TS×30% + NK×20%                           ║
+║  → Tổng Hợp ≥70% = VƯỢNG (CÁT) | 50-69% = TRUNG BÌNH | <50% = SUY         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 """,
-    'formula': 'Unified% = LH_raw_normalized×50% + TrườngSinh_power×30% + NgũKhí_power×20%',
+    'formula': 'Tổng Hợp% = LH_raw_normalized×50% + TrườngSinh_power×30% + NgũKhí_power×20%',
     'conclusion_rules': {
-        'high': (70, 100, '🟢 VƯỢNG — Sự việc THUẬN LỢI, đạt kết quả tốt'),
-        'medium': (50, 69, '🟡 TRUNG BÌNH — Cần thêm nỗ lực, kết quả tùy điều kiện'),
-        'low': (30, 49, '🟠 SUY — Khó khăn, cần cân nhắc kỹ'),
-        'very_low': (0, 29, '🔴 RẤT YẾU — Bất lợi, nên tránh hoặc chờ'),
+        'high': (70, 100, '🟢 VƯỢNG — THUẬN LỢI, có thể hành động'),
+        'medium': (50, 69, '🟡 TRUNG BÌNH — Nghiêng thuận nhưng cần chuẩn bị kỹ'),
+        'low': (30, 49, '🟠 SUY — BẤT LỢI, nên chờ hoặc đổi phương án'),
+        'very_low': (0, 29, '🔴 RẤT YẾU — KHÔNG NÊN, nên tránh lúc này'),
     },
 }
 
@@ -128,12 +225,12 @@ DIAGRAMS = {
 │                                                   │
 │  KM: BT(Cung{cung_bt}) {bt_sv_rel} SV(Cung{cung_sv}) │
 ├───────────────────────────────────────────────────┤
-│ Score = {score_detail}                            │
+│ Điểm = {score_detail}                            │
 │ = {total_score:+d} → {conclusion}                 │
 └───────────────────────────────────────────────────┘
 """,
         'formula': 'Nguyệt(±8) + Nhật(±6) + NT(±6) − KT(±8) + TK(-15) + NPhá(-12) + TSVK(+10) + BT↔SV(±8)',
-        'conclusion_rule': 'Score > 10 → CÓ | Score < -10 → KHÔNG | Giữa → LỠ CỠ',
+        'conclusion_rule': 'Điểm > 10 → CÓ | Điểm < -10 → KHÔNG | Giữa → NGHIÊNG CÓ/KHÔNG',
     },
 
     'SD2': {
@@ -237,14 +334,14 @@ DIAGRAMS = {
                      'nợ', 'lãi', 'lỗ', 'vốn', 'kinh doanh', 'buôn bán', 'cổ phiếu', 'crypto'],
         'template': """
 ┌─── SĐ6: TÀI LỘC ────────────────────────────────┐
-│  DT = Thê Tài ({hanh_dt})                        │
+│  DT = {dung_than} ({hanh_dt})                     │
 │  ThêTài: {the_tai_state}                          │
 │  HuynhĐệ: {huynh_de_state} (cướp tài)           │
 │  TửTôn: {tu_ton_state} (sinh tài)                │
 │  QuanQuỷ: {quan_quy_state} (thuế/kiện)           │
 │                                                   │
 │  KM: Cửa={cua_dt} | Sinh Môn={sinh_mon}          │
-│  Score = {score_detail}                           │
+│  Điểm = {score_detail}                           │
 ├───────────────────────────────────────────────────┤
 │ = {total_score:+d} → {conclusion}                 │
 └───────────────────────────────────────────────────┘
@@ -306,7 +403,7 @@ DIAGRAMS = {
                      'xin việc', 'nghỉ việc', 'hợp đồng', 'sự nghiệp', 'khởi nghiệp'],
         'template': """
 ┌─── SĐ9: CÔNG VIỆC ───────────────────────────────┐
-│  DT = Quan Quỷ ({hanh_dt})                       │
+│  DT = {dung_than} ({hanh_dt})                       │
 │  QuanQuỷ: {quan_quy_state}                       │
 │  PhụMẫu: {phu_mau_state} (bảo trợ)              │
 │  DT Trì Thế: {dt_tri_the}                        │
@@ -470,12 +567,12 @@ DIAGRAMS = {
 │  TA: {ta_verdict}                                 │
 │                                                   │
 │  CÁT: {cat_count}/5 | HUNG: {hung_count}/5       │
-│  Unified: {unified_pct}% — {tier_cap}             │
+│  Tổng Hợp: {unified_pct}% — {tier_cap}             │
 ├───────────────────────────────────────────────────┤
 │ KẾT LUẬN: {conclusion}                            │
 └───────────────────────────────────────────────────┘
 """,
-        'formula': '≥4CÁT=ĐẠI CÁT | ≥3CÁT=CÁT | 2/2=LỠ CỠ | ≥3HUNG=HUNG | ≥4HUNG=ĐẠI HUNG',
+        'formula': '≥4CÁT=ĐẠI CÁT | ≥3CÁT=CÁT | 2/2=NGHIÊNG THUẬN | ≥3HUNG=HUNG | ≥4HUNG=ĐẠI HUNG',
     },
 }
 
@@ -509,6 +606,72 @@ KY_THAN_NGUYEN_NHAN = {
     'Tử Tôn': 'Con cái/phúc đức/niềm vui mất',
 }
 
+# ═══════════════════════════════════════════════════════════════
+# V42.9.8: REFERENCE TABLES — KỲ MÔN / TỬ VI / XEM NGÀY
+# Tích hợp từ DKT để diagrams bao phủ 8/8 phương pháp
+# ═══════════════════════════════════════════════════════════════
+
+# --- KỲ MÔN: Bát Môn + Cửu Tinh Reference ---
+KM_BAT_MON_REF = {
+    'Khai Môn':  {'hanh': 'Kim', 'cat_hung': 'ĐẠI CÁT', 'y_nghia': 'Mở cửa, khởi đầu, khai trương, thuận cho mọi việc'},
+    'Hưu Môn':   {'hanh': 'Thủy','cat_hung': 'CÁT',     'y_nghia': 'Nghỉ ngơi, hưởng lộc, gặp quý nhân'},
+    'Sinh Môn':  {'hanh': 'Thổ', 'cat_hung': 'ĐẠI CÁT', 'y_nghia': 'Sinh sôi, phát triển, đầu tư, tài lộc'},
+    'Thương Môn': {'hanh': 'Mộc','cat_hung': 'TIỂU CÁT','y_nghia': 'Kinh doanh, buôn bán, đi xa (có cẩn thận)'},
+    'Đỗ Môn':   {'hanh': 'Mộc', 'cat_hung': 'BÌNH',     'y_nghia': 'Bế tắc, ẩn nấp, che giấu bí mật'},
+    'Cảnh Môn':  {'hanh': 'Hỏa','cat_hung': 'BÌNH',     'y_nghia': 'Phô trương, khoe khoang, kiện tụng, thi cử'},
+    'Tử Môn':   {'hanh': 'Thổ', 'cat_hung': 'ĐẠI HUNG','y_nghia': 'Chết chóc, tang tóc, tai họa nặng'},
+    'Kinh Môn':  {'hanh': 'Kim', 'cat_hung': 'HUNG',     'y_nghia': 'Kinh sợ, lo lắng, tranh chấp pháp lý'},
+}
+
+KM_CUU_TINH_REF = {
+    'Thiên Bồng': {'hanh': 'Thủy','cat_hung': 'HUNG',  'y_nghia': 'Trộm cắp, mưu mô, ẩn giấu'},
+    'Thiên Nhậm': {'hanh': 'Thổ', 'cat_hung': 'CÁT',   'y_nghia': 'Hiền lành, nhân từ, y học'},
+    'Thiên Xung': {'hanh': 'Mộc', 'cat_hung': 'CÁT',   'y_nghia': 'Dũng mãnh, xung phong, hành động'},
+    'Thiên Phụ':  {'hanh': 'Mộc', 'cat_hung': 'CÁT',   'y_nghia': 'Phù trợ, quý nhân giúp đỡ'},
+    'Thiên Anh': {'hanh': 'Hỏa', 'cat_hung': 'BÌNH',   'y_nghia': 'Văn chương, kiện tụng, phô trương'},
+    'Thiên Nhuế': {'hanh': 'Thổ','cat_hung': 'HUNG',    'y_nghia': 'Ngu muội, trì trệ, bệnh kéo dài'},
+    'Thiên Cầm': {'hanh': 'Thổ', 'cat_hung': 'CÁT',    'y_nghia': 'Trung tâm, ổn định, chủ tọa'},
+    'Thiên Trụ': {'hanh': 'Kim', 'cat_hung': 'HUNG',    'y_nghia': 'Phá hoại, phản bội, gian dối'},
+    'Thiên Tâm': {'hanh': 'Kim', 'cat_hung': 'CÁT',    'y_nghia': 'Chữa bệnh, quân sư, mưu lược'},
+}
+
+# --- TỬ VI: Chính Tinh Reference (để diagrams reference khi cần) ---
+TV_CHINH_TINH_REF = {
+    'Tử Vi':     {'hanh': 'Thổ', 'role': 'Đế tinh — vua, quyền lực tối cao'},
+    'Thiên Cơ':  {'hanh': 'Mộc', 'role': 'Mưu sĩ — trí tuệ, linh hoạt'},
+    'Thái Dương': {'hanh': 'Hỏa','role': 'Nam giới, cha, quý nhân'},
+    'Vũ Khúc':   {'hanh': 'Kim', 'role': 'Tài tinh — tiền bạc, quyết đoán'},
+    'Thiên Đồng': {'hanh': 'Thủy','role':'Phúc tinh — hưởng thụ'},
+    'Liêm Trinh': {'hanh': 'Hỏa','role': 'Đào hoa — sắc đẹp, thị phi'},
+    'Thiên Phủ': {'hanh': 'Thổ', 'role': 'Kho tàng — giàu có, ổn định'},
+    'Thái Âm':   {'hanh': 'Thủy','role': 'Nữ giới, mẹ, bí mật'},
+    'Tham Lang':  {'hanh': 'Mộc','role': 'Đào hoa — ham muốn, đa tài'},
+    'Cự Môn':    {'hanh': 'Thủy','role': 'Ám tinh — thị phi, tranh cãi'},
+    'Thiên Tướng': {'hanh':'Thủy','role':'Ấn tinh — bảo hộ'},
+    'Thiên Lương': {'hanh':'Mộc','role': 'Thọ tinh — nhân từ, trường thọ'},
+    'Thất Sát':  {'hanh': 'Kim', 'role': 'Sát tinh — quyền lực, sát khí'},
+    'Phá Quân':  {'hanh': 'Thủy','role': 'Phá hoại — đổi mới, cách mạng'},
+}
+
+# --- XEM NGÀY: Hoàng Đạo / Hắc Đạo Reference ---
+XND_HOANG_DAO_REF = {
+    'Thanh Long':  {'cat_hung': 'CÁT', 'y_nghia': 'Vui mừng, tài lộc, khai trương'},
+    'Minh Đường':  {'cat_hung': 'CÁT', 'y_nghia': 'Quý nhân, sang trọng, thuận lợi'},
+    'Kim Quỹ':    {'cat_hung': 'CÁT', 'y_nghia': 'Tài lộc, kho tàng, đám cưới'},
+    'Thiên Đức':  {'cat_hung': 'CÁT', 'y_nghia': 'Phúc đức trời, an lành'},
+    'Ngọc Đường':  {'cat_hung': 'CÁT', 'y_nghia': 'Vinh hiển, thi cử, quan lộc'},
+    'Tư Mệnh':   {'cat_hung': 'CÁT', 'y_nghia': 'Bảo hộ mệnh, an khang'},
+}
+
+XND_HAC_DAO_REF = {
+    'Thiên Hình':  {'cat_hung': 'HUNG', 'y_nghia': 'Hình phạt, kiện tụng'},
+    'Chu Tước':   {'cat_hung': 'HUNG', 'y_nghia': 'Thị phi, cãi vã'},
+    'Bạch Hổ':   {'cat_hung': 'HUNG', 'y_nghia': 'Tang tóc, tai nạn'},
+    'Thiên Lao':  {'cat_hung': 'HUNG', 'y_nghia': 'Giam giữ, trì trệ'},
+    'Huyền Vũ':  {'cat_hung': 'HUNG', 'y_nghia': 'Trộm cắp, lừa đảo'},
+    'Câu Trận':  {'cat_hung': 'HUNG', 'y_nghia': 'Tranh chấp, kiện tụng'},
+}
+
 
 # ═══════════════════════════════════════════════════════════════
 # HELPER: Match câu hỏi → Diagram ID
@@ -517,6 +680,9 @@ def match_question_to_diagram(question):
     """Match câu hỏi vào sơ đồ tương tác phù hợp nhất.
     Returns: (diagram_id, diagram_info)
     Luôn kèm SĐ_MASTER.
+    
+    V42.9: Question-type keywords (ai, tại sao, khi nào...) get 3x priority
+    vì chúng xác định LOẠI câu hỏi, không phải chủ đề.
     """
     if not question:
         return 'SD0', DIAGRAMS['SD0']
@@ -525,13 +691,27 @@ def match_question_to_diagram(question):
     best_id = 'SD0'
     best_score = 0
     
+    # V42.9: Keywords xác định LOẠI câu hỏi → ưu tiên ×3
+    _QTYPE_PRIORITY = {
+        'ai ', 'là ai', 'người nào',                         # SD13
+        'tại sao', 'vì sao', 'nguyên nhân', 'do đâu',       # SD14
+        'khi nào', 'bao giờ', 'lúc nào', 'bao lâu',         # SD5
+        'ở đâu', 'hướng nào', 'phương nào', 'chỗ nào',      # SD4
+        'thế nào', 'như thế nào', 'ra sao',                  # SD15
+        'cái nào', 'nên chọn', 'hay là',                     # SD16
+        'cái gì', 'loại gì', 'là gì',                        # SD3
+        'tuổi', 'bao nhiêu tuổi', 'mấy tuổi',               # SD2
+        'đi', 'xuất hành', 'du lịch', 'chuyến đi',           # SD12
+    }
+    
     for d_id, d_info in DIAGRAMS.items():
         if d_id == 'SD0':
             continue  # SD0 là fallback
         score = 0
         for kw in d_info.get('keywords', []):
             if kw in q:
-                score += len(kw)
+                weight = 3 if kw in _QTYPE_PRIORITY else 1
+                score += len(kw) * weight
         if score > best_score:
             best_score = score
             best_id = d_id
@@ -547,9 +727,9 @@ import re as _re
 # Từ vô nghĩa / filler / noise thường gặp trong câu hỏi
 _NOISE_WORDS = {
     # Filler / padding
-    'ạ', 'á', 'ơi', 'nhé', 'nha', 'hen', 'ha', 'hả', 'nhỉ', 'đi', 'thôi',
-    'vậy đó', 'đấy', 'nè', 'nghe', 'xem', 'giúp', 'giùm', 'dùm', 'hộ',
-    'với', 'luôn', 'rồi', 'đây', 'kìa', 'kia', 'chút', 'xíu', 'tí', 'tý',
+    'ạ', 'á', 'ơi', 'nhé', 'hen', 'ha', 'hả', 'nhỉ', 'thôi',
+    'vậy đó', 'đấy', 'nè', 'giúp', 'giùm', 'dùm', 'hộ',
+    'kìa', 'chút', 'xíu', 'tí', 'tý',
     # Lịch sự thừa (dài→ngắn)
     'cho tôi hỏi', 'cho em hỏi', 'em muốn hỏi', 'tôi muốn hỏi',
     'mình muốn hỏi', 'hỏi xíu', 'hỏi chút', 'hỏi tí', 'hỏi tý',

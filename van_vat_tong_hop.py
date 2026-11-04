@@ -633,7 +633,7 @@ NGU_HANH_VAN_VAT = {
             'Trường Sinh': ['Hòn sỏi nhỏ', 'Viên đất sét', 'Hạt cát', 'Viên gạch nhỏ', 'Nắp chén'],
             'Mộc Dục': ['Bát đĩa rửa sạch', 'Sàn nhà lau xong', 'Gạch mới rửa', 'Tường sơn lại'],
             'Suy': ['Tường loang lổ', 'Gạch vỡ', 'Bát mẻ', 'Sàn nứt', 'Đất khô cằn', 'Tượng bạc màu'],
-            'Bệnh': ['Tường nứt', 'Nền lún', 'Gạch vỡ vụn', 'Sàn trơn trượt', 'Đất ô nhiễm'],
+'Bệnh': ['Tường nứt', 'Nền lún', 'Gạch vỡ vụn', 'Sàn trơn trượt', 'Đất ô nhiễm'],
             'Tử': ['Gạch vỡ nát', 'Tường đổ', 'Bình vỡ', 'Đất chết (không trồng được)', 'Cát bỏ hoang', 'Tro tàn đất'],
             'Mộ': ['Mộ phần', 'Đất chôn kho báu', 'Hầm đất', 'Hang động', 'Đá quý trong mỏ', 'Gốm cổ chôn'],
             'Tuyệt': ['Bụi đất', 'Cát bay sa mạc', 'Đá vôite tan', 'Sỏi nghiền', 'Tro than'],
@@ -767,6 +767,14 @@ VAN_VAT_MO_RONG = {
         # 🌍 QUỐC GIA / VÙNG
         'quoc_gia': ['Phương Tây', 'Châu Âu', 'Mỹ', 'Anh', 'Đức', 'Nhật Bản (công nghệ)',
                      'Hàn Quốc (Samsung)', 'Thụy Sĩ (đồng hồ)', 'Ý (siêu xe)'],
+                     
+        # 👻 TÂM LINH / MA QUỶ (TRỜI, QUYỀN LỰC, ĐAO KIẾM, CHIẾN TRANH)
+        'tam_linh': ['Ngọc Hoàng Thượng Đế', 'Phật Tổ Như Lai', 'Thái Thượng Lão Quân', 
+                     'Mẫu Đệ Nhất Thượng Thiên', 'Tây Vương Mẫu', 'Quan Lớn Đệ Nhất', 'Quan Lớn Đệ Tứ (Khâm sai)',
+                     'Phù Đổng Thiên Vương (Thánh Gióng)', 'Quan Thánh Đế Quân (Quan Công)', 'Đức Thánh Trần',
+                     'Tôn Ngộ Không', 'Thần Tài', 'Triệu Công Minh',
+                     'Tướng quân cõi âm', 'Thần chiến tranh', 'Thần vũ khí', 'Ma binh ma tướng',
+                     'Hồn ma tử trận', 'Hồn ma chết do kim loại/xe cộ', 'Oán linh tà kiếm', 'Quỷ dạ xoa mang giáp'],
     },
     
     'Mộc': {
@@ -825,6 +833,17 @@ VAN_VAT_MO_RONG = {
         
         'quoc_gia': ['Phương Đông', 'Việt Nam (tre, lúa)', 'Trung Quốc (trà, gỗ)',
                      'Nhật Bản (tre/bonsai)', 'Indonesia (gỗ teak)', 'Brazil (nhiệt đới)'],
+                     
+        # 👻 TÂM LINH / MA QUỶ (RỪNG, NÚI, GIÓ, NHÂN TỪ, TRỒNG TRỌT)
+        'tam_linh': ['Mẫu Đệ Nhị Thượng Ngàn', 'Bà Chúa Năm Phương', 'Chúa Thác Bờ',
+                     'Ông Hoàng Bảy (Bảo Hà)', 'Ông Hoàng Đôi (Hoàng Triệu)', 'Chầu Lục', 'Chầu Bé Bắc Lệ', 
+                     'Cô Đôi Thượng Ngàn', 'Cô Năm Suối Lân', 'Cô Sáu Sơn Trang', 'Cô Bảy Kim Giao', 
+                     'Cô Tám Đồi Chè', 'Cô Mười Đồng Mỏ', 'Cô Bé Thượng Ngàn', 'Cậu Đôi Thượng Ngàn',
+                     'Quan Thế Âm Bồ Tát', 'Thần Nông', 'Then (Thần Trời Thái)', 'Mụ (Thần Mường)', 
+                     'Neak Tà (Ông Tà Khmer)', 'Mộc tinh (Yêu tinh cây)', 'Xà tinh', 'Thạch tinh',
+                     'Thần rừng', 'Thần cây đa/cây sanh', 'Tiên nữ', 'Yêu quái rừng sâu',
+                     'Phi (Ma Thái)', 'Phi hướn (Ma nhà)', 'Ma xó', 'Ma gà', 'Ma lai', 'Ma trành (hổ vồ)', 
+                     'Cô hồn vất vưởng bụi tre', 'Ma treo cổ'],
         
         # 💄 MỸ PHẨM
         'my_pham': ['Serum thiên nhiên', 'Kem dưỡng hữu cơ', 'Son môi thảo dược',
@@ -892,6 +911,16 @@ VAN_VAT_MO_RONG = {
         
         'quoc_gia': ['Phương Bắc', 'Bắc Cực', 'Scandinavia', 'Canada', 'Russia',
                      'New Zealand', 'Iceland', 'Nhật Bản (biển)', 'Maldives (đảo)'],
+                     
+        # 👻 TÂM LINH / MA QUỶ (NƯỚC, ÂM TY, TRÍ TUỆ, ĐỀN ĐÀI SÔNG NƯỚC)
+        'tam_linh': ['Mẫu Đệ Tam Thoải Phủ', 'Ông Hoàng Mười (Nghệ An)', 'Ông Hoàng Bơ (Thoải)',
+                     'Quan Lớn Đệ Tam', 'Cô Bơ (Thoải)', 'Cô Bé Thoải', 'Cậu Bơ Thoải Cung', 'Lạc Long Quân',
+                     'Long Vương (Thủy Tề)', 'Nam Hải Long Vương', 'Hà Bá', 'Thanh Xà Bạch Xà (Ông Lốt)',
+                     'Sở Giang Vương', 'Tống Đế Vương', 'Ngũ Quan Vương', 'Diêm La Thiên Tử',
+                     'Biện Thành Vương', 'Thái Sơn Vương', 'Đô Thị Vương', 'Bình Đẳng Vương', 'Chuyển Luân Vương',
+                     'Địa Tạng Vương Bồ Tát', 'Diêm Vương', 'Hắc Bạch Vô Thường', 'Đầu Trâu Mặt Ngựa', 'Mạnh Bà',
+                     'Rắn thần Naga', 'Thủy quái', 'Tinh linh nước', 'Ma da', 'Oan hồn chết đuối', 'Tiên nữ hồ/biển',
+                     'Hồn ma trôi sông', 'Ma nữ tóc dài ướt sũng', 'Vong nhi (nước ối)'],
         
         'my_pham': ['Nước hoa', 'Perfume', 'Kem dưỡng ẩm', 'Serum hyaluronic',
                     'Toner', 'Micellar water', 'Sữa rửa mặt', 'Kem chống nắng dạng gel',
@@ -958,6 +987,14 @@ VAN_VAT_MO_RONG = {
         
         'quoc_gia': ['Phương Nam', 'Úc (nắng)', 'Ấn Độ', 'Dubai', 'Bắc Phi (Sahara)',
                      'Mexico', 'Spain', 'Italy (thời trang, ẩm thực)'],
+                     
+        # 👻 TÂM LINH / MA QUỶ (LỬA, SẤM CHỚP, ÁNH SÁNG, TRỪNG PHẠT)
+        'tam_linh': ['Cửu Thiên Huyền Nữ', 'Táo Quân (Thần Bếp)', 'Hỏa Đức Tinh Quân (Hỏa Thần)',
+                     'Bất Động Minh Vương', 'Bà Chúa Hỏa', 'Bà Ngũ Hành (Ngũ Hành Nương Nương)',
+                     'Cô Chín Sòng Sơn (bói toán/phép thuật)', 'Thái Dương Tinh Quân', 'Phật A Di Đà (hào quang)', 
+                     'Chu Tước', 'Phán Quan cõi âm', 'Ác quỷ địa ngục', 'Quỷ sai', 'Quỷ nhập tràng', 
+                     'Ma trơi (will-o\'the-wisp)', 'Oan hồn chết cháy', 'Vong linh cuồng nộ', 
+                     'Linh hồn giận dữ', 'Cô hồn đói khát'],
         
         'my_pham': ['Son môi đỏ', 'Mascara', 'Eyeliner', 'Phấn highlight',
                     'Bronzer', 'Blush đỏ', 'Nail polish đỏ', 'Body glitter'],
@@ -1025,6 +1062,16 @@ VAN_VAT_MO_RONG = {
         'quoc_gia': ['Trung Quốc (đại lục)', 'Ai Cập (kim tự tháp)', 'Peru (Machu Picchu)',
                      'Ấn Độ (Taj Mahal)', 'Campuchia (Angkor Wat)', 'Rome (Colosseum)',
                      'Đồng bằng sông Cửu Long', 'Tây Nguyên'],
+                     
+        # 👻 TÂM LINH / MA QUỶ (ĐẤT ĐAI, ÂM PHẦN, BẢO VỆ, NUÔI DƯỠNG)
+        'tam_linh': ['Mẫu Liễu Hạnh (Mẫu Đệ Tứ Địa Phủ)', 'Tản Viên Sơn Thánh', 'Âu Cơ', 'Chử Đồng Tử',
+                     'Ông Hoàng Tư', 'Ông Hoàng Năm', 'Ông Hoàng Sáu', 'Ông Hoàng Tám', 'Ông Hoàng Chín',
+                     'Cô Tư Địa Phủ (Cô Tư Ỷ La)', 'Cậu Bé Đồi Ngang',
+                     'Bà Chúa Xứ', 'Bà Đen', 'Thiên Y A Na', 'Thành Hoàng Bản Cảnh',
+                     'Thổ Công', 'Thổ Địa', 'Sơn Thần (Thần Núi)', 'Quan Lớn Đệ Ngũ',
+                     'Ngũ Hổ Thần Tướng (Ông Cẩu/Hổ)', 'Phật Di Lặc', 'Bụt Mọc (Thần đá Mường)', 'Ông đầu rau',
+                     'Cương thi', 'Xác ướp', 'Ngạ quỷ (Ma đói)', 'Hồ ly tinh', 'Chó đội nón mê',
+                     'Vong hồn dưới mộ', 'Cô hồn bãi tha ma', 'Dạ xoa', 'Quỷ giữ hầm mộ', 'Hồn ma chôn giấu'],
         
         'my_pham': ['Kem nền', 'Foundation', 'Concealer', 'Phấn phủ', 'Setting powder',
                     'Mặt nạ đất sét (clay mask)', 'Scrub (tẩy da chết)', 'Bùn khoáng'],
@@ -1352,6 +1399,170 @@ def get_van_vat_chi_tiet(hanh, truong_sinh_stage):
     return result
 
 
+# ═══════════════════════════════════════════════════════════════
+# V40.9: SMART VẠN VẬT FILTER — LỌC THÔNG MINH THEO CÂU HỎI
+# AI chỉ nhận dữ liệu LIÊN QUAN, không dump toàn bộ 45 dòng
+# ═══════════════════════════════════════════════════════════════
+
+# Bản đồ: keyword trong câu hỏi → categories cần lấy
+QUESTION_CATEGORY_MAP = {
+    # === NGƯỜI (ngoại hình, tính cách, nghề) ===
+    'nguoi': {
+        'keys': ['người', 'ai', 'anh', 'chị', 'ông', 'bà', 'đối tác', 'đối phương', 'bạn gái', 'bạn trai',
+                 'vợ', 'chồng', 'con', 'cha', 'mẹ', 'sếp', 'nhân viên', 'trông như', 'ngoại hình', 'tính cách',
+                 'đẹp', 'xấu', 'cao', 'thấp', 'mập', 'gầy', 'tóc', 'mắt', 'mặt', 'da', 'giọng'],
+        'icons': ['🧑', 'Tính cách', 'Nghề', 'Tầng '],
+        'extra_icons': ['👁', '👂'],  # Giác quan hỗ trợ mô tả người
+    },
+    # === ĐỒ VẬT (vật gì, hình dáng, chất liệu) ===
+    'vat': {
+        'keys': ['vật', 'đồ', 'cầm', 'mang', 'đeo', 'hình dáng', 'chất liệu', 'màu', 'kích', 'nặng', 'nhẹ',
+                 'mất', 'tìm', 'trộm', 'ăn cắp', 'quên', 'để đâu', 'giấu', 'hàng hóa', 'sản phẩm',
+                 'mua', 'bán', 'xe', 'điện thoại', 'máy', 'dao', 'kéo', 'trang sức', 'nhẫn', 'đồng hồ'],
+        'icons': ['🔮', '🚗', '👔', '💎', '🎵', '🏭', '⚔', '⚽', '🛋', '🏡', '🎨', '🧸', '📱', '💻'],
+        'extra_icons': ['👁', '✋', '👃'],  # Nhìn, sờ, ngửi
+    },
+    # === BỆNH TẬT (sức khỏe, y tế) ===
+    'benh': {
+        'keys': ['bệnh', 'ốm', 'đau', 'khỏe', 'sức khỏe', 'thuốc', 'bác sĩ', 'viện', 'phẫu thuật',
+                 'mổ', 'triệu chứng', 'ho', 'sốt', 'nhức', 'phổi', 'gan', 'thận', 'tim', 'xương',
+                 'chết', 'sống', 'nguy', 'cấp cứu', 'chữa', 'trị'],
+        'icons': ['🏥', '💉', '🦴'],
+        'extra_icons': [],
+    },
+    # === NHÀ CỬA, ĐỊA LÝ (phong thủy, nơi ở) ===
+    'nha': {
+        'keys': ['nhà', 'đất', 'phong thủy', 'xây', 'mua nhà', 'bán nhà', 'thuê', 'căn hộ', 'phòng',
+                 'hướng', 'nơi', 'ở đâu', 'địa chỉ', 'vùng', 'miền', 'quốc gia', 'nước', 'thành phố',
+                 'chùa', 'đền', 'núi', 'sông', 'biển'],
+        'icons': ['🏠', '🗻', '🧭', '⛪', '🌍'],
+        'extra_icons': [],
+    },
+    # === NGHỀ NGHIỆP, KINH DOANH ===
+    'nghe': {
+        'keys': ['nghề', 'việc', 'công việc', 'kinh doanh', 'buôn bán', 'đầu tư', 'lương', 'tiền',
+                 'giàu', 'nghèo', 'thăng tiến', 'sa thải', 'tuyển', 'hợp đồng', 'dự án', 'startup',
+                 'bitcoin', 'crypto', 'chứng khoán', 'cổ phiếu', 'ngân hàng', 'vốn'],
+        'icons': ['📱', '💻', '🏭', '🏢'],
+        'extra_icons': ['🧑'],  # Nghề trong phần người
+    },
+    # === THỜI TIẾT, MÙA, THỜI GIAN ===
+    'thoi_tiet': {
+        'keys': ['thời tiết', 'mưa', 'nắng', 'gió', 'bão', 'tuyết', 'mùa', 'lạnh', 'nóng'],
+        'icons': ['🌤', '🧭'],
+        'extra_icons': [],
+    },
+    # === TÌNH CẢM, TÂM LÝ ===
+    'tinh_cam': {
+        'keys': ['yêu', 'tình', 'cảm xúc', 'buồn', 'vui', 'giận', 'hận', 'ghen', 'chia tay', 'ly hôn',
+                 'kết hôn', 'cưới', 'hẹn hò', 'tình duyên', 'nhớ', 'thương', 'ghét'],
+        'icons': ['🎭'],
+        'extra_icons': ['🧑'],
+    },
+    # === THỰC PHẨM, ĐỒ ĂN UỐNG ===
+    'an_uong': {
+        'keys': ['ăn', 'uống', 'thức ăn', 'đồ ăn', 'nhà hàng', 'quán', 'nấu', 'bếp', 'bia', 'rượu',
+                 'cà phê', 'trà', 'nước', 'thực phẩm', 'ngon'],
+        'icons': ['🍜', '🥤'],
+        'extra_icons': ['👅', '👃'],
+    },
+    # === ĐỘNG VẬT, CÂY CỎ ===
+    'dong_vat': {
+        'keys': ['con gì', 'thú', 'chó', 'mèo', 'ngựa', 'chim', 'cá', 'rắn', 'cây', 'hoa', 'trồng',
+                 'nuôi', 'vật nuôi', 'thú cưng', 'nông', 'ruộng', 'vườn'],
+        'icons': ['🐾', '🌾'],
+        'extra_icons': [],
+    },
+    # === TÂM LINH, THẦN THÁNH, MA QUỶ ===
+    'tam_linh': {
+        'keys': ['tâm linh', 'thần', 'thánh', 'ma', 'quỷ', 'vong', 'oan hồn', 'địa ngục', 'cõi âm',
+                 'thiên đàng', 'phật', 'chúa', 'cúng', 'bái', 'bùa', 'ngải', 'phong thủy', 'linh hồn', 'hồn'],
+        'icons': ['👻', '⛪', '🔮'],
+        'extra_icons': ['🧑'],
+    },
+}
+
+def smart_van_vat_for_question(hanh, truong_sinh_stage, question=""):
+    """V40.9: Lọc Vạn Vật thông minh theo câu hỏi.
+    
+    Thay vì dump 45 dòng → chỉ trả 15-20 dòng LIÊN QUAN.
+    - Luôn giữ: Thuộc tính cơ bản (5 dòng) + Xu hướng
+    - Lọc thêm: Categories phù hợp với câu hỏi
+    - Nếu không nhận dạng được → trả full (fallback)
+    
+    Returns: (filtered_text, matched_topics)
+    """
+    full_text = format_van_vat_for_ai(hanh, truong_sinh_stage)
+    all_lines = full_text.split('\n')
+    
+    if not question or not question.strip():
+        return full_text, ['full']
+    
+    q = question.lower().strip()
+    
+    # Tìm topics phù hợp
+    matched_topics = []
+    matched_icons = set()
+    
+    for topic, config in QUESTION_CATEGORY_MAP.items():
+        for keyword in config['keys']:
+            if keyword in q:
+                matched_topics.append(topic)
+                matched_icons.update(config['icons'])
+                matched_icons.update(config.get('extra_icons', []))
+                break  # Chỉ cần match 1 keyword per topic
+    
+    # Nếu không match gì → trả full
+    if not matched_topics:
+        return full_text, ['full']
+    
+    # V41.2: Câu hỏi WHAT/COUNT/AGE → trả FULL (cần tất cả dữ liệu)
+    q_needs_full = any(kw in q for kw in ['cái gì', 'loại gì', 'sản xuất', 'làm gì', 'nghề gì',
+                                           'bao nhiêu', 'mấy', 'số lượng', 'tuổi'])
+    if q_needs_full:
+        return full_text, matched_topics + ['full_for_detail']
+    
+    # Lọc lines
+    filtered_lines = []
+    for line in all_lines:
+        if not line.strip():
+            continue
+        
+        # LUÔN GIỮ: Header + thuộc tính cơ bản (không có icon) + Xu hướng
+        if line.startswith('==='):
+            filtered_lines.append(line)
+            continue
+        
+        has_icon = any(icon in line for icon in ['👁','👂','👃','👅','✋','🔮','🧑','🏠','🏥',
+                       '🐾','🧭','📈','🚗','👔','🍜','🥤','💎','📱','🎵','🏭','⚔','⚽',
+                       '🌤','🎭','🌍','💄','🧸','🛋','💉','⛪','🗻','🦴','🌾','🏢','🏡','🎨','💻','👻'])
+        
+        # Dòng không có icon → thuộc tính cơ bản → LUÔN GIỮ
+        if not has_icon:
+            # Trừ Tính cách/Nghề/Tầng — chỉ giữ nếu match 'nguoi'
+            if any(k in line for k in ['Tính cách', 'Nghề:', 'Tầng ']):
+                if any(k in line for k in matched_icons):
+                    filtered_lines.append(line)
+            else:
+                filtered_lines.append(line)
+            continue
+        
+        # Dòng có icon → chỉ giữ nếu icon nằm trong matched_icons
+        for icon in matched_icons:
+            if icon in line:
+                filtered_lines.append(line)
+                break
+    
+    # Đảm bảo luôn có Xu hướng
+    xu_huong = [l for l in all_lines if '📈' in l]
+    for xh in xu_huong:
+        if xh not in filtered_lines:
+            filtered_lines.append(xh)
+    
+    filtered_text = '\n'.join(filtered_lines)
+    return filtered_text, matched_topics
+
+
 def format_van_vat_for_ai(hanh, truong_sinh_stage):
     """Format vạn vật chi tiết thành text cho AI đọc và đối chiếu.
     Output ngắn gọn nhưng ĐẦY ĐỦ để AI trả lời chính xác.
@@ -1399,9 +1610,77 @@ def format_van_vat_for_ai(hanh, truong_sinh_stage):
     bt = data.get('benh_tat', {})
     lines.append(f"🏥 Bệnh: {bt.get('loai', '')} | Chi tiết: {', '.join(bt.get('cu_the', [])[:5])}")
     lines.append(f"🐾 Thú: {data.get('dong_vat', '')} | 🌿 Cây: {data.get('thuc_vat', '')}")
-    lines.append(f"🧭 Hướng: {data.get('huong', '')} | Mùa: {data.get('mua', '')} | Số: {data.get('so', [])}")
+    _so_list = data.get('so', [])
+    _so_str = ', '.join(str(s) for s in _so_list) if isinstance(_so_list, list) else str(_so_list)
+    lines.append(f"🧭 Hướng: {data.get('huong', '')} | Mùa: {data.get('mua', '')} | Giờ: {data.get('gio', '')}")
+    lines.append(f"🔢 Số lượng: {data.get('so_luong', '?')} | Con số: {_so_str}")
     lines.append(f"📈 Xu hướng: {data.get('xu_huong', '')}")
     
+    # === V40.8: XUẤT TẤT CẢ CATEGORIES TỪ MO_RONG + BO_SUNG ===
+    try:
+        expanded = VAN_VAT_MO_RONG.get(hanh, {})
+        bo_sung = VAN_VAT_BO_SUNG.get(hanh, {})
+        pt = expanded.get('phuong_tien', {})
+        pt_items = pt.get(truong_sinh_stage, pt.get('chung', [])) if isinstance(pt, dict) else pt
+        if pt_items: lines.append(f"🚗 **Phương tiện:** {', '.join(pt_items[:5])}")
+        tp = expanded.get('trang_phuc', {})
+        tp_items = tp.get(truong_sinh_stage, tp.get('chung', [])) if isinstance(tp, dict) else tp
+        if tp_items: lines.append(f"👔 **Trang phục:** {', '.join(tp_items[:5])}")
+        food = expanded.get('thuc_pham_chi_tiet', {})
+        food_items = food.get('chung', []) if isinstance(food, dict) else food
+        drink_items = food.get('do_uong', []) if isinstance(food, dict) else []
+        if food_items: lines.append(f"🍜 **Thực phẩm:** {', '.join(food_items[:6])}")
+        if drink_items: lines.append(f"🥤 **Đồ uống:** {', '.join(drink_items[:5])}")
+        ks = expanded.get('khoang_san', [])
+        if ks: lines.append(f"💎 **Khoáng sản:** {', '.join(ks[:5])}")
+        cn_tech = expanded.get('cong_nghe', {})
+        cn_items = cn_tech.get(truong_sinh_stage, cn_tech.get('chung', [])) if isinstance(cn_tech, dict) else cn_tech
+        if cn_items: lines.append(f"📱 **Công nghệ:** {', '.join(cn_items[:5])}")
+        nc = expanded.get('nhac_cu', [])
+        if nc: lines.append(f"🎵 **Nhạc cụ:** {', '.join(nc[:5])}")
+        cng = expanded.get('cong_nghiep', [])
+        if cng: lines.append(f"🏭 **Công nghiệp:** {', '.join(cng[:5])}")
+        vk = expanded.get('vu_khi', [])
+        if vk: lines.append(f"⚔️ **Vũ khí:** {', '.join(vk[:5])}")
+        tt_sp = expanded.get('the_thao', [])
+        if tt_sp: lines.append(f"⚽ **Thể thao:** {', '.join(tt_sp[:5])}")
+        tw = expanded.get('thoi_tiet', [])
+        if isinstance(tw, list) and tw: lines.append(f"🌤️ **Thời tiết:** {', '.join(tw[:4])}")
+        cx = expanded.get('cam_xuc', [])
+        if cx: lines.append(f"🎭 **Cảm xúc:** {', '.join(cx[:5])}")
+        qg = expanded.get('quoc_gia', [])
+        if qg: lines.append(f"🌍 **Quốc gia:** {', '.join(qg[:5])}")
+        mp = expanded.get('my_pham', [])
+        if isinstance(mp, dict): mp = mp.get('chung', [])
+        if mp: lines.append(f"💄 **Mỹ phẩm:** {', '.join(mp[:5])}")
+        te = expanded.get('do_tre_em', [])
+        if isinstance(te, dict): te = te.get('chung', [])
+        if te: lines.append(f"🧸 **Đồ trẻ em:** {', '.join(te[:5])}")
+        nt_f = bo_sung.get('noi_that', [])
+        if nt_f: lines.append(f"🛋️ **Nội thất:** {', '.join(nt_f[:5])}")
+        yt = bo_sung.get('y_te', [])
+        if yt: lines.append(f"💉 **Y tế:** {', '.join(yt[:5])}")
+        tg_rel = bo_sung.get('ton_giao', [])
+        if tg_rel: lines.append(f"⛪ **Tôn giáo:** {', '.join(tg_rel[:5])}")
+        tl = expanded.get('tam_linh', [])
+        if tl: lines.append(f"👻 **Tâm linh / Ma quỷ:** {', '.join(tl)}")
+        dl = bo_sung.get('dia_ly', [])
+        if dl: lines.append(f"🗻 **Địa lý:** {', '.join(dl[:5])}")
+        bp = bo_sung.get('bo_phan_co_the', [])
+        if bp: lines.append(f"🦴 **Cơ thể:** {', '.join(bp[:6])}")
+        nn = bo_sung.get('nong_nghiep', [])
+        if nn: lines.append(f"🌾 **Nông nghiệp:** {', '.join(nn[:5])}")
+        vp = bo_sung.get('van_phong', [])
+        if vp: lines.append(f"🏢 **Văn phòng:** {', '.join(vp[:5])}")
+        gd = bo_sung.get('gia_dung', [])
+        if gd: lines.append(f"🏡 **Gia dụng:** {', '.join(gd[:5])}")
+        nt_art = bo_sung.get('nghe_thuat', [])
+        if nt_art: lines.append(f"🎨 **Nghệ thuật:** {', '.join(nt_art[:5])}")
+        kts = bo_sung.get('ky_thuat_so', [])
+        if kts: lines.append(f"💻 **Kỹ thuật số:** {', '.join(kts[:5])}")
+    except Exception:
+        pass
+
     return "\n".join(lines)
 
 
@@ -1518,7 +1797,73 @@ def get_tham_tu_mo_ta(hanh, truong_sinh_stage, question=""):
         gd = bo_sung.get('gia_dung', [])
         if gd:
             lines.append(f"🏡 **Gia dụng:** {', '.join(gd[:5])}")
-    except ImportError:
+        
+        # === THÊM CÁC CATEGORY CÒN THIẾU TỪ MO_RONG ===
+        # Công nghệ
+        cn_tech = expanded.get('cong_nghe', {})
+        cn_items = cn_tech.get(truong_sinh_stage, cn_tech.get('chung', [])) if isinstance(cn_tech, dict) else cn_tech
+        if cn_items:
+            lines.append(f"📱 **Công nghệ:** {', '.join(cn_items[:5])}")
+        
+        # Nhạc cụ
+        nc = expanded.get('nhac_cu', [])
+        if nc:
+            lines.append(f"🎵 **Nhạc cụ:** {', '.join(nc[:5])}")
+        
+        # Công nghiệp
+        cng = expanded.get('cong_nghiep', [])
+        if cng:
+            lines.append(f"🏭 **Công nghiệp:** {', '.join(cng[:5])}")
+        
+        # Vũ khí (Kim)
+        vk = expanded.get('vu_khi', [])
+        if vk:
+            lines.append(f"⚔️ **Vũ khí:** {', '.join(vk[:5])}")
+        
+        # Quốc gia/Vùng
+        qg = expanded.get('quoc_gia', [])
+        if qg:
+            lines.append(f"🌍 **Quốc gia/Vùng:** {', '.join(qg[:5])}")
+        tl = expanded.get('tam_linh', [])
+        if tl:
+            lines.append(f"👻 **Tâm linh / Ma quỷ:** {', '.join(tl)}")
+        
+        # Mỹ phẩm
+        mp = expanded.get('my_pham', [])
+        if isinstance(mp, dict):
+            mp = mp.get('chung', [])
+        if mp:
+            lines.append(f"💄 **Mỹ phẩm:** {', '.join(mp[:5])}")
+        
+        # Đồ trẻ em
+        te = expanded.get('do_tre_em', [])
+        if isinstance(te, dict):
+            te = te.get('chung', [])
+        if te:
+            lines.append(f"🧸 **Đồ trẻ em:** {', '.join(te[:5])}")
+        
+        # === THÊM CÁC CATEGORY CÒN THIẾU TỪ BO_SUNG ===
+        # Nông nghiệp
+        nn = bo_sung.get('nong_nghiep', [])
+        if nn:
+            lines.append(f"🌾 **Nông nghiệp:** {', '.join(nn[:5])}")
+        
+        # Văn phòng
+        vp = bo_sung.get('van_phong', [])
+        if vp:
+            lines.append(f"🏢 **Văn phòng:** {', '.join(vp[:5])}")
+        
+        # Nghệ thuật
+        nt_art = bo_sung.get('nghe_thuat', [])
+        if nt_art:
+            lines.append(f"🎨 **Nghệ thuật:** {', '.join(nt_art[:5])}")
+        
+        # Kỹ thuật số
+        kts = bo_sung.get('ky_thuat_so', [])
+        if kts:
+            lines.append(f"💻 **Kỹ thuật số:** {', '.join(kts[:5])}")
+    except Exception as _dbg_e:
+        import traceback; traceback.print_exc()
         pass
     
     # Xu hướng

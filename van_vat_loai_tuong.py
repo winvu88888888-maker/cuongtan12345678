@@ -54,6 +54,7 @@ NGU_HANH_LOAI_TUONG = {
         ["Thực Vật", "Tre, Tùng, Liễu", "Hoàng hoa, Hướng dương", "Lúa, Ngô, Khoai", "Cúc, phong lan", "Sen, Rong, Tảo"],
         ["Đồ Ăn", "Rau xanh, đồ chua", "Đồ nướng, đồ đắng", "Ngũ cốc, đồ ngọt", "Đồ cay, gia vị", "Hải sản, đồ mặn"],
         ["Tĩnh Vật", "Gỗ, giấy, sách", "Đèn, nến, điện tử", "Gạch, đất, gốm sứ", "Kim loại, dao, kéo", "Bình nước, gương"],
+        ["Tâm Linh", "Mẫu Thượng Ngàn, Ông Bảy, Quan Âm, Cô Đôi Thượng Ngàn", "Cửu Thiên Huyền Nữ, Táo Quân, Bà Chúa Hỏa, Ma chơi", "Mẫu Liễu Hạnh, Tản Viên Sơn Thánh, Bà Đen, Thổ Công", "Ngọc Hoàng, Phật Tổ, Quan Công, Thánh Gióng", "Mẫu Thoải, Ông Hoàng Mười, Cô Bơ, Diêm Vương, Hà Bá"],
         ["Số", "3, 8", "2, 7", "5, 10", "4, 9", "1, 6"],
 
         # === XẾP HẠNG VƯỢNG SUY ===
@@ -114,6 +115,8 @@ BAT_QUAI_LOAI_TUONG = {
         ["Tình Huống HUNG", "Kiêu ngạo, cô độc, cứng nhắc", "Cãi vã, lừa gạt bằng lời, khẩu thiệt", "Kiện tụng, cháy nổ, tách ly, phản bội", "Tai nạn, giận mất khôn, phá hoại", "Tin đồn, lừa đảo, gió chiều nào che đó", "Trộm cắp, rượu chè, tai nạn nước", "Bế tắc, cô lập, chia rẽ", "Lười biếng, yếu đuối, mất phương hướng"],
         # === PHONG THỦY ===
         ["Phong Thủy", "Cửa chính hướng TN, nhà cao, mái vòm", "Ao đầm trước nhà, cửa sổ hướng Tây", "Bếp lửa, đèn sáng, phòng khách phía Nam", "Cầu thang, cửa lớn, sân rộng phía Đông", "Cây xanh trước cửa, hành lang dài", "Nhà cạnh sông, bể nước, giếng", "Tường cao, đá trang trí, hướng ĐB", "Sân rộng, đất bằng, vườn hướng TN"],
+        # === TÂM LINH / MA QUỶ ===
+        ["Tâm Linh/Ma Quỷ", "Ngọc Hoàng, Phật Tổ, Thánh Gióng, Quan Công", "Cô Chín, Tiên nữ, Vu nữ, Đồng cốt", "Cửu Thiên Huyền Nữ, Táo Quân, Bà Chúa Hỏa, Ma chơi", "Thần Sấm, Tôn Ngộ Không, Quan Lớn Đệ Tam", "Ông Hoàng Bảy, Mẫu Thượng Ngàn, Cô Đôi Thượng Ngàn", "Mẫu Thoải, Ông Mười, Cô Bơ, Diêm Vương, Ma da", "Sơn Thánh, Bà Đen, Bà Chúa Xứ, Ông Hổ, Vong nhi", "Mẫu Liễu Hạnh, Âu Cơ, Thành Hoàng, Thổ Công"],
         # === KIM LOẠI / KHOÁNG SẢN ===
         ["Kim Loại/KS", "Vàng ròng, Bạch kim, Ngọc, Kim cương", "Bạc, Đồng trắng, Pha lê, Thủy tinh", "Đồng đỏ, Sắt nóng, Than, Diêm sinh", "Sắt, Thép, Kẽm, Đồng thau", "Thiếc, Nhôm, Fiber, Gỗ quý", "Chì, Thủy ngân, Dầu mỏ, Nước khoáng", "Đá hoa cương, Thạch anh, Xi măng", "Đất sét, Gạch, Ngói, Gốm sứ"],
         # === ÂM THANH ===
@@ -219,10 +222,11 @@ def render_van_vat_view():
     """, unsafe_allow_html=True)
 
     # === TAB LAYOUT ===
-    tab1, tab2, tab3 = st.tabs([
+    tab1, tab2, tab3, tab4 = st.tabs([
         "🌳🔥🏔️⚔️💧 Ngũ Hành Loại Tượng",
         "☯️ Bát Quái Loại Tượng",
-        "📜 Kinh Dịch • Mai Hoa • Thiết Bản"
+        "📜 Kinh Dịch • Mai Hoa • Thiết Bản",
+        "🔮 Chi Tiết 12 Trường Sinh"
     ])
 
     # ─── TAB 1: NGŨ HÀNH ───
@@ -260,9 +264,9 @@ def render_van_vat_view():
             for col_idx, cell in enumerate(row):
                 if col_idx == 0:
                     # Category column
-                    html += f'<td style="padding:10px 8px;font-weight:800;color:#1e293b;border:1px solid #cbd5e1;background:#f1f5f9;white-space:nowrap;">{cell}</td>'
+                    html += f'<td style="padding:10px 8px;font-weight:800;color:#fbbf24;border:1px solid rgba(100,116,139,0.3);background:rgba(22,33,62,0.8);white-space:nowrap;">{cell}</td>'
                 else:
-                    html += f'<td style="padding:10px 8px;color:#1e293b;border:1px solid #cbd5e1;text-align:center;font-weight:600;">{cell}</td>'
+                    html += f'<td style="padding:10px 8px;color:#ecf0f1;border:1px solid rgba(100,116,139,0.3);text-align:center;font-weight:600;">{cell}</td>'
             html += "</tr>"
 
         html += "</tbody></table></div>"
@@ -274,24 +278,24 @@ def render_van_vat_view():
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("""
-            <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:15px;padding:20px;">
+            <div style="background:rgba(22,78,22,0.4);border:2px solid #22c55e;border-radius:15px;padding:20px;">
                 <h4 style="color:#16a34a;text-align:center;">✅ TƯƠNG SINH (Hỗ trợ)</h4>
-                <p style="text-align:center;font-size:1.3rem;font-weight:800;color:#1e293b;">
+                <p style="text-align:center;font-size:1.3rem;font-weight:800;color:#ecf0f1;">
                     💧→🌳→🔥→🏔️→⚔️→💧
                 </p>
-                <p style="text-align:center;color:#374151;font-weight:700;">
+                <p style="text-align:center;color:#94a3b8;font-weight:700;">
                     Thủy sinh Mộc → Mộc sinh Hỏa → Hỏa sinh Thổ → Thổ sinh Kim → Kim sinh Thủy
                 </p>
             </div>
             """, unsafe_allow_html=True)
         with col2:
             st.markdown("""
-            <div style="background:#fef2f2;border:2px solid #ef4444;border-radius:15px;padding:20px;">
+            <div style="background:rgba(78,22,22,0.4);border:2px solid #ef4444;border-radius:15px;padding:20px;">
                 <h4 style="color:#dc2626;text-align:center;">❌ TƯƠNG KHẮC (Kìm hãm)</h4>
-                <p style="text-align:center;font-size:1.3rem;font-weight:800;color:#1e293b;">
+                <p style="text-align:center;font-size:1.3rem;font-weight:800;color:#ecf0f1;">
                     💧→🔥→⚔️→🌳→🏔️→💧
                 </p>
-                <p style="text-align:center;color:#374151;font-weight:700;">
+                <p style="text-align:center;color:#94a3b8;font-weight:700;">
                     Thủy khắc Hỏa → Hỏa khắc Kim → Kim khắc Mộc → Mộc khắc Thổ → Thổ khắc Thủy
                 </p>
             </div>
@@ -320,9 +324,9 @@ def render_van_vat_view():
             html2 += f'<tr style="background:{bg_row};">'
             for col_idx, cell in enumerate(row):
                 if col_idx == 0:
-                    html2 += f'<td style="padding:8px 6px;font-weight:800;color:#1e293b;border:1px solid #cbd5e1;background:#f1f5f9;white-space:nowrap;">{cell}</td>'
+                    html2 += f'<td style="padding:8px 6px;font-weight:800;color:#fbbf24;border:1px solid rgba(100,116,139,0.3);background:rgba(22,33,62,0.8);white-space:nowrap;">{cell}</td>'
                 else:
-                    html2 += f'<td style="padding:8px 6px;color:#1e293b;border:1px solid #cbd5e1;text-align:center;font-weight:600;font-size:0.85rem;">{cell}</td>'
+                    html2 += f'<td style="padding:8px 6px;color:#ecf0f1;border:1px solid rgba(100,116,139,0.3);text-align:center;font-weight:600;font-size:0.85rem;">{cell}</td>'
             html2 += "</tr>"
 
         html2 += "</tbody></table></div>"
@@ -366,9 +370,9 @@ def render_van_vat_view():
         st.markdown(f"### {data['mai_hoa']['title']}")
         for idx, rule in enumerate(data['mai_hoa']['rules'], 1):
             st.markdown(f"""
-            <div style="background:#fffbeb;border-left:4px solid #f59e0b;padding:10px 15px;margin:8px 0;border-radius:0 8px 8px 0;">
-                <strong style="color:#92400e;">📌 Quy tắc {idx}:</strong>
-                <span style="color:#451a03;font-weight:600;"> {rule}</span>
+            <div style="background:rgba(30,27,75,0.6);border-left:4px solid #f59e0b;padding:10px 15px;margin:8px 0;border-radius:0 8px 8px 0;">
+                <strong style="color:#fbbf24;">📌 Quy tắc {idx}:</strong>
+                <span style="color:#ecf0f1;font-weight:600;"> {rule}</span>
             </div>
             """, unsafe_allow_html=True)
 
@@ -400,6 +404,196 @@ def render_van_vat_view():
             </tr>"""
         na_html += "</tbody></table></div>"
         st.markdown(na_html, unsafe_allow_html=True)
+
+    # ─── TAB 4: CHI TIẾT 12 TRƯỜNG SINH × NGŨ HÀNH ───
+    with tab4:
+        st.markdown("### 🔮 VẠN VẬT CHI TIẾT — 12 TRƯỜNG SINH × NGŨ HÀNH")
+        st.markdown("> *Chọn Hành + Trường Sinh để xem TẤT CẢ thông tin chi tiết*")
+        
+        import re
+        
+        try:
+            from van_vat_tong_hop import format_van_vat_for_ai
+            
+            col_h, col_ts = st.columns(2)
+            with col_h:
+                hanh_sel = st.selectbox("🌿 Chọn Hành:", ["Kim", "Mộc", "Thủy", "Hỏa", "Thổ"], key="vv_hanh")
+            with col_ts:
+                ts_sel = st.selectbox("🔄 Chọn Trường Sinh:", [
+                    "Trường Sinh", "Mộc Dục", "Quan Đới", "Lâm Quan", "Đế Vượng",
+                    "Suy", "Bệnh", "Tử", "Mộ", "Tuyệt", "Thai", "Dưỡng"
+                ], key="vv_ts")
+            
+            # Get data
+            result = format_van_vat_for_ai(hanh_sel, ts_sel)
+            all_lines = result.split('\n')
+            
+            hanh_colors_map = {"Kim": "#94a3b8", "Mộc": "#22c55e", "Thủy": "#3b82f6", "Hỏa": "#ef4444", "Thổ": "#eab308"}
+            hanh_color = hanh_colors_map.get(hanh_sel, "#64748b")
+            
+            # ── Classify lines into sections ──
+            sections = {
+                "📋 THUỘC TÍNH CƠ BẢN": [],
+                "👁️ NGŨ GIÁC QUAN": [],
+                "🧑 CON NGƯỜI": [],
+                "🌍 ĐỊA LÝ & TỰ NHIÊN": [],
+                "🔮 ĐỒ VẬT & VẠN VẬT": [],
+                "📱 MỞ RỘNG HIỆN ĐẠI": [],
+            }
+            section_colors = {
+                "📋 THUỘC TÍNH CƠ BẢN": "#94a3b8",
+                "👁️ NGŨ GIÁC QUAN": "#8b5cf6",
+                "🧑 CON NGƯỜI": "#ec4899",
+                "🌍 ĐỊA LÝ & TỰ NHIÊN": "#22c55e",
+                "🔮 ĐỒ VẬT & VẠN VẬT": "#a855f7",
+                "📱 MỞ RỘNG HIỆN ĐẠI": "#3b82f6",
+            }
+            
+            for line in all_lines:
+                if not line.strip() or line.startswith("==="):
+                    continue
+                # Classify
+                if any(k in line for k in ["👁", "👂", "👃", "👅", "✋"]):
+                    sections["👁️ NGŨ GIÁC QUAN"].append(line)
+                elif any(k in line for k in ["🧑", "Tính cách", "Nghề:", "Tầng "]):
+                    sections["🧑 CON NGƯỜI"].append(line)
+                elif any(k in line for k in ["🏠", "🏥", "🐾", "🧭", "📈", "🗻", "🌤", "⛪"]):
+                    sections["🌍 ĐỊA LÝ & TỰ NHIÊN"].append(line)
+                elif any(k in line for k in ["🔮", "⚔", "🎵", "🏭", "⚽", "💎", "🚗", "👔", "🛋", "💉", "🌾", "🏢", "🏡", "🎨", "🧸"]):
+                    sections["🔮 ĐỒ VẬT & VẠN VẬT"].append(line)
+                elif any(k in line for k in ["📱", "💻", "🍜", "🥤", "🎭", "🌍", "💄"]):
+                    sections["📱 MỞ RỘNG HIỆN ĐẠI"].append(line)
+                else:
+                    sections["📋 THUỘC TÍNH CƠ BẢN"].append(line)
+            
+            # ── Header ──
+            total_items = sum(len(v) for v in sections.values())
+            st.markdown(f"""
+            <div style="
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                border: 2px solid {hanh_color};
+                border-radius: 16px;
+                padding: 20px 24px;
+                margin: 16px 0 8px 0;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            ">
+                <h2 style="color:{hanh_color}; margin:0 0 6px 0; font-size:1.6rem;">
+                    🔮 {hanh_sel} × {ts_sel}
+                </h2>
+                <p style="color:#94a3b8; margin:0; font-size:0.9rem;">
+                    Tổng: <strong style="color:#fbbf24;">{total_items} mục</strong> — 
+                    📋 {len(sections['📋 THUỘC TÍNH CƠ BẢN'])} | 
+                    👁️ {len(sections['👁️ NGŨ GIÁC QUAN'])} | 
+                    🧑 {len(sections['🧑 CON NGƯỜI'])} | 
+                    🌍 {len(sections['🌍 ĐỊA LÝ & TỰ NHIÊN'])} | 
+                    🔮 {len(sections['🔮 ĐỒ VẬT & VẠN VẬT'])} | 
+                    📱 {len(sections['📱 MỞ RỘNG HIỆN ĐẠI'])}
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Icon → color mapping
+            icon_colors = {
+                "👁": "#8b5cf6", "👂": "#06b6d4", "👃": "#f59e0b", "👅": "#ef4444", "✋": "#22c55e",
+                "🔮": "#a855f7", "🧑": "#ec4899", "🏠": "#6366f1", "🏥": "#dc2626", "🐾": "#f97316",
+                "🧭": "#0ea5e9", "📈": "#10b981", "🚗": "#64748b", "👔": "#8b5cf6", "🍜": "#f59e0b",
+                "🥤": "#06b6d4", "💎": "#a855f7", "📱": "#3b82f6", "🎵": "#ec4899", "🏭": "#78716c",
+                "⚔": "#ef4444", "⚽": "#22c55e", "🌤": "#fbbf24", "🎭": "#c084fc", "🌍": "#0ea5e9",
+                "💄": "#f472b6", "🧸": "#fb923c", "🛋": "#a78bfa", "💉": "#dc2626", "⛪": "#fbbf24",
+                "🗻": "#6b7280", "🦴": "#f8fafc", "🌾": "#84cc16", "🏢": "#6366f1", "🏡": "#10b981",
+                "🎨": "#e879f9", "💻": "#38bdf8",
+            }
+            
+            # ── Render each section ──
+            for section_name, section_lines in sections.items():
+                if not section_lines:
+                    continue
+                
+                sec_color = section_colors.get(section_name, "#94a3b8")
+                
+                # Section header
+                items_html = f"""
+                <div style="
+                    background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9));
+                    border: 1px solid {sec_color}50;
+                    border-radius: 14px;
+                    padding: 14px;
+                    margin: 12px 0 6px 0;
+                ">
+                    <div style="
+                        color:{sec_color}; 
+                        font-weight:800; 
+                        font-size:1.05rem; 
+                        margin-bottom:10px;
+                        padding-bottom:6px;
+                        border-bottom: 1px solid {sec_color}30;
+                    ">{section_name} ({len(section_lines)})</div>
+                """
+                
+                for line in section_lines:
+                    line_color = "#94a3b8"
+                    for icon, color in icon_colors.items():
+                        if icon in line:
+                            line_color = color
+                            break
+                    
+                    display_line = re.sub(r'\*\*(.+?)\*\*', r'<strong style="color:#fbbf24;">\1</strong>', line)
+                    
+                    items_html += f"""
+                    <div style="
+                        background: rgba(10,10,26,0.5);
+                        border-left: 3px solid {line_color};
+                        padding: 7px 12px;
+                        margin: 3px 0;
+                        border-radius: 0 8px 8px 0;
+                        color: #e2e8f0;
+                        font-size: 0.92rem;
+                        line-height: 1.55;
+                    ">{display_line}</div>"""
+                
+                items_html += "</div>"
+                st.markdown(items_html, unsafe_allow_html=True)
+            
+            # ── Quick view: ALL 12 stages ──
+            st.markdown("---")
+            st.markdown(f"### 📊 Tổng quan {hanh_sel} — 12 Trường Sinh")
+            
+            all_stages = ["Trường Sinh", "Mộc Dục", "Quan Đới", "Lâm Quan", "Đế Vượng",
+                          "Suy", "Bệnh", "Tử", "Mộ", "Tuyệt", "Thai", "Dưỡng"]
+            stage_icons = ["🌱", "🛁", "👑", "🏛️", "⭐", "📉", "🤒", "💀", "⚰️", "❌", "🤰", "🍼"]
+            
+            # 3 rows × 4 cols
+            for row in range(3):
+                cols = st.columns(4)
+                for col_idx in range(4):
+                    i = row * 4 + col_idx
+                    if i >= len(all_stages):
+                        break
+                    stage = all_stages[i]
+                    icon = stage_icons[i]
+                    with cols[col_idx]:
+                        is_selected = (stage == ts_sel)
+                        border_w = "3px" if is_selected else "1px"
+                        stage_color = "#22c55e" if i <= 4 else "#f59e0b" if i <= 6 else "#ef4444" if i <= 9 else "#a855f7"
+                        glow = f"box-shadow: 0 0 12px {stage_color}60;" if is_selected else ""
+                        st.markdown(f"""
+                        <div style="
+                            background: rgba(15,23,42,0.8);
+                            border: {border_w} solid {stage_color};
+                            border-radius: 10px;
+                            padding: 10px 6px;
+                            margin: 3px 0;
+                            text-align: center;
+                            {glow}
+                        ">
+                            <div style="font-size:1.4rem;">{icon}</div>
+                            <div style="color:{stage_color}; font-weight:800; font-size:0.82rem;">{stage}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+        except ImportError:
+            st.error("⚠️ Không tìm thấy module van_vat_tong_hop.py")
+        except Exception as e:
+            st.error(f"⚠️ Lỗi: {e}")
 
     # Footer
     st.markdown("""

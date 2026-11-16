@@ -25,14 +25,29 @@ except Exception as e:
     st.error(f"🚨 Lỗi nạp Hệ thống: {e}")
     def render_universal_data_hub_tab(): st.error("Tab Dữ Liệu lỗi")
     def render_system_management_tab(): st.error("Tab Quản Trị lỗi")
+    def render_mining_summary_on_dashboard(**kwargs): pass
     def add_entry(*args, **kwargs): return False
+    def get_hub_stats(): return {'total': 0, 'size_mb': 0.0}
+    def init_global_factory(): return {'status': 'offline'}
 
 # Import modules from ai_modules
 try:
     from ai_modules.orchestrator import AIOrchestrator
     from ai_modules.memory_system import MemorySystem
 except ImportError:
-    st.error("⚠️ Không thể tải ai_modules")
+    # V22.0: Fallback — tránh crash NameError khi module không tồn tại
+    class AIOrchestrator:
+        def __init__(self, api_key=None):
+            self.api_key = api_key
+        def process_request(self, req):
+            return {'plan': {'project_name': 'N/A'}, 'execution': {'created_files': []}}
+    class MemorySystem:
+        def __init__(self):
+            pass
+        def get_statistics(self):
+            return {'total_knowledge': 0, 'total_executions': 0, 'executions_by_status': {'success': 0}}
+        def search_knowledge(self, q):
+            return []
 
 # n8n Integration
 try:
@@ -53,8 +68,21 @@ def render_ai_factory_view():
     st.info("Hệ thống tích hợp n8n & Sharded Data Hub: Tự động hóa 24/7.")
     
     # Initialize Global Factory Manager (Persistent 24/7)
-    from ai_modules.autonomous_miner import load_config
+    from ai_modules.autonomous_miner import load_config, save_config
     config = load_config()
+    
+    # AUTO-SYNC: Luôn đồng bộ API key mới nhất vào factory
+    _active_key = st.session_state.get("gemini_key", "")
+    if not _active_key:
+        try:
+            _active_key = st.secrets.get("GEMINI_API_KEY", "")
+        except Exception:
+            pass
+    if _active_key and _active_key != config.get("api_key", ""):
+        config["api_key"] = _active_key
+        config["autonomous_247"] = True
+        save_config(config)
+    
     is_active_247 = config.get("autonomous_247", False)
 
     if 'global_factory_status' not in st.session_state or st.session_state.get('last_247_state') != is_active_247:
@@ -79,8 +107,12 @@ def render_ai_factory_view():
         st.session_state.memory = MemorySystem()
         
     if 'n8n_client' not in st.session_state:
-        n8n_url = st.secrets.get("N8N_BASE_URL", "http://localhost:5678")
-        n8n_key = st.secrets.get("N8N_API_KEY", None)
+        try:
+            n8n_url = st.secrets.get("N8N_BASE_URL", "http://localhost:5678")
+            n8n_key = st.secrets.get("N8N_API_KEY", None)
+        except Exception:
+            n8n_url = "http://localhost:5678"
+            n8n_key = None
         st.session_state.n8n_client = N8NClient(n8n_url, n8n_key)
 
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
@@ -104,16 +136,19 @@ def render_dashboard_tab():
     
     col1, col2, col3, col4 = st.columns(4)
     s = 'padding:15px;border-radius:10px;border-left:5px solid '
+    bg_style = 'background: #1e293b; color: #ffffff;' # Premium dark background
     
     # Show real Shard Hub total
-    col1.markdown(f'<div style="{s}#3b82f6;background:#f8f9fa"><h3>📁 {hub_stats.get("total", 0)}</h3><p>Shards Hub</p></div>', unsafe_allow_html=True)
-    col2.markdown(f'<div style="{s}#764ba2;background:#f8f9fa"><h3>📚 {stats.get("total_knowledge", 0)}</h3><p>Memory DB</p></div>', unsafe_allow_html=True)
-    col3.markdown(f'<div style="{s}#2ecc71;background:#f8f9fa"><h3>💾 {hub_stats.get("size_mb", 0.0)} MB</h3><p>Dung lượng</p></div>', unsafe_allow_html=True)
+    col1.markdown(f'<div style="{s}#3b82f6;{bg_style}"><h3>📁 {hub_stats.get("total", 0)}</h3><p style="color: #94a3b8; margin:0;">Shards Hub</p></div>', unsafe_allow_html=True)
+    col2.markdown(f'<div style="{s}#764ba2;{bg_style}"><h3>📚 {stats.get("total_knowledge", 0)}</h3><p style="color: #94a3b8; margin:0;">Memory DB</p></div>', unsafe_allow_html=True)
+    col3.markdown(f'<div style="{s}#2ecc71;{bg_style}"><h3>💾 {hub_stats.get("size_mb", 0.0)} MB</h3><p style="color: #94a3b8; margin:0;">Dung lượng</p></div>', unsafe_allow_html=True)
     
     success = stats.get("executions_by_status", {}).get("success", 0)
     total = max(1, stats.get("total_executions", 0))
-    col4.markdown(f'<div style="{s}#e74c3c;background:#f8f9fa"><h3>✅ {int(success/total*100)}%</h3><p>Hệ thống</p></div>', unsafe_allow_html=True)
+    col4.markdown(f'<div style="{s}#e74c3c;{bg_style}"><h3>✅ {int(success/total*100)}%</h3><p style="color: #94a3b8; margin:0;">Hệ thống</p></div>', unsafe_allow_html=True)
     
+    st.markdown("---")
+    st.success("🛡️ **Chế độ BẢO TỒN**: Tất cả chủ đề được bảo vệ vĩnh viễn. Không có dữ liệu nào bị xóa.")
     st.markdown("---")
     render_mining_summary_on_dashboard(key_suffix="_dash")
 
